@@ -100,7 +100,11 @@ export function HomePage() {
         {trips && trips.length > 0 ? (
           <div className="space-y-4">
             {trips.map(trip => (
-              <TripCard key={trip.id} trip={trip} />
+              <TripCard 
+                key={trip.id} 
+                trip={trip} 
+                onClick={() => navigate(`/trips/${trip.id}`)} 
+              />
             ))}
           </div>
         ) : (

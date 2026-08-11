@@ -63,7 +63,7 @@ export const TripDashboardPage: React.FC = () => {
             title={mockDecision.title}
             description="Locking this in helps finalize the budget and map out the daily itinerary."
             actionLabel="Decide Now"
-            onAction={() => {}}
+            onAction={() => navigate(`/trips/${id}/decisions`)}
             type={mockDecision.type}
           />
         </section>
@@ -93,7 +93,7 @@ export const TripDashboardPage: React.FC = () => {
               </Card>
             </Link>
 
-            <Link to={`/trips/${id}/planner`} className="block group">
+            <Link to={`/trips/${id}/plan`} className="block group">
               <Card className="h-full bg-white border-slate-200 hover:border-accent-terracotta/50 hover:shadow-md transition-all p-5">
                 <div className="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                   🗺️

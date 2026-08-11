@@ -49,8 +49,15 @@ export const TripIdeaCard: React.FC<TripIdeaCardProps> = ({
       )}
       style={style}
     >
-      {/* Header Image Placeholder */}
-      <div className={cn("h-40 w-full bg-gradient-to-br", getGradient(idea.destination))} />
+      {/* Header Image */}
+      {idea.imageUrl ? (
+        <div className="h-40 w-full relative">
+          <img src={idea.imageUrl} alt={idea.destination} className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+        </div>
+      ) : (
+        <div className={cn("h-40 w-full bg-gradient-to-br", getGradient(idea.destination))} />
+      )}
 
       <div className="p-6 flex flex-col flex-grow">
         {/* Destination & Badges */}

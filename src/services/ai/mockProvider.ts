@@ -18,7 +18,7 @@ const MOCK_IDEAS: TripIdea[] = [
     travelStyle: 'Culture & Food',
     keyActivities: ['Temple Hopping', 'Culinary Tours', 'Batik Making'],
     confidence: 0.9,
-    imageUrl: 'https://images.unsplash.com/photo-1596402184320-417e7178b2cd?auto=format&fit=crop&w=800&q=80',
+    imageUrl: '/images/destinations/yogyakarta.jpg',
   },
   {
     id: 'idea_bali',
@@ -36,7 +36,7 @@ const MOCK_IDEAS: TripIdea[] = [
     travelStyle: 'Beach & Nature',
     keyActivities: ['Surfing', 'Yoga', 'Beach Clubs'],
     confidence: 0.85,
-    imageUrl: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800&q=80',
+    imageUrl: '/images/destinations/bali.jpg',
   },
   {
     id: 'idea_malang',
@@ -54,7 +54,7 @@ const MOCK_IDEAS: TripIdea[] = [
     travelStyle: 'Nature & Adventure',
     keyActivities: ['Volcano Trekking', 'Café Hopping', 'Museums'],
     confidence: 0.8,
-    imageUrl: 'https://images.unsplash.com/photo-1604928141064-207cea6f5822?auto=format&fit=crop&w=800&q=80',
+    imageUrl: '/images/destinations/malang.jpg',
   },
   {
     id: 'idea_lombok',
@@ -72,7 +72,7 @@ const MOCK_IDEAS: TripIdea[] = [
     travelStyle: 'Beach & Adventure',
     keyActivities: ['Snorkeling', 'Hiking', 'Relaxing'],
     confidence: 0.85,
-    imageUrl: 'https://images.unsplash.com/photo-1576085898323-218337e3e43c?auto=format&fit=crop&w=800&q=80',
+    imageUrl: '/images/destinations/lombok.jpg',
   },
   {
     id: 'idea_bandung',
@@ -90,7 +90,7 @@ const MOCK_IDEAS: TripIdea[] = [
     travelStyle: 'Food & Shopping',
     keyActivities: ['Shopping', 'Culinary Tours', 'Nature Walks'],
     confidence: 0.75,
-    imageUrl: 'https://images.unsplash.com/photo-1549473889-14f410d83298?auto=format&fit=crop&w=800&q=80',
+    imageUrl: '/images/destinations/bandung.jpg',
   }
 ];
 

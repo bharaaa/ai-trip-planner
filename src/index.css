@@ -1,0 +1,154 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,500&display=swap');
+
+/* ──────────────────────────────────────────────
+   Design Tokens — AI Trip Planner
+   Font: Plus Jakarta Sans
+   Accent: Warm Coral / Terracotta
+   ────────────────────────────────────────────── */
+
+@theme {
+  /* ─── Typography ─── */
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+
+  /* ─── Accent: Warm Coral / Terracotta ─── */
+  --color-accent-50: #fef3f0;
+  --color-accent-100: #fde4dc;
+  --color-accent-200: #fbc8b8;
+  --color-accent-300: #f6a68a;
+  --color-accent-400: #e07a5f;
+  --color-accent-500: #d4654a;
+  --color-accent-600: #b8493a;
+  --color-accent-700: #9a3b30;
+  --color-accent-800: #7d322b;
+  --color-accent-900: #672c28;
+  --color-accent-950: #381411;
+
+  /* ─── Warm Neutrals ─── */
+  --color-warm-50: #faf9f7;
+  --color-warm-100: #f3f1ed;
+  --color-warm-200: #e8e4de;
+  --color-warm-300: #d5cfc5;
+  --color-warm-400: #b8b0a2;
+  --color-warm-500: #a39a8a;
+  --color-warm-600: #8a7f6f;
+  --color-warm-700: #72685b;
+  --color-warm-800: #5f574d;
+  --color-warm-900: #504a42;
+  --color-warm-950: #2a2622;
+
+  /* ─── Semantic Colors ─── */
+  --color-success: #4ade80;
+  --color-warning: #fbbf24;
+  --color-error: #f87171;
+  --color-info: #60a5fa;
+
+  /* ─── Shadows ─── */
+  --shadow-subtle: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.06);
+  --shadow-elevated: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.07);
+  --shadow-dialog: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+
+  /* ─── Custom animations ─── */
+  --animate-fade-in: fade-in 0.4s ease-out;
+  --animate-slide-up: slide-up 0.4s ease-out;
+  --animate-slide-down: slide-down 0.3s ease-out;
+  --animate-scale-in: scale-in 0.2s ease-out;
+  --animate-pulse-subtle: pulse-subtle 2s ease-in-out infinite;
+  --animate-shimmer: shimmer 1.5s ease-in-out infinite;
+}
+
+/* ─── Google Font: loaded via @import at top of file ─── */
+
+/* ─── Keyframes ─── */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* ─── Base Styles ─── */
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-warm-50);
+  color: var(--color-warm-950);
+  line-height: 1.6;
+}
+
+/* ─── Focus States ─── */
+:focus-visible {
+  outline: 2px solid var(--color-accent-400);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ─── Reduced Motion ─── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-warm-300);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-warm-400);
+}
+
+/* ─── Selection ─── */
+::selection {
+  background-color: var(--color-accent-100);
+  color: var(--color-accent-900);
+}
+
+/* ─── Dialog backdrop ─── */
+dialog::backdrop {
+  background-color: rgba(42, 38, 34, 0.5);
+  backdrop-filter: blur(4px);
+}

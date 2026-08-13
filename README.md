@@ -1,32 +1,71 @@
-# React + TypeScript + Vite
+# Collaborative AI Trip Planner
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+An intelligent, multi-player travel planning application that helps groups organize, discover, and plan their perfect trip together. 
 
-Currently, two official plugins are available:
+Built with React, TypeScript, Vite, Zustand, and Supabase. Powered by AI to generate tailored itineraries based on group consensus.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## ✨ Features
 
-## React Compiler
+### 🔐 Authentication & Profiles
+* Secure Email & Password sign up/login powered by Supabase Auth.
+* Automatic user profile creation with Row Level Security (RLS) to ensure data privacy.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 👥 Collaborative Trip Management
+* **Create Trips:** Start a new trip, specify travel style, flexible dates, and budget.
+* **Invite Friends:** Search for registered users by name or email and invite them to collaborate.
+* **Real-time Access Control:** Trips are instantly accessible to all invited members securely via database joins and Row Level Security.
 
-## Expanding the Oxlint configuration
+### 🧠 AI-Powered Discovery Phase (Coming Soon)
+* The AI analyzes the group's constraints (budget, dates, origin) and generates beautiful, curated destination ideas.
+* **Tinder-style Voting:** Group members can swipe/react to destinations (`Love`, `Maybe`, `Nope`) to build consensus.
+* **Group Preference Aggregation:** Everyone inputs their pace, budget, and style preferences, and the app visualizes the group's "vibe".
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+### 📅 AI Itinerary Generation (Coming Soon)
+* Once a destination is selected, the AI builds a detailed, day-by-day itinerary tailored to the group's aggregate preferences.
+* **Flexible Edits:** Drag and drop itinerary items, adjust times, or ask the AI to regenerate specific days.
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+## 🛠 Tech Stack
+
+* **Frontend:** React 19, TypeScript, Vite
+* **Styling:** Tailwind CSS (Warm & Coral themes, Plus Jakarta Sans)
+* **State Management:** Zustand
+* **Animation:** Framer Motion (page transitions)
+* **Backend & Database:** Supabase (PostgreSQL, PostgREST, GoTrue Auth)
+
+## 🚀 Getting Started
+
+### Prerequisites
+* Node.js
+* A Supabase Project
+
+### 1. Installation
+Clone the repo and install dependencies:
+```bash
+npm install
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+### 2. Environment Setup
+Create a `.env` file in the root directory:
+```env
+VITE_SUPABASE_URL=your-supabase-url
+VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+```
+
+### 3. Database Setup
+The database schema must be initialized in your Supabase project.
+You can find the complete SQL schema required to run this application inside the `/supabase_schema.sql.md` (or equivalent) documentation file. It includes:
+* Enums
+* Tables (Users, Trips, Members, Decisions, Itineraries, etc.)
+* Row Level Security (RLS) Policies
+* Database Triggers (e.g., syncing Auth to Public Users)
+
+### 4. Running Locally
+Start the Vite development server:
+```bash
+npm run dev
+```
+
+## 🔒 Security Architecture
+This app implements **Defense in Depth**:
+1. **Database Level (RLS):** Supabase strictly enforces `is_trip_member()` policies, meaning the database physically will not return trip data to users who are not invited.
+2. **Client Level (Zustand & Queries):** State is immediately cleared upon logout, and database queries proactively filter by `user_id` membership to prevent data leakage even if RLS is temporarily disabled.

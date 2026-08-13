@@ -10,6 +10,7 @@ import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { StepIndicator } from './components/StepIndicator';
 import { formatCurrency } from '@/lib/utils/formatting';
+import { CalendarRange, Calendar, Shuffle, Wallet, Armchair, Sparkles, HelpCircle, CarFront, Plane, TrainFront, Car } from 'lucide-react';
 import type { User } from '@/types';
 
 export function CreateTripPage() {
@@ -96,13 +97,13 @@ export function CreateTripPage() {
         {step === 1 && (
           <motion.div key={1} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
             <div className="text-center space-y-3">
-              <h1 className="text-3xl font-semibold text-warm-900 tracking-tight">Let's start planning</h1>
+              <h1 className="text-3xl font-semibold text-warm-900 tracking-tight">Let's plan your new adventure</h1>
               <p className="text-warm-600">You don't need to know where yet. We'll figure it out together.</p>
             </div>
             <div className="space-y-6">
               <Input
-                label="Trip Name"
-                placeholder="e.g. Summer Getaway"
+                label="Name your adventure"
+                placeholder="e.g. Summer Getaway, Bali 2026..."
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 autoFocus
@@ -123,8 +124,13 @@ export function CreateTripPage() {
         {step === 2 && (
           <motion.div key={2} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
             <div className="text-center space-y-3">
-              <h1 className="text-3xl font-semibold text-warm-900 tracking-tight">Who's coming?</h1>
-              <p className="text-warm-600">You and {formData.invitedUsers.length} traveler{formData.invitedUsers.length !== 1 ? 's' : ''}</p>
+              <h1 className="text-3xl font-semibold text-warm-900 tracking-tight">Who's joining the crew?</h1>
+              <p className="text-warm-600">
+                {formData.invitedUsers.length === 0 
+                  ? 'Only you' 
+                  : `You and ${formData.invitedUsers.length} other${formData.invitedUsers.length !== 1 ? 's' : ''}`
+                }
+              </p>
             </div>
             
             <div className="space-y-4 relative">
@@ -157,10 +163,10 @@ export function CreateTripPage() {
 
               <div className="relative">
                 <Input
-                  label="Invite Friends"
+                  label="Invite your crew"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search by name or email..."
+                  placeholder="Search friends by name or email..."
                 />
                 
                 {searchQuery.trim().length >= 2 && (
@@ -202,14 +208,14 @@ export function CreateTripPage() {
         {step === 3 && (
           <motion.div key={3} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
             <div className="text-center space-y-3">
-              <h1 className="text-3xl font-semibold text-warm-900 tracking-tight">When are you thinking?</h1>
+              <h1 className="text-3xl font-semibold text-warm-900 tracking-tight">When is this happening?</h1>
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {[
-                { type: 'exact', label: 'I have exact dates', emoji: '📅' },
-                { type: 'month', label: 'Sometime in...', emoji: '📆' },
-                { type: 'flexible', label: "I'm flexible", emoji: '🤷' }
+                { type: 'exact', label: 'Dates locked in', icon: <CalendarRange className="w-6 h-6 text-warm-600 mb-1" /> },
+                { type: 'month', label: 'Sometime in...', icon: <Calendar className="w-6 h-6 text-warm-600 mb-1" /> },
+                { type: 'flexible', label: "Completely flexible", icon: <Shuffle className="w-6 h-6 text-warm-600 mb-1" /> }
               ].map(opt => (
                 <Card 
                   key={opt.type}
@@ -219,7 +225,7 @@ export function CreateTripPage() {
                   )}
                   onClick={() => setFormData({ ...formData, dateFlexibility: opt.type })}
                 >
-                  <span className="text-2xl">{opt.emoji}</span>
+                  {opt.icon}
                   <span className="font-medium text-sm text-center text-warm-900">{opt.label}</span>
                 </Card>
               ))}
@@ -285,10 +291,10 @@ export function CreateTripPage() {
               <p className="text-sm font-medium text-warm-900">Trip Style</p>
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  { id: 'budget', label: 'Budget', emoji: '💸' },
-                  { id: 'comfortable', label: 'Comfortable', emoji: '🛋️' },
-                  { id: 'premium', label: 'Premium', emoji: '✨' },
-                  { id: 'dont_know', label: "I don't know", emoji: '🤔' }
+                  { id: 'budget', label: 'Budget', icon: <Wallet className="w-5 h-5" /> },
+                  { id: 'comfortable', label: 'Comfortable', icon: <Armchair className="w-5 h-5" /> },
+                  { id: 'premium', label: 'Premium', icon: <Sparkles className="w-5 h-5" /> },
+                  { id: 'dont_know', label: "I don't know", icon: <HelpCircle className="w-5 h-5" /> }
                 ].map(style => (
                   <Card 
                     key={style.id}
@@ -298,7 +304,9 @@ export function CreateTripPage() {
                     )}
                     onClick={() => setFormData({ ...formData, budgetFlexibility: style.id })}
                   >
-                    <span className="text-xl">{style.emoji}</span>
+                    <div className={cn(formData.budgetFlexibility === style.id ? "text-accent-600" : "text-warm-500")}>
+                      {style.icon}
+                    </div>
                     <span className={cn("text-sm font-medium", formData.budgetFlexibility === style.id ? "text-accent-700" : "text-warm-700")}>
                       {style.label}
                     </span>
@@ -348,10 +356,10 @@ export function CreateTripPage() {
                 <p className="text-sm font-medium text-warm-900">Preferred Transport</p>
                 <div className="grid grid-cols-2 gap-3">
                   {[
-                    { id: 'any', label: 'Any', emoji: '🚖' },
-                    { id: 'flight', label: 'Flight', emoji: '✈️' },
-                    { id: 'train', label: 'Train', emoji: '🚆' },
-                    { id: 'car', label: 'Car', emoji: '🚗' }
+                    { id: 'any', label: 'Any', icon: <CarFront className="w-5 h-5" /> },
+                    { id: 'flight', label: 'Flight', icon: <Plane className="w-5 h-5" /> },
+                    { id: 'train', label: 'Train', icon: <TrainFront className="w-5 h-5" /> },
+                    { id: 'car', label: 'Car', icon: <Car className="w-5 h-5" /> }
                   ].map(t => (
                     <Card 
                       key={t.id}
@@ -361,7 +369,9 @@ export function CreateTripPage() {
                       )}
                       onClick={() => setFormData({ ...formData, transport: t.id })}
                     >
-                      <span className="text-xl">{t.emoji}</span>
+                      <div className={cn(formData.transport === t.id ? "text-accent-600" : "text-warm-500")}>
+                        {t.icon}
+                      </div>
                       <span className={cn("capitalize text-sm font-medium", formData.transport === t.id ? "text-accent-700" : "text-warm-700")}>
                         {t.label}
                       </span>

@@ -9,9 +9,12 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { StepIndicator } from './components/StepIndicator';
+import { DateRangePicker } from '@/components/ui/DateRangePicker';
 import { formatCurrency } from '@/lib/utils/formatting';
 import { CalendarRange, Calendar, Shuffle, Wallet, Armchair, Sparkles, HelpCircle, CarFront, Plane, TrainFront, Car } from 'lucide-react';
 import type { User } from '@/types';
+import type { DateRange } from 'react-day-picker';
+import { differenceInDays } from 'date-fns';
 
 export function CreateTripPage() {
   const navigate = useNavigate();
@@ -23,6 +26,7 @@ export function CreateTripPage() {
     name: '',
     invitedUsers: [] as User[],
     dateFlexibility: 'exact',
+    dateRange: undefined as DateRange | undefined,
     duration: 5,
     budgetPerPerson: 5000000,
     budgetType: 'per_person',
@@ -65,10 +69,23 @@ export function CreateTripPage() {
   const prevStep = () => setStep(s => Math.max(1, s - 1));
 
   const handleCreate = async () => {
+    let finalDuration = formData.duration;
+    let startDate: Date | undefined;
+    let endDate: Date | undefined;
+
+    if (formData.dateFlexibility === 'exact' && formData.dateRange?.from) {
+      startDate = formData.dateRange.from;
+      endDate = formData.dateRange.to || formData.dateRange.from;
+      finalDuration = differenceInDays(endDate, startDate) + 1;
+    }
+
     const tripId = await createTrip({
       name: formData.name,
       origin: formData.startingLocation,
       flexibleDates: formData.dateFlexibility !== 'exact',
+      startDate,
+      endDate,
+      duration: finalDuration,
       invitedUserIds: formData.invitedUsers.map(u => u.id)
     });
     navigate(`/trips/${tripId}/preferences`);
@@ -213,9 +230,9 @@ export function CreateTripPage() {
             
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {[
-                { type: 'exact', label: 'Dates locked in', icon: <CalendarRange className="w-6 h-6 text-warm-600 mb-1" /> },
+                { type: 'exact', label: 'Locked In', icon: <CalendarRange className="w-6 h-6 text-warm-600 mb-1" /> },
                 { type: 'month', label: 'Sometime in...', icon: <Calendar className="w-6 h-6 text-warm-600 mb-1" /> },
-                { type: 'flexible', label: "Completely flexible", icon: <Shuffle className="w-6 h-6 text-warm-600 mb-1" /> }
+                { type: 'flexible', label: 'Sometime in the future', icon: <Shuffle className="w-6 h-6 text-warm-600 mb-1" /> }
               ].map(opt => (
                 <Card 
                   key={opt.type}
@@ -231,14 +248,32 @@ export function CreateTripPage() {
               ))}
             </div>
 
-            <div className="space-y-4 pt-4">
-              <Input
-                type="number"
-                label="How many days?"
-                value={formData.duration}
-                onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) || 1 })}
-                min={1}
-              />
+            <div className="space-y-4 pt-4 flex flex-col items-center">
+              {formData.dateFlexibility === 'exact' ? (
+                <div className="w-full">
+                  <p className="text-sm font-medium text-warm-900 mb-3 text-center">Select your travel dates</p>
+                  <DateRangePicker 
+                    selected={formData.dateRange}
+                    onSelect={(range) => setFormData({ ...formData, dateRange: range })}
+                    className="mx-auto"
+                  />
+                  {formData.dateRange?.from && formData.dateRange?.to && (
+                    <p className="text-center text-sm font-medium text-warm-600 mt-4">
+                      {differenceInDays(formData.dateRange.to, formData.dateRange.from) + 1} days trip
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <div className="w-full">
+                  <Input
+                    type="number"
+                    label="How many days?"
+                    value={formData.duration}
+                    onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) || 1 })}
+                    min={1}
+                  />
+                </div>
+              )}
             </div>
 
             <div className="flex gap-4 pt-4">

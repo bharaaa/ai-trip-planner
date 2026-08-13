@@ -223,3 +223,110 @@ dialog::backdrop {
   background-color: rgba(40, 37, 31, 0.55);
   backdrop-filter: blur(6px);
 }
+
+/* ─── React Day Picker Customization ─── */
+.rdp-root {
+  --rdp-accent-color: var(--color-accent-500) !important;
+  --rdp-background-color: var(--color-accent-50) !important;
+  --rdp-outline: 2px solid var(--color-accent-400) !important;
+  
+  width: 100% !important;
+  margin: 0 auto;
+  font-family: var(--font-sans);
+  color: var(--color-warm-900);
+}
+
+.rdp-months,
+.rdp-month {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.rdp-root table {
+  width: 100% !important;
+  max-width: 100% !important;
+  table-layout: fixed !important;
+  border-collapse: collapse !important;
+}
+
+.rdp-root th,
+.rdp-root td {
+  width: calc(100% / 7) !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+.rdp-root button.rdp-day {
+  margin: 0 auto !important;
+  width: 2.75rem !important;
+  height: 2.75rem !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  border-radius: 0.5rem !important;
+}
+
+.rdp-nav {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  gap: 0.25rem;
+}
+
+.rdp-month {
+  position: relative;
+}
+
+.rdp-caption {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1.5rem !important;
+}
+
+.rdp-day_selected:not(.rdp-day_range_middle) {
+  background-color: var(--rdp-accent-color) !important;
+  color: white !important;
+  font-weight: bold;
+}
+
+.rdp-day_today:not(.rdp-day_selected) {
+  font-weight: bold;
+  color: var(--color-accent-600);
+}
+
+.rdp-day_today:not(.rdp-day_selected)::after {
+  content: '';
+  display: block;
+  width: 4px;
+  height: 4px;
+  background-color: var(--color-accent-500);
+  border-radius: 50%;
+  margin: 0 auto;
+  margin-top: -6px;
+}
+
+.rdp-day_holiday:not(.rdp-day_selected) {
+  color: var(--color-error-500);
+  font-weight: 600;
+}
+
+.rdp-day_range_middle {
+  background-color: var(--rdp-background-color);
+  color: var(--color-accent-800);
+}
+
+.rdp-button:hover:not(.rdp-day_selected) {
+  background-color: var(--color-warm-100);
+}
+
+.rdp-dropdown {
+  padding: 0.25rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--color-warm-200);
+}
+

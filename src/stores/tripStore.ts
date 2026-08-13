@@ -263,6 +263,8 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
       updatedAt: new Date(),
       origin: data.origin || '',
       flexibleDates: data.flexibleDates ?? true,
+      startDate: data.startDate,
+      endDate: data.endDate,
       currency: 'IDR',
       budgetFlexibility: 50,
       travelers: (data.invitedUserIds?.length || 0) + 1, // Admin + invited
@@ -290,7 +292,11 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
         origin: newTrip.origin,
         travelers: newTrip.travelers,
         status: newTrip.status,
-        phase: newTrip.phase
+        phase: newTrip.phase,
+        flexible_dates: newTrip.flexibleDates,
+        start_date: newTrip.startDate?.toISOString().split('T')[0],
+        end_date: newTrip.endDate?.toISOString().split('T')[0],
+        duration: newTrip.duration
       }).select().single();
 
       if (!error && insertedTrip) {

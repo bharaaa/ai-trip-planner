@@ -13,6 +13,8 @@ import { DestinationSelection } from '@/features/discovery/components/Destinatio
 import { ReactionBar } from '@/features/discovery/components/ReactionBar';
 import { Dialog } from '@/components/ui/Dialog';
 import { aiService } from '@/services/ai';
+import { formatCurrency } from '@/lib/utils/formatting';
+import { Users, Calendar, Clock, Wallet, MapPin } from 'lucide-react';
 import type { TripContext, ReactionType, TripIdea, TripReaction } from '@/types';
 
 export const DiscoveryPage = () => {
@@ -25,15 +27,15 @@ export const DiscoveryPage = () => {
   const [isRefining, setIsRefining] = useState(false);
   const [selectedIdeaId, setSelectedIdeaId] = useState<string | null>(null);
 
-  // Mock Context
+  // Derive Context from activeTrip
   const context: TripContext = {
-    origin: 'Jakarta',
-    travelers: 4,
-    budgetPerPerson: 4000000,
-    dateMonth: 'September',
-    flexibleDates: true,
-    duration: 5,
-    preferences: { food: 5, beach: 4, nature: 4, culture: 3, cafes: 2, nightlife: 1, adventure: 1, shopping: 1 } as any
+    origin: activeTrip?.origin || '',
+    travelers: activeTrip?.travelers || 1,
+    budgetPerPerson: activeTrip?.budgetPerPerson || 0,
+    dateMonth: activeTrip?.dateMonth || '',
+    flexibleDates: activeTrip?.flexibleDates || false,
+    duration: activeTrip?.duration || 1,
+    preferences: { food: 5, beach: 4, nature: 4, culture: 3, cafes: 2, nightlife: 1, adventure: 1, shopping: 1 } as any // TODO: Aggregate real preferences
   };
 
   const aggregatePreferences = [
@@ -115,28 +117,28 @@ export const DiscoveryPage = () => {
         {/* Context Bar */}
         <div className="bg-warm-100 rounded-xl px-5 py-4 flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm font-medium text-warm-700 shadow-sm">
           <div className="flex items-center gap-2">
-            <span className="text-sm">👥</span>
-            <span>4 friends</span>
+            <Users className="w-4 h-4" />
+            <span>{activeTrip.travelers} traveler{activeTrip.travelers !== 1 && 's'}</span>
           </div>
           <div className="hidden sm:block text-warm-300">•</div>
           <div className="flex items-center gap-2">
-            <span className="text-sm">📅</span>
-            <span>September</span>
+            <Calendar className="w-4 h-4" />
+            <span>{activeTrip.flexibleDates ? activeTrip.dateMonth || 'Flexible' : 'Specific Dates'}</span>
           </div>
           <div className="hidden sm:block text-warm-300">•</div>
           <div className="flex items-center gap-2">
-            <span className="text-sm">⏳</span>
-            <span>4–5 days</span>
+            <Clock className="w-4 h-4" />
+            <span>{activeTrip.duration} days</span>
           </div>
           <div className="hidden sm:block text-warm-300">•</div>
           <div className="flex items-center gap-2">
-            <span className="text-sm">💰</span>
-            <span>Rp 4M/person</span>
+            <Wallet className="w-4 h-4" />
+            <span>{formatCurrency(activeTrip.budgetPerPerson || 0)}/person</span>
           </div>
           <div className="hidden sm:block text-warm-300">•</div>
           <div className="flex items-center gap-2">
-            <span className="text-sm">📍</span>
-            <span>Jakarta</span>
+            <MapPin className="w-4 h-4" />
+            <span>{activeTrip.origin}</span>
           </div>
         </div>
 
@@ -192,9 +194,9 @@ export const DiscoveryPage = () => {
                     <div className="pt-8">
                       <DestinationSelection
                         destination={{ name: activeTrip.tripIdeas[0].destination }}
-                        travelers={4}
-                        dates="Sep 10 - Sep 15, 2024"
-                        budget={{ min: 3500000, max: 4500000 }}
+                        travelers={activeTrip.travelers}
+                        dates={activeTrip.flexibleDates ? activeTrip.dateMonth : 'TBD'}
+                        budget={{ min: activeTrip.tripIdeas[0].estimatedBudget?.min || 0, max: activeTrip.tripIdeas[0].estimatedBudget?.max || 0 }}
                         onConfirm={() => handleSelectDestination(activeTrip.tripIdeas[0])}
                       />
                     </div>

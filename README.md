@@ -53,11 +53,7 @@ VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
 
 ### 3. Database Setup
 The database schema must be initialized in your Supabase project.
-You can find the complete SQL schema required to run this application inside the `/supabase_schema.sql.md` (or equivalent) documentation file. It includes:
-* Enums
-* Tables (Users, Trips, Members, Decisions, Itineraries, etc.)
-* Row Level Security (RLS) Policies
-* Database Triggers (e.g., syncing Auth to Public Users)
+Database schema coming soon
 
 ### 4. Running Locally
 Start the Vite development server:

@@ -20,43 +20,39 @@ import { aiService } from '@/services/ai';
 import type { ItineraryDay, ItineraryItem, ActivityType, Decision, DecisionStatus, DecisionType, Itinerary } from '@/types';
 import { PageTransition } from '@/components/motion/PageTransition';
 
-// Mock generation for demonstration
-const mockGenerate = async (): Promise<Itinerary> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        generatedAt: new Date(),
-        isAIDraft: true,
-        days: [
-          {
-            dayNumber: 1,
-            date: new Date('2026-09-15'),
-            title: 'Arrival & Seminyak Sunsets',
-            items: [
-              { id: 'item-1', isAIGenerated: false, isMustDo: false, type: 'transport', title: 'Airport Transfer', time: '14:00', location: 'Ngurah Rai Airport' },
-              { id: 'item-2', isAIGenerated: false, isMustDo: false, type: 'accommodation', title: 'Check-in to Villa', time: '15:30', location: 'Seminyak' },
-              { id: 'item-3', isAIGenerated: false, type: 'food', title: 'Sunset Dinner at La Plancha', time: '17:30', location: 'La Plancha', isMustDo: true },
-            ]
-          }
-        ]
-      });
-    }, 2500);
-  });
-};
+// Remove local mockGenerate since we use aiService
 
 export const PlannerPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { activeTrip, setItinerary } = useTripStore();
   const [activeTab, setActiveTab] = useState<'itinerary' | 'map'>('itinerary');
   const [isGenerating, setIsGenerating] = useState(false);
-  const [itinerary, setItinerary] = useState<Itinerary | null>(null);
   
+  const itinerary = activeTrip?.itinerary || null;
+
   const handleGenerate = async () => {
+    if (!id || !activeTrip?.selectedDestination) return;
     setIsGenerating(true);
-    // In a real app we would use aiService.generateItinerary
-    const generated = await mockGenerate();
-    setItinerary(generated);
-    setIsGenerating(false);
+    try {
+      // Mock Context for now until context store is fully built out
+      const context = {
+        origin: 'Jakarta',
+        travelers: activeTrip.members?.length || 1,
+        budgetPerPerson: activeTrip.budgetPerPerson || 4000000,
+        dateMonth: 'September',
+        flexibleDates: activeTrip.flexibleDates,
+        duration: 5,
+        preferences: activeTrip.preferences?.[0] || {} as any
+      };
+      
+      const generated = await aiService.generateItinerary(activeTrip.selectedDestination as any, context);
+      setItinerary(id, generated);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (

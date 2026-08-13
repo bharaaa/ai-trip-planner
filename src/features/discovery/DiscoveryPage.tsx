@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { PageTransition } from '@/components/motion/PageTransition';
 import { cn } from '@/lib/utils/cn';
 import { useTripStore } from '@/stores/tripStore';
+import { useAuthStore } from '@/stores/authStore';
 import { useNavigate, useParams } from 'react-router';
 import { GroupPreferenceSummary } from '@/components/discovery/GroupPreferenceSummary';
 import { RecommendationGrid } from '@/components/discovery/RecommendationGrid';
@@ -17,7 +18,8 @@ import type { TripContext, ReactionType, TripIdea, TripReaction } from '@/types'
 export const DiscoveryPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { activeTrip, currentUser, setTripIdeas, addReaction, selectDestination } = useTripStore();
+  const { user: currentUser } = useAuthStore();
+  const { activeTrip, setTripIdeas, addReaction, selectDestination } = useTripStore();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isRefining, setIsRefining] = useState(false);
@@ -59,27 +61,12 @@ export const DiscoveryPage = () => {
   if (!activeTrip) return null;
 
   const handleReact = (ideaId: string, type: ReactionType) => {
+    if (!currentUser) return;
     addReaction(activeTrip.id, {
       tripIdeaId: ideaId,
       userId: currentUser.id,
       userName: currentUser.name,
       reaction: type,
-    });
-
-    // Simulate other members reacting
-    const members = activeTrip.members.filter(m => m.userId !== currentUser.id);
-    members.forEach((m, index) => {
-      setTimeout(() => {
-        const mockReactionTypes: ReactionType[] = ['love', 'maybe', 'nope'];
-        const randomReact = mockReactionTypes[Math.floor(Math.random() * mockReactionTypes.length)];
-        
-        addReaction(activeTrip.id, {
-          tripIdeaId: ideaId,
-          userId: m.userId,
-          userName: m.name,
-          reaction: type === 'love' && Math.random() > 0.5 ? 'love' : randomReact,
-        });
-      }, (index + 1) * 800);
     });
   };
 
@@ -110,7 +97,7 @@ export const DiscoveryPage = () => {
     }
     ideasReactions[r.tripIdeaId].push(r);
 
-    if (r.userId === currentUser.id) {
+    if (currentUser && r.userId === currentUser.id) {
       userReactions[r.tripIdeaId] = r.reaction;
     }
   });

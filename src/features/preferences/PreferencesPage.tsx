@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils/cn';
 import { useTripStore } from '@/stores/tripStore';
+import { useAuthStore } from '@/stores/authStore';
 import { useNavigate, useParams } from 'react-router';
 import { Button } from '@/components/ui/Button';
 import { Slider } from '@/components/ui/Slider';
@@ -16,7 +17,8 @@ const ChevronDown = ({ className }: { className?: string }) => (
 export const PreferencesPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { activeTrip, currentUser, submitPreferences, setPhase } = useTripStore();
+  const { user: currentUser } = useAuthStore();
+  const { activeTrip, submitPreferences, setPhase } = useTripStore();
   
   const [selectedCategories, setSelectedCategories] = useState<Map<PreferenceCategory, number>>(new Map());
   const [showMore, setShowMore] = useState(false);
@@ -35,7 +37,7 @@ export const PreferencesPage = () => {
   };
 
   const handleSubmit = () => {
-    if (!id || !activeTrip) return;
+    if (!id || !activeTrip || !currentUser) return;
 
     // Convert map to record
     const categoriesRecord: Record<string, number> = {};
@@ -53,34 +55,6 @@ export const PreferencesPage = () => {
     };
 
     submitPreferences(id, currentUser.id, preference);
-
-    // Mock 3 other members' preferences if this is the first submission
-    if (activeTrip.preferences.length === 0) {
-      const mockUsers = [
-        { id: 'user_2', name: 'Andi' },
-        { id: 'user_3', name: 'Rizky' },
-        { id: 'user_4', name: 'Dimas' }
-      ];
-      
-      mockUsers.forEach((user, i) => {
-        const mockPref: Preference = {
-          userId: user.id,
-          categories: {
-            food: 5,
-            beach: 4,
-            nature: i % 2 === 0 ? 5 : 3,
-            culture: 4,
-            nightlife: i === 1 ? 5 : 1,
-            cafes: 3
-          } as Record<PreferenceCategory, number>,
-          pace: 40 + i * 10,
-          budgetPreference: 50 + i * 15,
-          travelTolerance: 60,
-          morningPreference: 30 + i * 20,
-        };
-        submitPreferences(id, user.id, mockPref);
-      });
-    }
 
     setPhase(id, 'discover');
     navigate(`/trips/${id}/discover`);

@@ -48,18 +48,8 @@ export const RegisterPage: React.FC = () => {
     }
 
     if (data?.user) {
-      // 2. Create the user profile in our public `users` table
-      const { error: profileError } = await supabase.from('users').insert({
-        id: data.user.id,
-        name,
-        email
-      });
-
-      if (profileError) {
-        console.error('Failed to create profile:', profileError);
-        // We won't block the user, but we should log it.
-        // Make sure to add the RLS INSERT policy for the users table!
-      }
+      // We now rely on a Supabase Database Trigger (auth.users -> public.users)
+      // to automatically create the user profile upon signup.
 
       setSuccessMsg('Registration successful! You can now log in.');
       setTimeout(() => {

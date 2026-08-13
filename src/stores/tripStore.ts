@@ -2,14 +2,15 @@ import { create } from 'zustand';
 import type { User, Trip, TripMember, Preference, TripIdea, TripReaction, Destination, Itinerary, ItineraryItem, Decision, DecisionStatus, TripPhase } from '@/types';
 
 interface TripStoreState {
-  currentUser: User;
   trips: Trip[];
   activeTrip: Trip | null;
   isGeneratingIdeas: boolean;
   isGeneratingItinerary: boolean;
   
   fetchTrips: () => Promise<void>;
-  createTrip: (data: Partial<Trip>) => Promise<string>;
+  clearTrips: () => void;
+  searchUsers: (query: string) => Promise<User[]>;
+  createTrip: (data: Partial<Trip> & { invitedUserIds?: string[] }) => Promise<string>;
   setActiveTrip: (tripId: string) => void;
   addMember: (tripId: string, member: TripMember) => void;
   submitPreferences: (tripId: string, userId: string, preferences: Preference) => void;
@@ -23,15 +24,15 @@ interface TripStoreState {
   moveItineraryItem: (tripId: string, fromDay: number, fromIndex: number, toDay: number, toIndex: number) => void;
   addDecision: (tripId: string, decision: Decision) => void;
   updateDecisionStatus: (tripId: string, decisionId: string, status: DecisionStatus) => void;
+  addDecisionVote: (tripId: string, decisionId: string, optionId: string, userId: string, vote: 'for' | 'against' | 'neutral') => void;
   setPhase: (tripId: string, phase: TripPhase) => void;
   setGeneratingIdeas: (value: boolean) => void;
   setGeneratingItinerary: (value: boolean) => void;
 }
 
-const defaultUser: User = { id: '00000000-0000-0000-0000-000000000001', name: 'Bhara', email: 'bhara@email.com' };
+import { useAuthStore } from './authStore';
 
 export const useTripStore = create<TripStoreState>((set, get) => ({
-  currentUser: defaultUser,
   trips: [],
   activeTrip: null,
   isGeneratingIdeas: false,
@@ -41,6 +42,27 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
   fetchTrips: async () => {
     try {
       const { supabase } = await import('@/lib/supabase');
+      const currentUser = useAuthStore.getState().user;
+      
+      if (!currentUser) {
+        set({ trips: [] });
+        return;
+      }
+      
+      // Defense in depth: Find which trips this user is a member of
+      // (Even if RLS is disabled, this prevents fetching all trips)
+      const { data: memberships } = await supabase
+        .from('trip_members')
+        .select('trip_id')
+        .eq('user_id', currentUser.id);
+        
+      if (!memberships || memberships.length === 0) {
+        set({ trips: [] });
+        return;
+      }
+      
+      const tripIds = memberships.map(m => m.trip_id);
+
       // Checking if user has configured env keys
       if (!import.meta.env.VITE_SUPABASE_URL) return;
 
@@ -48,16 +70,30 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
         .from('trips')
         .select(`
           *,
-          members:trip_members(*),
+          members:trip_members(*, users(*)),
           preferences:trip_preferences(*),
           tripIdeas:trip_ideas(
             *,
             reactions:trip_reactions(*)
           ),
-          decisions(*),
+          decisions(
+            *,
+            options:decision_options!decision_id(
+              *,
+              votes:decision_votes(*)
+            )
+          ),
+          itineraries(
+            *,
+            days:itinerary_days(
+              *,
+              items:itinerary_items(*)
+            )
+          ),
           tasks(*),
           expenses(*)
         `)
+        .in('id', tripIds)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -100,6 +136,71 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
             };
           });
 
+          const mappedDecisions = (t.decisions || []).map((d: any) => ({
+            id: d.id,
+            title: d.title,
+            description: d.description,
+            type: d.type,
+            status: d.status,
+            createdAt: new Date(d.created_at),
+            decidedOption: d.decided_option_id,
+            options: (d.options || []).map((o: any) => ({
+              id: o.id,
+              title: o.title,
+              description: o.description,
+              votes: (o.votes || []).map((v: any) => ({
+                userId: v.user_id,
+                vote: v.vote
+              }))
+            }))
+          }));
+
+          let mappedItinerary = undefined;
+          if (t.itineraries && t.itineraries.length > 0) {
+            const rawItinerary = t.itineraries[0];
+            const sortedDays = (rawItinerary.days || []).sort((a: any, b: any) => a.day_number - b.day_number);
+            
+            mappedItinerary = {
+              days: sortedDays.map((day: any) => {
+                const sortedItems = (day.items || []).sort((a: any, b: any) => a.order_index - b.order_index);
+                return {
+                  date: new Date(day.date),
+                  title: day.title,
+                  items: sortedItems.map((item: any) => ({
+                    id: item.id,
+                    time: item.time,
+                    title: item.title,
+                    description: item.description,
+                    type: item.type,
+                    location: item.location,
+                    duration: item.duration,
+                    isAiGenerated: item.is_ai_generated,
+                    isMustDo: item.is_must_do,
+                    notes: item.notes
+                  }))
+                };
+              })
+            };
+          }
+
+          const mappedPreferences = (t.preferences || []).map((p: any) => ({
+            userId: p.user_id,
+            categories: p.categories || {},
+            pace: p.pace,
+            budgetPreference: p.budget_preference,
+            travelTolerance: p.travel_tolerance,
+            morningPreference: p.morning_preference
+          }));
+
+          const mappedMembers = (t.members || []).map((m: any) => ({
+            userId: m.user_id,
+            name: m.users?.name || 'Unknown',
+            avatarUrl: m.users?.avatar_url,
+            role: m.role,
+            joinedAt: new Date(m.joined_at),
+            preferencesSubmitted: m.preferences_submitted
+          }));
+
           return {
             ...t,
             flexibleDates: t.flexible_dates,
@@ -110,9 +211,10 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
             selectedDestination: t.selected_destination,
             tripIdeas: mappedIdeas,
             reactions: allReactions,
-            members: t.members || [],
-            preferences: t.preferences || [],
-            decisions: t.decisions || [],
+            members: mappedMembers,
+            preferences: mappedPreferences,
+            decisions: mappedDecisions,
+            itinerary: mappedItinerary,
           };
         }) as unknown as Trip[];
         
@@ -120,6 +222,34 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
       }
     } catch (err) {
       console.error('Error fetching trips from Supabase:', err);
+    }
+  },
+
+  clearTrips: () => {
+    set({ trips: [], activeTrip: null });
+  },
+
+  searchUsers: async (query: string) => {
+    if (!import.meta.env.VITE_SUPABASE_URL || !query.trim()) return [];
+    try {
+      const { supabase } = await import('@/lib/supabase');
+      // Search by email or name using ilike
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .or(`email.ilike.%${query}%,name.ilike.%${query}%`)
+        .limit(10);
+        
+      if (error) throw error;
+      return (data || []).map(u => ({
+        id: u.id,
+        name: u.name,
+        email: u.email,
+        avatarUrl: u.avatar_url
+      })) as User[];
+    } catch (err) {
+      console.error('Error searching users:', err);
+      return [];
     }
   },
 
@@ -135,7 +265,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
       flexibleDates: data.flexibleDates ?? true,
       currency: 'IDR',
       budgetFlexibility: 50,
-      travelers: data.travelers || 1,
+      travelers: (data.invitedUserIds?.length || 0) + 1, // Admin + invited
       preferences: [],
       tripIdeas: [],
       reactions: [],
@@ -145,8 +275,16 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
       ...data,
     } as Trip;
 
+    let adminId = '00000000-0000-0000-0000-000000000001';
+
     if (import.meta.env.VITE_SUPABASE_URL) {
       const { supabase } = await import('@/lib/supabase');
+      
+      const { data: userData } = await supabase.auth.getUser();
+      if (userData.user) {
+        adminId = userData.user.id;
+      }
+
       const { data: insertedTrip, error } = await supabase.from('trips').insert({
         name: newTrip.name,
         origin: newTrip.origin,
@@ -159,25 +297,47 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
         finalId = insertedTrip.id;
         newTrip.id = finalId;
         
-        // Insert admin member
-        await supabase.from('trip_members').insert({
-          trip_id: finalId,
-          user_id: '00000000-0000-0000-0000-000000000001',
-          role: 'admin',
-          preferences_submitted: false
-        });
+        // Prepare members to insert
+        const membersToInsert = [
+          {
+            trip_id: finalId,
+            user_id: adminId,
+            role: 'admin',
+            preferences_submitted: false
+          }
+        ];
+
+        if (data.invitedUserIds && data.invitedUserIds.length > 0) {
+          data.invitedUserIds.forEach(id => {
+            if (id !== adminId) {
+              membersToInsert.push({
+                trip_id: finalId,
+                user_id: id,
+                role: 'member',
+                preferences_submitted: false
+              });
+            }
+          });
+        }
+
+        await supabase.from('trip_members').insert(membersToInsert);
       }
     } else {
       newTrip.id = finalId;
     }
 
-    newTrip.members = [{
-      userId: '00000000-0000-0000-0000-000000000001',
-      name: defaultUser.name,
-      role: 'admin',
-      joinedAt: new Date(),
-      preferencesSubmitted: false
-    }];
+    const currentUser = useAuthStore.getState().user;
+    newTrip.members = [
+      {
+        userId: adminId,
+        name: currentUser?.name || 'Admin',
+        role: 'admin',
+        joinedAt: new Date(),
+        preferencesSubmitted: false
+      }
+      // Note: we don't fetch the full user profiles of the invited members immediately here.
+      // They will be populated on the next fetchTrips.
+    ];
 
     set((state) => ({ trips: [newTrip, ...state.trips] }));
     return finalId;
@@ -213,6 +373,25 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
       }
       return trip;
     });
+
+    // Sync to Supabase
+    import('@/lib/supabase').then(({ supabase }) => {
+      if (import.meta.env.VITE_SUPABASE_URL) {
+        supabase.from('trip_preferences').upsert({
+          trip_id: tripId,
+          user_id: userId,
+          categories: preferences.categories,
+          pace: preferences.pace,
+          budget_preference: preferences.budgetPreference,
+          travel_tolerance: preferences.travelTolerance,
+          morning_preference: preferences.morningPreference
+        }).then(({ error }) => {
+          if (error) console.error('Failed to sync preferences:', error);
+        });
+        supabase.from('trip_members').update({ preferences_submitted: true }).eq('trip_id', tripId).eq('user_id', userId).then();
+      }
+    });
+
     return { trips, activeTrip: trips.find(t => t.id === state.activeTrip?.id) || null };
   }),
 
@@ -299,6 +478,65 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
     const trips = state.trips.map(trip => 
       trip.id === tripId ? { ...trip, itinerary, updatedAt: new Date() } : trip
     );
+
+    // Sync to Supabase
+    import('@/lib/supabase').then(async ({ supabase }) => {
+      if (import.meta.env.VITE_SUPABASE_URL) {
+        try {
+          // 1. Delete existing itinerary to replace (cascade deletes days/items)
+          await supabase.from('itineraries').delete().eq('trip_id', tripId);
+          
+          // 2. Insert new itinerary
+          const { data: itData, error: itError } = await supabase.from('itineraries')
+            .insert({ trip_id: tripId, is_ai_draft: true }).select().single();
+            
+          if (itError || !itData) throw itError;
+
+          // 3. Insert days
+          const daysPayload = itinerary.days.map((d, index) => ({
+            itinerary_id: itData.id,
+            day_number: index + 1,
+            date: d.date.toISOString(),
+            title: d.title || `Day ${index + 1}`
+          }));
+          
+          const { data: daysData, error: daysError } = await supabase.from('itinerary_days')
+            .insert(daysPayload).select();
+            
+          if (daysError || !daysData) throw daysError;
+
+          // 4. Insert items
+          const itemsPayload: any[] = [];
+          itinerary.days.forEach((day, dIndex) => {
+            const dayRecord = daysData.find(d => d.day_number === dIndex + 1);
+            if (dayRecord) {
+              day.items.forEach((item, iIndex) => {
+                itemsPayload.push({
+                  day_id: dayRecord.id,
+                  time: item.time,
+                  title: item.title,
+                  description: item.description,
+                  type: item.type,
+                  location: item.location,
+                  duration: item.duration,
+                  is_ai_generated: item.isAiGenerated,
+                  is_must_do: item.isMustDo,
+                  notes: item.notes,
+                  order_index: iIndex
+                });
+              });
+            }
+          });
+          
+          if (itemsPayload.length > 0) {
+            await supabase.from('itinerary_items').insert(itemsPayload);
+          }
+        } catch (err) {
+          console.error('Failed to sync itinerary to Supabase:', err);
+        }
+      }
+    });
+
     return { trips, activeTrip: trips.find(t => t.id === state.activeTrip?.id) || null };
   }),
 
@@ -367,6 +605,33 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
     const trips = state.trips.map(trip => 
       trip.id === tripId ? { ...trip, decisions: [...trip.decisions, decision], updatedAt: new Date() } : trip
     );
+    
+    // Sync to Supabase
+    import('@/lib/supabase').then(({ supabase }) => {
+      if (import.meta.env.VITE_SUPABASE_URL) {
+        supabase.from('decisions').insert({
+          id: decision.id,
+          trip_id: tripId,
+          title: decision.title,
+          description: decision.description,
+          type: decision.type,
+          status: decision.status
+        }).then(({ error }) => {
+          if (error) console.error('Failed to sync decision:', error);
+          else {
+            // Insert options
+            const options = decision.options.map(o => ({
+              id: o.id,
+              decision_id: decision.id,
+              title: o.title,
+              description: o.description
+            }));
+            supabase.from('decision_options').insert(options).then();
+          }
+        });
+      }
+    });
+
     return { trips, activeTrip: trips.find(t => t.id === state.activeTrip?.id) || null };
   }),
 
@@ -380,6 +645,57 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
       }
       return trip;
     });
+
+    // Sync to Supabase
+    import('@/lib/supabase').then(({ supabase }) => {
+      if (import.meta.env.VITE_SUPABASE_URL) {
+        supabase.from('decisions').update({ status }).eq('id', decisionId).then(({ error }) => {
+          if (error) console.error('Failed to sync decision status:', error);
+        });
+      }
+    });
+
+    return { trips, activeTrip: trips.find(t => t.id === state.activeTrip?.id) || null };
+  }),
+
+  addDecisionVote: (tripId, decisionId, optionId, userId, vote) => set((state) => {
+    const trips = state.trips.map(trip => {
+      if (trip.id === tripId) {
+        const decisions = trip.decisions.map(d => {
+          if (d.id === decisionId) {
+            const options = d.options.map(o => {
+              if (o.id === optionId) {
+                // Remove existing vote by this user if any
+                const filteredVotes = o.votes.filter(v => v.userId !== userId);
+                return { ...o, votes: [...filteredVotes, { userId, vote }] };
+              } else {
+                // If it's single vote logic, maybe remove vote from other options?
+                // Assuming it's simple multi-vote for now, but usually voting 'for' removes 'for' on others.
+                return o;
+              }
+            });
+            return { ...d, options };
+          }
+          return d;
+        });
+        return { ...trip, decisions, updatedAt: new Date() };
+      }
+      return trip;
+    });
+
+    // Sync to Supabase
+    import('@/lib/supabase').then(({ supabase }) => {
+      if (import.meta.env.VITE_SUPABASE_URL) {
+        supabase.from('decision_votes').upsert({
+          decision_option_id: optionId,
+          user_id: userId,
+          vote: vote
+        }).then(({ error }) => {
+          if (error) console.error('Failed to sync vote:', error);
+        });
+      }
+    });
+
     return { trips, activeTrip: trips.find(t => t.id === state.activeTrip?.id) || null };
   }),
 

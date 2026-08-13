@@ -1,25 +1,41 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { cn } from '@/lib/utils/cn';
 import { useNavigate, useParams, Link } from 'react-router';
 import { TripProgress } from '@/components/trip/TripProgress';
 import { NextDecision } from '@/components/trip/NextDecision';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
+import { useTripStore } from '@/stores/tripStore';
 
 export const TripDashboardPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { activeTrip, setActiveTrip, trips, fetchTrips } = useTripStore();
 
-  // Mock Trip Data
-  const hasDestination = true;
+  useEffect(() => {
+    if (trips.length === 0) {
+      fetchTrips();
+    }
+  }, [fetchTrips, trips.length]);
+
+  useEffect(() => {
+    if (id && (!activeTrip || activeTrip.id !== id)) {
+      setActiveTrip(id);
+    }
+  }, [id, activeTrip, setActiveTrip]);
+
+  if (!activeTrip) {
+    return (
+      <div className="min-h-screen bg-warm-50 flex items-center justify-center">
+        <p className="text-warm-500">Loading trip data...</p>
+      </div>
+    );
+  }
+
+  const hasDestination = !!activeTrip.selectedDestination;
   
-  const mockDecision = {
-    id: 'd-accom',
-    title: 'Where should we stay?',
-    type: 'accommodation' as const,
-    status: 'voting' as const,
-    options: []
-  };
+  // Find the next open decision, or just show a fallback if none exist
+  const nextDecision = activeTrip.decisions?.find(d => d.status === 'open' || d.status === 'voting') || null;
 
   return (
     <div className="min-h-screen bg-warm-50 flex flex-col">
@@ -28,20 +44,22 @@ export const TripDashboardPage: React.FC = () => {
         {/* Hero Section */}
         <section className="gradient-warm rounded-2xl p-6 md:p-8 border border-warm-200/40 shadow-sm relative overflow-hidden">
           <div className="relative z-10">
-            <Badge variant="accent" className="mb-4">September Escape</Badge>
+            <Badge variant="accent" className="mb-4">Trip Dashboard</Badge>
             <h1 className="text-3xl md:text-4xl font-bold text-warm-900 tracking-tight mb-2">
-              {hasDestination ? 'Bali, Indonesia' : 'Still discovering...'}
+              {hasDestination ? `${activeTrip.selectedDestination?.title}, ${activeTrip.selectedDestination?.country}` : 'Still discovering...'}
             </h1>
-            <p className="text-warm-500 font-medium">Sep 15 - 19, 2026 • 4 Members</p>
+            <p className="text-warm-500 font-medium">
+              {activeTrip.members?.length || 1} Members
+            </p>
             
             <div className="mt-8 max-w-2xl">
               <TripProgress 
                 trip={{
                   checkpoints: [
-                    { id: '1', label: 'Destination', completed: true },
-                    { id: '2', label: 'Dates', completed: true },
-                    { id: '3', label: 'Accommodation', completed: false },
-                    { id: '4', label: 'Itinerary', completed: false },
+                    { id: '1', label: 'Destination', completed: !!activeTrip.selectedDestination },
+                    { id: '2', label: 'Dates', completed: !activeTrip.flexibleDates },
+                    { id: '3', label: 'Accommodation', completed: activeTrip.decisions?.some(d => d.type === 'accommodation' && d.status === 'decided') || false },
+                    { id: '4', label: 'Itinerary', completed: !!activeTrip.itinerary },
                   ]
                 }} 
               />
@@ -50,15 +68,17 @@ export const TripDashboardPage: React.FC = () => {
         </section>
 
         {/* Action Priority */}
-        <section>
-          <NextDecision 
-            title={mockDecision.title}
-            description="Locking this in helps finalize the budget and map out the daily itinerary."
-            actionLabel="Decide Now"
-            onAction={() => navigate(`/trips/${id}/decisions`)}
-            type={mockDecision.type}
-          />
-        </section>
+        {nextDecision && (
+          <section>
+            <NextDecision 
+              title={nextDecision.title}
+              description={nextDecision.description || "Locking this in helps finalize the budget and map out the daily itinerary."}
+              actionLabel="Decide Now"
+              onAction={() => navigate(`/trips/${id}/decisions`)}
+              type={nextDecision.type}
+            />
+          </section>
+        )}
 
         {/* Quick Links Grid */}
         <section>
@@ -96,30 +116,6 @@ export const TripDashboardPage: React.FC = () => {
             </Link>
 
           </div>
-        </section>
-
-        {/* Recent Activity */}
-        <section>
-          <h2 className="text-sm font-semibold text-warm-500 uppercase tracking-wider mb-4">Recent Updates</h2>
-          <Card className="bg-white border-warm-200/40 shadow-sm overflow-hidden p-0">
-             <div className="divide-y divide-warm-100">
-               {[
-                 { user: 'Andi', action: 'voted for', target: 'Villa in Seminyak', time: '2 hours ago' },
-                 { user: 'Rizky', action: 'suggested', target: 'Snorkeling trip', time: '5 hours ago' },
-                 { user: 'Bhara', action: 'marked as decided:', target: 'Dates (Sep 15 - 19)', time: '1 day ago' },
-               ].map((act, i) => (
-                 <div key={i} className="p-4 flex items-center gap-4 hover:bg-warm-50 transition-colors">
-                   <div className="w-8 h-8 rounded-full bg-warm-200 flex items-center justify-center text-xs font-medium shrink-0">
-                     {act.user.charAt(0)}
-                   </div>
-                   <p className="text-sm text-warm-600 flex-1">
-                     <span className="font-medium text-warm-900">{act.user}</span> {act.action} <span className="font-medium text-warm-900">{act.target}</span>
-                   </p>
-                   <span className="text-xs text-warm-400 whitespace-nowrap">{act.time}</span>
-                 </div>
-               ))}
-             </div>
-          </Card>
         </section>
 
       </main>

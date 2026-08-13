@@ -1,24 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router';
 import { AnimatePresence, motion } from 'motion/react';
 import { PageTransition } from '@/components/motion/PageTransition';
 import { cn } from '@/lib/utils/cn';
 import { useTripStore } from '@/stores/tripStore';
+import { useAuthStore } from '@/stores/authStore';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { StepIndicator } from './components/StepIndicator';
 import { formatCurrency } from '@/lib/utils/formatting';
+import type { User } from '@/types';
 
 export function CreateTripPage() {
   const navigate = useNavigate();
-  const createTrip = useTripStore((state) => state.createTrip);
-  const currentUser = useTripStore((state) => state.currentUser);
+  const { user: currentUser } = useAuthStore();
+  const { createTrip, searchUsers } = useTripStore();
   
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     name: '',
-    travelers: [currentUser.name],
+    invitedUsers: [] as User[],
     dateFlexibility: 'exact',
     duration: 5,
     budgetPerPerson: 5000000,
@@ -29,6 +31,35 @@ export function CreateTripPage() {
     transport: 'flight'
   });
 
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<User[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const searchRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    if (searchQuery.trim().length < 2) {
+      setSearchResults([]);
+      return;
+    }
+    
+    if (searchRef.current) clearTimeout(searchRef.current);
+    
+    searchRef.current = setTimeout(async () => {
+      setIsSearching(true);
+      const results = await searchUsers(searchQuery);
+      // Filter out users already invited or currentUser
+      const filtered = results.filter(u => 
+        currentUser && u.id !== currentUser.id && !formData.invitedUsers.some(invited => invited.id === u.id)
+      );
+      setSearchResults(filtered);
+      setIsSearching(false);
+    }, 300);
+    
+    return () => {
+      if (searchRef.current) clearTimeout(searchRef.current);
+    };
+  }, [searchQuery, formData.invitedUsers, searchUsers, currentUser?.id]);
+
   const nextStep = () => setStep(s => s + 1);
   const prevStep = () => setStep(s => Math.max(1, s - 1));
 
@@ -36,26 +67,20 @@ export function CreateTripPage() {
     const tripId = await createTrip({
       name: formData.name,
       origin: formData.startingLocation,
-      travelers: formData.travelers.length,
-      flexibleDates: formData.dateFlexibility !== 'exact'
+      flexibleDates: formData.dateFlexibility !== 'exact',
+      invitedUserIds: formData.invitedUsers.map(u => u.id)
     });
     navigate(`/trips/${tripId}/preferences`);
   };
 
-  const handleTravelerChange = (index: number, value: string) => {
-    const newTravelers = [...formData.travelers];
-    newTravelers[index] = value;
-    setFormData({ ...formData, travelers: newTravelers });
+  const addTraveler = (user: User) => {
+    setFormData({ ...formData, invitedUsers: [...formData.invitedUsers, user] });
+    setSearchQuery('');
+    setSearchResults([]);
   };
 
-  const addTraveler = () => {
-    setFormData({ ...formData, travelers: [...formData.travelers, ''] });
-  };
-
-  const removeTraveler = (index: number) => {
-    if (formData.travelers.length <= 1) return;
-    const newTravelers = formData.travelers.filter((_, i) => i !== index);
-    setFormData({ ...formData, travelers: newTravelers });
+  const removeTraveler = (userId: string) => {
+    setFormData({ ...formData, invitedUsers: formData.invitedUsers.filter(u => u.id !== userId) });
   };
 
   return (
@@ -99,30 +124,73 @@ export function CreateTripPage() {
           <motion.div key={2} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
             <div className="text-center space-y-3">
               <h1 className="text-3xl font-semibold text-warm-900 tracking-tight">Who's coming?</h1>
-              <p className="text-warm-600">{formData.travelers.length} traveler{formData.travelers.length > 1 ? 's' : ''}</p>
+              <p className="text-warm-600">You and {formData.invitedUsers.length} traveler{formData.invitedUsers.length !== 1 ? 's' : ''}</p>
             </div>
-            <div className="space-y-4">
-              {formData.travelers.map((t, i) => (
-                <div key={i} className="flex gap-2 items-end">
-                  <div className="flex-1">
-                    <Input
-                      label={i === 0 ? "You" : `Traveler ${i + 1}`}
-                      value={t}
-                      onChange={(e) => handleTravelerChange(i, e.target.value)}
-                      placeholder="Name"
-                      disabled={i === 0}
-                    />
+            
+            <div className="space-y-4 relative">
+              <div className="space-y-3 mb-6">
+                <div className="flex items-center gap-3 p-3 bg-white border border-warm-200 rounded-xl">
+                  <div className="w-10 h-10 rounded-full bg-accent-100 flex items-center justify-center font-bold text-accent-700">
+                    {currentUser?.name?.charAt(0) || 'U'}
                   </div>
-                  {i > 0 && (
-                    <Button variant="secondary" onClick={() => removeTraveler(i)}>
+                  <div className="flex-1">
+                    <p className="font-medium text-warm-900">{currentUser?.name || 'You'} (You)</p>
+                    <p className="text-xs text-warm-500">{currentUser?.email || ''}</p>
+                  </div>
+                </div>
+
+                {formData.invitedUsers.map((u) => (
+                  <div key={u.id} className="flex items-center gap-3 p-3 bg-white border border-warm-200 rounded-xl">
+                    <div className="w-10 h-10 rounded-full bg-warm-100 flex items-center justify-center font-bold text-warm-700">
+                      {u.name.charAt(0)}
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium text-warm-900">{u.name}</p>
+                      <p className="text-xs text-warm-500">{u.email}</p>
+                    </div>
+                    <Button variant="secondary" onClick={() => removeTraveler(u.id)} className="text-sm px-3">
                       Remove
                     </Button>
-                  )}
-                </div>
-              ))}
-              <Button variant="secondary" onClick={addTraveler} className="w-full">
-                + Add traveler
-              </Button>
+                  </div>
+                ))}
+              </div>
+
+              <div className="relative">
+                <Input
+                  label="Invite Friends"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search by name or email..."
+                />
+                
+                {searchQuery.trim().length >= 2 && (
+                  <Card className="absolute top-full left-0 right-0 mt-2 p-2 z-10 shadow-lg border-warm-200 max-h-60 overflow-y-auto">
+                    {isSearching ? (
+                      <p className="text-sm text-warm-500 p-4 text-center">Searching...</p>
+                    ) : searchResults.length > 0 ? (
+                      <div className="space-y-1">
+                        {searchResults.map(user => (
+                          <button
+                            key={user.id}
+                            className="w-full text-left p-3 hover:bg-warm-50 rounded-lg flex items-center gap-3 transition-colors"
+                            onClick={() => addTraveler(user)}
+                          >
+                            <div className="w-8 h-8 rounded-full bg-warm-200 flex items-center justify-center font-medium text-warm-700 text-sm">
+                              {user.name.charAt(0)}
+                            </div>
+                            <div>
+                              <p className="font-medium text-warm-900 text-sm">{user.name}</p>
+                              <p className="text-xs text-warm-500">{user.email}</p>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-warm-500 p-4 text-center">No users found.</p>
+                    )}
+                  </Card>
+                )}
+              </div>
             </div>
             <div className="flex gap-4 pt-4">
               <Button variant="secondary" onClick={prevStep} className="flex-1">Back</Button>

@@ -8,86 +8,19 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Dialog } from '@/components/ui/Dialog';
 import { PageTransition } from '@/components/motion/PageTransition';
-
-// Mock Decisions
-const MOCK_DECISIONS: Decision[] = [
-  {
-    id: 'd1',
-    title: 'Where should we go?',
-    description: 'Destination selection',
-    type: 'destination',
-    status: 'decided',
-    decidedOption: 'o1',
-    participants: [],
-    createdAt: new Date(),
-    options: [
-      { id: 'o1', title: 'Bali, Indonesia', votes: [{ userId: 'u1', vote: 'for' }, { userId: 'u2', vote: 'for' }] }
-    ]
-  },
-  {
-    id: 'd2',
-    title: 'When are we going?',
-    description: 'Dates for the trip',
-    type: 'dates',
-    status: 'decided',
-    decidedOption: 'o2',
-    participants: [],
-    createdAt: new Date(),
-    options: [
-      { id: 'o2', title: 'Sep 15 - 19', votes: [{ userId: 'u1', vote: 'for' }, { userId: 'u3', vote: 'for' }] }
-    ]
-  },
-  {
-    id: 'd3',
-    title: 'Where should we stay?',
-    description: 'Accommodation style',
-    type: 'accommodation',
-    status: 'voting',
-    participants: [],
-    createdAt: new Date(),
-    options: [
-      { id: 'o3', title: 'Villa in Seminyak', description: 'Private pool, 4 beds', votes: [{ userId: 'u1', vote: 'for' }, { userId: 'u2', vote: 'for' }] },
-      { id: 'o4', title: 'Hotel in Kuta', description: 'Beachfront, breakfast incl.', votes: [{ userId: 'u3', vote: 'for' }] },
-      { id: 'o5', title: 'Airbnb in Ubud', description: 'Jungle views', votes: [] },
-    ]
-  },
-  {
-    id: 'd4',
-    title: 'How do we get around?',
-    description: 'Transportation mode',
-    type: 'transportation',
-    status: 'open',
-    participants: [],
-    createdAt: new Date(),
-    options: [
-      { id: 'o6', title: 'Rent scooters', votes: [] },
-      { id: 'o7', title: 'Hire a driver', votes: [] },
-      { id: 'o8', title: 'Mix of both', votes: [] },
-    ]
-  },
-  {
-    id: 'd5',
-    title: 'What should we do on Day 2?',
-    description: 'Main activity for the second day',
-    type: 'activity',
-    status: 'open',
-    participants: [],
-    createdAt: new Date(),
-    options: [
-      { id: 'o9', title: 'Beach day at Canggu', votes: [] },
-      { id: 'o10', title: 'Uluwatu Temple tour', votes: [] },
-      { id: 'o11', title: 'Snorkeling trip', votes: [] },
-    ]
-  }
-];
+import { useTripStore } from '@/stores/tripStore';
+import { useAuthStore } from '@/stores/authStore';
 
 export const DecisionsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [decisions, setDecisions] = useState(MOCK_DECISIONS);
+  const { activeTrip, addDecision, addDecisionVote } = useTripStore();
+  const { user } = useAuthStore();
   const [filter, setFilter] = useState<'all' | 'open' | 'decided'>('open');
   const [isNewDecisionOpen, setIsNewDecisionOpen] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [newDescription, setNewDescription] = useState('');
+
+  const decisions = activeTrip?.decisions || [];
 
   const filteredDecisions = decisions.filter(d => {
     if (filter === 'all') return true;
@@ -97,26 +30,28 @@ export const DecisionsPage: React.FC = () => {
   });
 
   const handleVote = (decisionId: string, optionId: string) => {
-    // Mock vote logic
-    console.log('Voted for', optionId, 'in decision', decisionId);
+    if (!id || !user) return;
+    addDecisionVote(id, decisionId, optionId, user.id, 'for');
   };
 
   const handleCreateDecision = () => {
-    if (!newTitle.trim()) return;
+    if (!newTitle.trim() || !id) return;
+    // We generate UUIDs matching Supabase format usually, but here we let Supabase handle it if we want.
+    // However our store expects an ID, so let's generate a temporary unique string (UUID format is better, but we'll use a random string).
+    const newDecisionId = crypto.randomUUID();
     const newDecision: Decision = {
-      id: `d${Date.now()}`,
+      id: newDecisionId,
       title: newTitle,
       description: newDescription,
       type: 'activity',
       status: 'open',
-      participants: [],
       createdAt: new Date(),
       options: [
-        { id: `o${Date.now()}_1`, title: 'Option 1', votes: [] },
-        { id: `o${Date.now()}_2`, title: 'Option 2', votes: [] },
+        { id: crypto.randomUUID(), title: 'Option 1', description: '', votes: [] },
+        { id: crypto.randomUUID(), title: 'Option 2', description: '', votes: [] },
       ]
     };
-    setDecisions([newDecision, ...decisions]);
+    addDecision(id, newDecision);
     setIsNewDecisionOpen(false);
     setNewTitle('');
     setNewDescription('');

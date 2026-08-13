@@ -14,9 +14,11 @@ export function Avatar({ name, src, size = 'md', className, ...props }: AvatarPr
     lg: 'w-12 h-12 text-base',
   };
 
-  const getInitials = (name: string) => {
+  const getInitials = (name?: string) => {
+    if (!name) return 'U';
     return name
       .split(' ')
+      .filter(Boolean)
       .map(part => part[0])
       .join('')
       .substring(0, 2)

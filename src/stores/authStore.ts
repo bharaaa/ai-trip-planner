@@ -54,6 +54,10 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   signOut: async () => {
+    // Clear trips state to prevent data leakage between accounts on the same device
+    const { useTripStore } = await import('./tripStore');
+    useTripStore.getState().clearTrips();
+    
     await supabase.auth.signOut();
   }
 }));

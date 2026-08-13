@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { PageTransition } from '@/components/motion/PageTransition';
 import { cn } from '@/lib/utils/cn';
 import { useTripStore } from '@/stores/tripStore';
 import { useNavigate, useParams } from 'react-router';
-import { TripHeader } from '@/components/trip/TripHeader';
 import { GroupPreferenceSummary } from '@/components/discovery/GroupPreferenceSummary';
 import { RecommendationGrid } from '@/components/discovery/RecommendationGrid';
 import { AILoadingState } from '@/components/ai/AILoadingState';
@@ -122,34 +122,43 @@ export const DiscoveryPage = () => {
   const selectedIdea = activeTrip.tripIdeas.find(i => i.id === selectedIdeaId);
 
   return (
-    <div className="min-h-screen bg-warm-50/50 pb-24">
-      <TripHeader 
-        tripName="September Escape" 
-        members={activeTrip.members} 
-        phase="Discovery" 
-      />
-      
-      <div className="max-w-6xl mx-auto px-6 pt-8 space-y-10">
+    <PageTransition className="min-h-screen bg-warm-50 pb-32">
+      <div className="max-w-6xl mx-auto px-6 pt-12 space-y-10">
         
         {/* Context Bar */}
-        <div className="bg-white rounded-xl border border-warm-200 p-4 text-center text-sm font-medium text-warm-700 shadow-sm flex flex-wrap justify-center gap-2 items-center">
-          <span>4 friends</span>
-          <span className="text-warm-300">•</span>
-          <span>September</span>
-          <span className="text-warm-300">•</span>
-          <span>4–5 days</span>
-          <span className="text-warm-300">•</span>
-          <span>Rp 4M/person</span>
-          <span className="text-warm-300">•</span>
-          <span>Jakarta</span>
+        <div className="bg-warm-100 rounded-xl px-5 py-4 flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm font-medium text-warm-700 shadow-sm">
+          <div className="flex items-center gap-2">
+            <span className="text-sm">👥</span>
+            <span>4 friends</span>
+          </div>
+          <div className="hidden sm:block text-warm-300">•</div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm">📅</span>
+            <span>September</span>
+          </div>
+          <div className="hidden sm:block text-warm-300">•</div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm">⏳</span>
+            <span>4–5 days</span>
+          </div>
+          <div className="hidden sm:block text-warm-300">•</div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm">💰</span>
+            <span>Rp 4M/person</span>
+          </div>
+          <div className="hidden sm:block text-warm-300">•</div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm">📍</span>
+            <span>Jakarta</span>
+          </div>
         </div>
 
         <GroupPreferenceSummary preferences={aggregatePreferences} />
         
-        <hr className="border-warm-200" />
+        <hr className="border-warm-200/60" />
 
         <div>
-          <h2 className="text-2xl font-semibold text-warm-900 mb-6">Trip ideas for your group</h2>
+          <h2 className="text-2xl font-semibold text-warm-900 tracking-tight mb-8">Here's what we found</h2>
           
           {isLoading ? (
             <AILoadingState 
@@ -163,7 +172,7 @@ export const DiscoveryPage = () => {
           ) : isRefining ? (
             <AILoadingState message="Refining ideas based on your group's feedback..." />
           ) : (
-            <div className="space-y-12">
+            <div className="space-y-16">
               <RecommendationGrid 
                 ideas={activeTrip.tripIdeas} 
                 reactions={ideasReactions}
@@ -173,8 +182,8 @@ export const DiscoveryPage = () => {
               />
 
               {allReacted && (
-                <div className="space-y-8 animate-slide-up">
-                  <h3 className="text-xl font-semibold text-warm-900 text-center">Group Consensus</h3>
+                <div className="space-y-8 animate-slide-up pt-8 border-t border-warm-200/60">
+                  <h3 className="text-xl font-semibold text-warm-900 text-center tracking-tight">Group Consensus</h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {activeTrip.tripIdeas.map(idea => (
                       <GroupConsensus 
@@ -214,11 +223,11 @@ export const DiscoveryPage = () => {
       <Dialog open={!!selectedIdeaId} onClose={() => setSelectedIdeaId(null)}>
         {selectedIdea && (
           <div className="p-6">
-            <h2 className="text-2xl font-bold mb-4">{selectedIdea.destination}</h2>
+            <h2 className="text-2xl font-bold mb-4 text-warm-900 tracking-tight">{selectedIdea.destination}</h2>
             <p className="text-warm-600 mb-6">{selectedIdea.reasons?.[0]}</p>
             
-            <div className="mb-6">
-              <h4 className="font-semibold mb-2">How do you feel about this destination?</h4>
+            <div className="mb-8">
+              <h4 className="font-medium text-warm-900 mb-4">How do you feel about this destination?</h4>
               <ReactionBar 
                 ideaId={selectedIdea.id}
                 currentReaction={userReactions[selectedIdea.id]}
@@ -227,7 +236,7 @@ export const DiscoveryPage = () => {
             </div>
             
             <button 
-              className="w-full py-3 bg-warm-900 text-white rounded-xl font-medium"
+              className="w-full py-3.5 bg-warm-900 text-white rounded-xl font-medium shadow-sm hover:bg-warm-800 transition-colors"
               onClick={() => handleSelectDestination(selectedIdea)}
             >
               Select this destination
@@ -235,6 +244,6 @@ export const DiscoveryPage = () => {
           </div>
         )}
       </Dialog>
-    </div>
+    </PageTransition>
   );
 };

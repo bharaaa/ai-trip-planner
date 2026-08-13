@@ -1,11 +1,12 @@
 import React from 'react';
+import { motion } from 'motion/react';
 import { cn } from '@/lib/utils/cn';
 import type { TripIdea, TripReaction, ReactionType } from '@/types';
 import { formatBudgetRange } from '@/lib/utils/formatting';
-// Use emojis instead of lucide-react
 
 interface TripIdeaCardProps {
   idea: TripIdea;
+  featured?: boolean;
   reactions?: TripReaction[];
   userReaction?: ReactionType;
   onReact?: (reaction: ReactionType) => void;
@@ -26,6 +27,7 @@ const getGradient = (destinationName: string) => {
 
 export const TripIdeaCard: React.FC<TripIdeaCardProps> = ({
   idea,
+  featured,
   reactions = [],
   userReaction,
   onReact,
@@ -42,118 +44,87 @@ export const TripIdeaCard: React.FC<TripIdeaCardProps> = ({
   );
 
   return (
-    <div 
+    <motion.div 
+      layoutId={`destination-${idea.id}`}
       className={cn(
-        "flex flex-col bg-white border border-warm-200 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-lg animate-slide-up",
+        "flex flex-col group cursor-pointer animate-slide-up h-full",
         className
       )}
       style={style}
+      onClick={onExplore}
     >
       {/* Header Image */}
-      {idea.imageUrl ? (
-        <div className="h-40 w-full relative">
-          <img src={idea.imageUrl} alt={idea.destination} className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-        </div>
-      ) : (
-        <div className={cn("h-40 w-full bg-gradient-to-br", getGradient(idea.destination))} />
-      )}
+      <div className={cn(
+        "w-full relative rounded-2xl overflow-hidden mb-5",
+        featured ? "aspect-[16/9] md:aspect-[21/9]" : "aspect-[4/3]"
+      )}>
+        {idea.imageUrl ? (
+          <img src={idea.imageUrl} alt={idea.destination} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+        ) : (
+          <div className={cn("w-full h-full bg-gradient-to-br transition-transform duration-700 group-hover:scale-105", getGradient(idea.destination))} />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/0 to-transparent" />
+      </div>
 
-      <div className="p-6 flex flex-col flex-grow">
-        {/* Destination & Badges */}
-        <div className="flex justify-between items-start mb-3">
-          <h3 className="text-xl font-semibold text-warm-900 flex items-center gap-2">
+      <div className="flex flex-col flex-grow px-1">
+        {/* Destination */}
+        <div className="flex items-center gap-3 mb-2">
+          <h3 className={cn("font-semibold text-warm-900 tracking-tight", featured ? "text-3xl" : "text-2xl")}>
             {idea.destination}
           </h3>
-          <div className="flex flex-wrap gap-1 justify-end">
-            {(idea as any).tags?.slice(0, 3).map((tag: string, i: number) => (
-              <span key={i} className="text-xs px-2 py-1 bg-warm-50 text-warm-700 rounded-lg whitespace-nowrap">
-                {tag}
-              </span>
-            ))}
-          </div>
+          {idea.fitScore !== undefined && (
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-accent-50 text-accent-700 border border-accent-100">
+              {idea.fitScore}% match
+            </span>
+          )}
         </div>
 
-        {/* Group Fit Section */}
-        {idea.fitScore !== undefined && (
-          <div className="mb-4">
-            <div className="flex justify-between text-xs text-warm-500 mb-1">
-              <span>AI-estimated group fit</span>
-              <span className="font-medium">{idea.fitScore}%</span>
-            </div>
-            <div className="h-1.5 w-full bg-warm-100 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-accent-400 rounded-full"
-                style={{ width: `${idea.fitScore}%` }}
-              />
-            </div>
-          </div>
+        {/* AI Insight */}
+        {idea.reasons?.[0] && (
+          <p className="text-warm-600 mb-4 leading-relaxed text-sm">
+            {idea.reasons[0]}
+          </p>
         )}
 
         {/* Key Info */}
-        <div className="flex gap-4 text-sm text-warm-600 mb-4">
+        <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-warm-500 mb-5 font-medium">
           <div className="flex items-center gap-1.5">
-            <span className="text-sm">💳</span>
+            <span>💳</span>
             {formatBudgetRange(idea.estimatedBudget.min, idea.estimatedBudget.max)}
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="text-sm">⏰</span>
+            <span>⏰</span>
             {idea.suggestedDuration} days
           </div>
         </div>
 
-        {/* Reasons */}
-        <div className="mb-6 flex-grow">
-          <h4 className="text-sm font-medium text-warm-800 mb-2">Fits your group because...</h4>
-          <ul className="space-y-1.5">
-            {idea.reasons?.map((reason: string, i: number) => (
-              <li key={i} className="text-sm text-warm-600 flex items-start gap-2">
-                <span className="text-xs text-accent-400 mt-0.5 shrink-0">✅</span>
-                <span className="leading-tight">{reason}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Highlights */}
-        {idea.highlights && idea.highlights.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-6">
-            {idea.highlights.slice(0, 3).map((highlight, i) => (
-              <span key={i} className="text-xs px-2.5 py-1 border border-warm-200 text-warm-600 rounded-lg">
-                {highlight}
-              </span>
-            ))}
-          </div>
-        )}
-
         {/* Reactions Summary & Actions */}
-        <div className="flex items-center justify-between pt-4 border-t border-warm-100 mt-auto">
-          {reactions.length > 0 ? (
-            <div className="flex gap-3 text-sm">
-              <span className="flex items-center gap-1 text-warm-600" title="Love">
-                ❤️ {reactionCounts.love}
-              </span>
-              <span className="flex items-center gap-1 text-warm-600" title="Maybe">
-                👍 {reactionCounts.maybe}
-              </span>
-              <span className="flex items-center gap-1 text-warm-600" title="No">
-                👎 {reactionCounts.nope}
-              </span>
+        <div className="flex items-center justify-between pt-4 mt-auto border-t border-warm-100">
+          <div className="flex gap-2">
+            <div className="flex items-center gap-1.5 bg-warm-50 px-2.5 py-1 rounded-full text-sm border border-warm-200/60" title="Love">
+              ❤️ <span className="font-semibold text-warm-700">{reactionCounts.love}</span>
             </div>
-          ) : (
-            <div className="text-xs text-warm-400">No reactions yet</div>
-          )}
+            <div className="flex items-center gap-1.5 bg-warm-50 px-2.5 py-1 rounded-full text-sm border border-warm-200/60" title="Maybe">
+              👍 <span className="font-semibold text-warm-700">{reactionCounts.maybe}</span>
+            </div>
+            <div className="flex items-center gap-1.5 bg-warm-50 px-2.5 py-1 rounded-full text-sm border border-warm-200/60" title="No">
+              👎 <span className="font-semibold text-warm-700">{reactionCounts.nope}</span>
+            </div>
+          </div>
 
           {onExplore && (
             <button 
-              onClick={onExplore}
-              className="px-4 py-2 bg-warm-900 hover:bg-warm-800 text-white text-sm font-medium rounded-lg transition-colors"
+              onClick={(e) => {
+                e.stopPropagation();
+                onExplore();
+              }}
+              className="text-accent-500 text-sm font-semibold hover:text-accent-600 transition-colors flex items-center gap-1"
             >
-              Explore
+              Explore details &rarr;
             </button>
           )}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };

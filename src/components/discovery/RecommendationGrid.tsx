@@ -1,5 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils/cn';
+import { StaggerContainer } from '@/components/motion/StaggerContainer';
+import { StaggerItem } from '@/components/motion/StaggerItem';
 import type { TripIdea, TripReaction, ReactionType } from '@/types';
 import { TripIdeaCard } from './TripIdeaCard';
 
@@ -21,18 +23,22 @@ export const RecommendationGrid: React.FC<RecommendationGridProps> = ({
   className,
 }) => {
   return (
-    <div className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6", className)}>
+    <StaggerContainer className={cn("grid grid-cols-1 md:grid-cols-12 gap-8", className)}>
       {ideas.map((idea, index) => (
-        <TripIdeaCard
+        <StaggerItem 
           key={idea.id}
-          idea={idea}
-          reactions={reactions[idea.id]}
-          userReaction={userReactions[idea.id]}
-          onReact={onReact ? (r) => onReact(idea.id, r) : undefined}
-          onExplore={onExplore ? () => onExplore(idea.id) : undefined}
-          style={{ animationDelay: `${index * 100}ms` }}
-        />
+          className={cn(index === 0 ? "col-span-12" : "col-span-12 md:col-span-6")}
+        >
+          <TripIdeaCard
+            idea={idea}
+            featured={index === 0}
+            reactions={reactions[idea.id]}
+            userReaction={userReactions[idea.id]}
+            onReact={onReact ? (r) => onReact(idea.id, r) : undefined}
+            onExplore={onExplore ? () => onExplore(idea.id) : undefined}
+          />
+        </StaggerItem>
       ))}
-    </div>
+    </StaggerContainer>
   );
 };

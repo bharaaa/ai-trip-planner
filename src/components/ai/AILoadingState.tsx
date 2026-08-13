@@ -1,5 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils/cn';
+import { StaggerContainer } from '@/components/motion/StaggerContainer';
+import { StaggerItem } from '@/components/motion/StaggerItem';
 
 export interface AILoadingStep {
   label: string;
@@ -14,36 +16,37 @@ export interface AILoadingStateProps {
 
 export function AILoadingState({ message, steps, className }: AILoadingStateProps) {
   return (
-    <div className={cn('flex flex-col gap-4 p-6 bg-white rounded-2xl border border-warm-200', className)}>
-      <div className="flex items-center gap-3">
-        <div className="relative flex items-center justify-center w-8 h-8 rounded-full bg-accent-50 text-accent-500">
-          <svg className="animate-spin w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
+    <div className={cn('flex flex-col items-center justify-center gap-6 p-8 bg-warm-50 rounded-2xl max-w-lg mx-auto border border-warm-200/50 shadow-sm', className)}>
+      <div className="flex flex-col items-center gap-4 text-center">
+        <div className="flex gap-1.5">
+          <div className="w-2.5 h-2.5 bg-accent-400 rounded-full dot-pulse" style={{ animationDelay: '0ms' }} />
+          <div className="w-2.5 h-2.5 bg-accent-400 rounded-full dot-pulse" style={{ animationDelay: '150ms' }} />
+          <div className="w-2.5 h-2.5 bg-accent-400 rounded-full dot-pulse" style={{ animationDelay: '300ms' }} />
         </div>
-        <p className="text-warm-900 font-medium">{message}</p>
+        <p className="text-warm-900 font-semibold text-lg">{message}</p>
       </div>
       
       {steps && steps.length > 0 && (
-        <div className="pl-11 flex flex-col gap-2">
+        <StaggerContainer className="flex flex-col gap-3 w-full max-w-sm mt-2">
           {steps.map((step, i) => (
-            <div key={i} className="flex items-center gap-2 text-sm">
-              <div className="w-4 h-4 flex items-center justify-center shrink-0">
+            <StaggerItem key={i} className="flex items-center gap-3 text-sm bg-white p-3 rounded-xl border border-warm-200 shadow-xs">
+              <div className="w-5 h-5 flex items-center justify-center shrink-0">
                 {step.completed ? (
-                  <svg className="w-4 h-4 text-accent-500" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
+                  <div className="w-5 h-5 rounded-full bg-accent-400 text-white flex items-center justify-center">
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
                 ) : (
-                  <div className="w-1.5 h-1.5 rounded-full bg-warm-300 animate-pulse" />
+                  <div className="w-2 h-2 rounded-full bg-warm-200 animate-pulse" />
                 )}
               </div>
-              <span className={cn(step.completed ? 'text-warm-700' : 'text-warm-500')}>
+              <span className={cn('font-medium', step.completed ? 'text-warm-900' : 'text-warm-500')}>
                 {step.label}
               </span>
-            </div>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       )}
     </div>
   );

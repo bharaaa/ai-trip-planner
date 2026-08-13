@@ -12,8 +12,8 @@ export function Badge({ className, variant = 'default', size = 'md', children, .
   const variants = {
     default: 'bg-warm-100 text-warm-700',
     accent: 'bg-accent-100 text-accent-700',
-    success: 'bg-green-50 text-green-700',
-    warning: 'bg-amber-50 text-amber-700',
+    success: 'bg-success-50 text-success-600',
+    warning: 'bg-warning-50 text-warning-500',
     outline: 'border border-warm-200 text-warm-600 bg-transparent',
   };
   

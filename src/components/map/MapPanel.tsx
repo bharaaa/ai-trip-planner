@@ -8,33 +8,41 @@ interface MapPanelProps {
   className?: string;
 }
 
-export const MapPanel: React.FC<MapPanelProps> = ({ destination, activities, className }) => {
+export const MapPanel: React.FC<MapPanelProps> = ({ destination, activities = [], className }) => {
   return (
-    <div className={cn("w-full h-full min-h-[400px] rounded-2xl overflow-hidden relative bg-gradient-to-br from-warm-100 to-warm-50 flex items-center justify-center border border-warm-200", className)}>
+    <div className={cn("w-full h-full min-h-[400px] rounded-2xl overflow-hidden relative bg-gradient-to-br from-warm-100 to-warm-200 flex items-center justify-center border border-warm-200/50", className)}>
       {/* Abstract map lines */}
-      <svg className="absolute inset-0 w-full h-full opacity-20" preserveAspectRatio="none" viewBox="0 0 100 100">
-        <path d="M0 20 Q 25 30, 50 10 T 100 40 L 100 100 L 0 100 Z" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-warm-400" />
-        <path d="M0 40 Q 30 60, 60 30 T 100 70" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-warm-400" />
-        <path d="M0 60 Q 40 80, 70 50 T 100 90" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-warm-400" />
+      <svg className="absolute inset-0 w-full h-full opacity-10" preserveAspectRatio="none" viewBox="0 0 100 100">
+        {/* Grid pattern */}
+        <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
+          <path d="M 10 0 L 0 0 0 10" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-warm-500" />
+        </pattern>
+        <rect width="100%" height="100%" fill="url(#grid)" />
       </svg>
       
-      {/* Map pins layer */}
-      <div className="absolute inset-0 w-full h-full opacity-60">
-        <div className="absolute top-[30%] left-[40%] w-3 h-3 bg-accent-400 rounded-full shadow-[0_0_15px_rgba(224,122,95,0.5)] animate-pulse" />
-        <div className="absolute top-[45%] left-[60%] w-2.5 h-2.5 bg-accent-300 rounded-full" />
-        <div className="absolute top-[60%] left-[35%] w-2 h-2 bg-accent-300 rounded-full" />
-        <div className="absolute top-[25%] left-[65%] w-2 h-2 bg-accent-300 rounded-full" />
+      {/* Activity Pills */}
+      <div className="absolute inset-0 w-full h-full opacity-80 pointer-events-none">
+        {activities.slice(0, 5).map((activity, i) => (
+          <div 
+            key={activity.id} 
+            className="absolute bg-white px-2 py-1 rounded-full text-[10px] font-medium text-warm-700 shadow-sm border border-warm-200 flex items-center gap-1"
+            style={{
+              top: `${20 + (i * 15)}%`,
+              left: `${15 + (i * 12) + (i % 2 === 0 ? 10 : 0)}%`,
+            }}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-accent-400" />
+            {activity.location || activity.title}
+          </div>
+        ))}
       </div>
 
-      <div className="relative z-10 text-center px-6 py-8 bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-white max-w-[80%]">
-        <div className="w-12 h-12 bg-accent-50 text-accent-500 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-        </div>
-        <h3 className="text-lg font-semibold text-warm-900 mb-1">
-          {destination ? `Map of ${destination}` : 'Interactive Map'}
+      <div className="relative z-10 text-center px-8 py-10 bg-white/60 backdrop-blur-md rounded-2xl shadow-sm border border-white max-w-[80%]">
+        <h3 className="text-xl font-semibold text-warm-900 mb-2">
+          {destination ? destination : 'Map'}
         </h3>
-        <p className="text-sm text-warm-500">
-          Map integration coming soon. You'll be able to see all your activities and routes here.
+        <p className="text-sm text-warm-600 font-medium">
+          Map coming soon
         </p>
       </div>
     </div>

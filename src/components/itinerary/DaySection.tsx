@@ -22,17 +22,26 @@ export const DaySection: React.FC<DaySectionProps> = ({
   isEditable = true,
 }) => {
   return (
-    <div className="flex flex-col mb-12">
-      <div className="mb-6 pl-4 border-l-2 border-accent-400">
-        <h2 className="text-sm uppercase tracking-wider text-warm-500 font-semibold mb-1">
-          Day {dayIndex + 1} {day.date ? `• ${day.date}` : ''}
-        </h2>
-        {day.title && (
-          <h3 className="text-xl font-semibold text-warm-900">{day.title}</h3>
-        )}
+    <div className="flex flex-col mb-4">
+      <div className="mb-4 pb-3 border-b border-warm-200/40 flex items-center gap-3">
+        <div className="w-7 h-7 bg-accent-400 text-white rounded-full flex items-center justify-center text-xs font-bold">
+          {dayIndex + 1}
+        </div>
+        <div>
+          {day.title && (
+            <h3 className="text-lg font-semibold text-warm-900 leading-tight">
+              {day.title}
+            </h3>
+          )}
+          {day.date && (
+            <span className="text-xs uppercase tracking-wider text-warm-500 font-medium">
+              {day.date.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }) || day.date.toString()}
+            </span>
+          )}
+        </div>
       </div>
 
-      <Timeline>
+      <Timeline className="space-y-1">
         {day.items.map((item) => (
           <ActivityCard
             key={item.id}

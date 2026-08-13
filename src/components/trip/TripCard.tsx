@@ -1,8 +1,8 @@
 import React from 'react';
 import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
-import { Progress } from '../ui/Progress';
 import { MemberAvatars } from './MemberAvatars';
+import { cn } from '@/lib/utils/cn';
 
 import type { Trip } from '@/types';
 export interface TripCardProps {
@@ -24,32 +24,34 @@ export function TripCard({ trip, onClick, className }: TripCardProps) {
     <Card 
       variant="interactive" 
       onClick={onClick}
-      className={className}
+      className={cn("relative overflow-hidden group hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 border-l-4 border-l-accent-400", className)}
     >
-      <div className="flex justify-between items-start mb-4">
-        <div>
-          <h3 className="text-lg font-semibold text-warm-900 mb-1">{trip.name}</h3>
-          <p className="text-warm-500 text-sm">{trip.selectedDestination?.name || 'Deciding destination...'}</p>
+      <div className="p-5">
+        <div className="flex justify-between items-start mb-4">
+          <div>
+            <h3 className="text-base font-semibold text-warm-900 mb-1">{trip.name}</h3>
+            <p className="text-sm text-warm-500">{trip.selectedDestination?.name || 'Deciding destination...'}</p>
+          </div>
+          <Badge variant={statusColors[trip.status] || 'default'} className="capitalize">
+            {trip.status}
+          </Badge>
         </div>
-        <Badge variant={statusColors[trip.status] || 'default'} className="capitalize">
-          {trip.status}
-        </Badge>
-      </div>
 
-      <div className="mb-6">
-        <Progress 
-          value={trip.progress || 0} 
-          label={trip.phase} 
-          showValue 
-          size="sm" 
-        />
-      </div>
-
-      <div className="flex justify-between items-center mt-auto pt-4 border-t border-warm-100">
-        <MemberAvatars members={trip.members} size="sm" />
-        <span className="text-xs text-warm-500">
-          {trip.memberCount} traveler{trip.memberCount !== 1 ? 's' : ''}
-        </span>
+        <div className="flex justify-between items-end mt-4">
+          <div className="flex-1 mr-6">
+             <div className="h-1 w-full bg-warm-100 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-accent-400 rounded-full transition-all duration-500" 
+                  style={{ width: `${trip.progress || 0}%` }}
+                />
+             </div>
+             <p className="text-xs text-warm-500 mt-2">{trip.phase}</p>
+          </div>
+          
+          <div className="flex items-center">
+            <MemberAvatars members={trip.members} size="sm" className="-space-x-2" />
+          </div>
+        </div>
       </div>
     </Card>
   );

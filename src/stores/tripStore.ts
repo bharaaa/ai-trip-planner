@@ -8,7 +8,8 @@ interface TripStoreState {
   isGeneratingIdeas: boolean;
   isGeneratingItinerary: boolean;
   
-  createTrip: (data: Partial<Trip>) => string;
+  fetchTrips: () => Promise<void>;
+  createTrip: (data: Partial<Trip>) => Promise<string>;
   setActiveTrip: (tripId: string) => void;
   addMember: (tripId: string, member: TripMember) => void;
   submitPreferences: (tripId: string, userId: string, preferences: Preference) => void;
@@ -27,7 +28,7 @@ interface TripStoreState {
   setGeneratingItinerary: (value: boolean) => void;
 }
 
-const defaultUser: User = { id: 'user_1', name: 'Bhara', email: 'bhara@email.com' };
+const defaultUser: User = { id: '00000000-0000-0000-0000-000000000001', name: 'Bhara', email: 'bhara@email.com' };
 
 export const useTripStore = create<TripStoreState>((set, get) => ({
   currentUser: defaultUser,
@@ -36,10 +37,95 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
   isGeneratingIdeas: false,
   isGeneratingItinerary: false,
 
-  createTrip: (data) => {
-    const id = `trip_${Date.now()}`;
-    const newTrip: Trip = {
-      id,
+  // ADDED: Fetch trips from Supabase
+  fetchTrips: async () => {
+    try {
+      const { supabase } = await import('@/lib/supabase');
+      // Checking if user has configured env keys
+      if (!import.meta.env.VITE_SUPABASE_URL) return;
+
+      const { data, error } = await supabase
+        .from('trips')
+        .select(`
+          *,
+          members:trip_members(*),
+          preferences:trip_preferences(*),
+          tripIdeas:trip_ideas(
+            *,
+            reactions:trip_reactions(*)
+          ),
+          decisions(*),
+          tasks(*),
+          expenses(*)
+        `)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      
+      if (data && data.length > 0) {
+        // Map snake_case database rows back to camelCase frontend types
+        const mappedTrips = data.map((t: any) => {
+          const allReactions: any[] = [];
+          
+          const mappedIdeas = (t.tripIdeas || []).map((idea: any) => {
+            if (idea.reactions) {
+              allReactions.push(...idea.reactions.map((r: any) => ({
+                ...r,
+                tripIdeaId: r.trip_idea_id,
+                userId: r.user_id,
+              })));
+            }
+            
+            return {
+              id: idea.id,
+              destination: idea.destination,
+              country: idea.country,
+              countryCode: idea.country_code,
+              title: idea.title,
+              summary: idea.summary,
+              estimatedBudget: {
+                min: idea.estimated_budget_min,
+                max: idea.estimated_budget_max,
+                currency: idea.currency || 'IDR'
+              },
+              fitScore: idea.fit_score,
+              reasons: idea.reasons || [],
+              highlights: idea.highlights || [],
+              tradeoffs: idea.tradeoffs || [],
+              suggestedDuration: idea.suggested_duration,
+              travelStyle: idea.travel_style,
+              keyActivities: idea.key_activities || [],
+              confidence: idea.confidence,
+              imageUrl: idea.image_url,
+            };
+          });
+
+          return {
+            ...t,
+            flexibleDates: t.flexible_dates,
+            budgetPerPerson: t.budget_per_person,
+            totalBudget: t.total_budget,
+            budgetFlexibility: t.budget_flexibility,
+            travelConstraints: t.travel_constraints,
+            selectedDestination: t.selected_destination,
+            tripIdeas: mappedIdeas,
+            reactions: allReactions,
+            members: t.members || [],
+            preferences: t.preferences || [],
+            decisions: t.decisions || [],
+          };
+        }) as unknown as Trip[];
+        
+        set({ trips: mappedTrips });
+      }
+    } catch (err) {
+      console.error('Error fetching trips from Supabase:', err);
+    }
+  },
+
+  createTrip: async (data) => {
+    let finalId = `trip_${Date.now()}`;
+    const newTrip = {
       name: data.name || 'New Trip',
       status: 'draft',
       phase: 'discover',
@@ -50,13 +136,6 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
       currency: 'IDR',
       budgetFlexibility: 50,
       travelers: data.travelers || 1,
-      members: [{
-        userId: defaultUser.id,
-        name: defaultUser.name,
-        role: 'admin',
-        joinedAt: new Date(),
-        preferencesSubmitted: false
-      }],
       preferences: [],
       tripIdeas: [],
       reactions: [],
@@ -66,8 +145,42 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
       ...data,
     } as Trip;
 
-    set((state) => ({ trips: [...state.trips, newTrip] }));
-    return id;
+    if (import.meta.env.VITE_SUPABASE_URL) {
+      const { supabase } = await import('@/lib/supabase');
+      const { data: insertedTrip, error } = await supabase.from('trips').insert({
+        name: newTrip.name,
+        origin: newTrip.origin,
+        travelers: newTrip.travelers,
+        status: newTrip.status,
+        phase: newTrip.phase
+      }).select().single();
+
+      if (!error && insertedTrip) {
+        finalId = insertedTrip.id;
+        newTrip.id = finalId;
+        
+        // Insert admin member
+        await supabase.from('trip_members').insert({
+          trip_id: finalId,
+          user_id: '00000000-0000-0000-0000-000000000001',
+          role: 'admin',
+          preferences_submitted: false
+        });
+      }
+    } else {
+      newTrip.id = finalId;
+    }
+
+    newTrip.members = [{
+      userId: '00000000-0000-0000-0000-000000000001',
+      name: defaultUser.name,
+      role: 'admin',
+      joinedAt: new Date(),
+      preferencesSubmitted: false
+    }];
+
+    set((state) => ({ trips: [newTrip, ...state.trips] }));
+    return finalId;
   },
 
   setActiveTrip: (tripId) => set((state) => ({
@@ -107,6 +220,25 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
     const trips = state.trips.map(trip => 
       trip.id === tripId ? { ...trip, tripIdeas: ideas, updatedAt: new Date() } : trip
     );
+    
+    // Sync to Supabase
+    import('@/lib/supabase').then(({ supabase }) => {
+      if (import.meta.env.VITE_SUPABASE_URL) {
+        const payload = ideas.map(idea => ({
+          trip_id: tripId,
+          destination: idea.destination,
+          country: idea.country,
+          country_code: idea.countryCode,
+          title: idea.title,
+          summary: idea.summary,
+          fit_score: idea.fitScore
+        }));
+        supabase.from('trip_ideas').insert(payload).then(({ error }) => {
+          if (error) console.error('Failed to sync ideas to Supabase:', error);
+        });
+      }
+    });
+
     return { trips, activeTrip: trips.find(t => t.id === state.activeTrip?.id) || null };
   }),
 
@@ -124,6 +256,21 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
       }
       return trip;
     });
+
+    // Sync to Supabase
+    import('@/lib/supabase').then(({ supabase }) => {
+      if (import.meta.env.VITE_SUPABASE_URL) {
+        supabase.from('trip_reactions').upsert({
+          trip_idea_id: reaction.tripIdeaId,
+          user_id: reaction.userId,
+          reaction: reaction.reaction,
+          reason: reaction.reason
+        }).then(({ error }) => {
+          if (error) console.error('Failed to sync reaction:', error);
+        });
+      }
+    });
+
     return { trips, activeTrip: trips.find(t => t.id === state.activeTrip?.id) || null };
   }),
 
@@ -131,6 +278,20 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
     const trips = state.trips.map(trip => 
       trip.id === tripId ? { ...trip, selectedDestination: destination, status: 'planning' as const, phase: 'plan' as const, updatedAt: new Date() } : trip
     );
+
+    // Sync to Supabase
+    import('@/lib/supabase').then(({ supabase }) => {
+      if (import.meta.env.VITE_SUPABASE_URL) {
+        supabase.from('trips').update({
+          selected_destination: destination,
+          status: 'planning',
+          phase: 'plan'
+        }).eq('id', tripId).then(({ error }) => {
+          if (error) console.error('Failed to update destination:', error);
+        });
+      }
+    });
+
     return { trips, activeTrip: trips.find(t => t.id === state.activeTrip?.id) || null };
   }),
 
@@ -187,12 +348,10 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
         const newDays = [...trip.itinerary.days];
         const itemToMove = newDays[fromDay].items[fromIndex];
         
-        // Remove from original position
         const fromItems = [...newDays[fromDay].items];
         fromItems.splice(fromIndex, 1);
         newDays[fromDay] = { ...newDays[fromDay], items: fromItems };
         
-        // Add to new position
         const toItems = fromDay === toDay ? [...newDays[fromDay].items] : [...newDays[toDay].items];
         toItems.splice(toIndex, 0, itemToMove);
         newDays[toDay] = { ...newDays[toDay], items: toItems };

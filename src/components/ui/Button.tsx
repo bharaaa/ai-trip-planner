@@ -9,33 +9,25 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'primary', size = 'md', isLoading = false, disabled, children, ...props }, ref) => {
-    const baseStyles = 'inline-flex items-center justify-center font-medium transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none rounded-lg';
+    const baseStyles = 'inline-flex items-center justify-center font-medium transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/40 focus-visible:ring-offset-1 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98]';
     
     const variants = {
-      primary: 'bg-accent-400 hover:bg-accent-500 text-white',
-      secondary: 'bg-white border border-warm-200 text-warm-900 hover:bg-warm-50',
-      ghost: 'text-warm-600 hover:text-warm-900 hover:bg-warm-100',
-      danger: 'bg-error text-white hover:bg-error/90', // Simplified for error token, but user requested error/10 -> bg-red-100 text-red-600? Let's use custom class if error is defined.
-    };
-    
-    // User requested: bg-error/10 text-error hover:bg-error/20
-    const customVariants = {
-        primary: 'bg-accent-400 hover:bg-accent-500 text-white',
-        secondary: 'bg-white border border-warm-200 text-warm-900 hover:bg-warm-50',
-        ghost: 'text-warm-600 hover:text-warm-900 hover:bg-warm-100',
-        danger: 'bg-red-100 text-red-600 hover:bg-red-200', // standard tailwind mapping for error
+      primary: 'bg-gradient-to-r from-accent-400 to-accent-500 hover:brightness-105 text-white shadow-sm',
+      secondary: 'bg-white border border-warm-200/60 text-warm-900 shadow-sm',
+      ghost: 'bg-transparent text-warm-600 hover:text-warm-900 hover:bg-warm-100/50',
+      danger: 'bg-error-50 text-error-500',
     };
 
     const sizes = {
-      sm: 'h-8 px-3 text-sm',
-      md: 'h-10 px-4 py-2',
-      lg: 'h-12 px-6 text-lg',
+      sm: 'h-8 px-3 text-xs rounded-lg',
+      md: 'h-9 px-4 text-sm rounded-lg',
+      lg: 'h-11 px-6 text-sm rounded-xl',
     };
 
     return (
       <button
         ref={ref}
-        className={cn(baseStyles, customVariants[variant], sizes[size], className)}
+        className={cn(baseStyles, variants[variant], sizes[size], className)}
         disabled={disabled || isLoading}
         {...props}
       >

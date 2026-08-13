@@ -8,6 +8,7 @@ import { DiscoveryPage } from './features/discovery/DiscoveryPage'
 import { PlannerPage } from './features/itinerary/PlannerPage'
 import { DecisionsPage } from './features/decisions/DecisionsPage'
 import { TripDashboardPage } from './features/trips/TripDashboardPage'
+import { LoginPage } from './features/auth/LoginPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -23,14 +24,15 @@ export function App() {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
+          <Route path="/login" element={<LoginPage />} />
           <Route element={<AppLayout />}>
             <Route index element={<HomePage />} />
             <Route path="trips/new" element={<CreateTripPage />} />
-            <Route path="trips/:tripId" element={<TripDashboardPage />} />
-            <Route path="trips/:tripId/preferences" element={<PreferencesPage />} />
-            <Route path="trips/:tripId/discover" element={<DiscoveryPage />} />
-            <Route path="trips/:tripId/plan" element={<PlannerPage />} />
-            <Route path="trips/:tripId/decisions" element={<DecisionsPage />} />
+            <Route path="trips/:id" element={<TripDashboardPage />} />
+            <Route path="trips/:id/preferences" element={<PreferencesPage />} />
+            <Route path="trips/:id/discover" element={<DiscoveryPage />} />
+            <Route path="trips/:id/plan" element={<PlannerPage />} />
+            <Route path="trips/:id/decisions" element={<DecisionsPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

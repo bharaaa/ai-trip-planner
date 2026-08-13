@@ -87,11 +87,11 @@ export const PreferencesPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-warm-50/50 pb-24">
+    <div className="min-h-screen bg-warm-50/50 pb-32">
       <div className="max-w-2xl mx-auto px-6 pt-12">
-        <header className="mb-10 text-center">
-          <h1 className="text-2xl font-semibold text-warm-900 mb-2">What sounds good?</h1>
-          <p className="text-warm-500">Pick what matters most to your group. No wrong answers.</p>
+        <header className="mb-10 text-center space-y-3">
+          <h1 className="text-3xl font-semibold text-warm-900 tracking-tight mb-2">What sounds good?</h1>
+          <p className="text-warm-600 text-base">Pick what matters most to your group. No wrong answers.</p>
         </header>
 
         <main className="space-y-8">
@@ -102,19 +102,19 @@ export const PreferencesPage = () => {
             />
           </section>
 
-          <section className="bg-white rounded-2xl border border-warm-200 overflow-hidden transition-all duration-300">
+          <section className="bg-white rounded-2xl border border-warm-200 overflow-hidden shadow-sm transition-all duration-300">
             <button 
               onClick={() => setShowMore(!showMore)}
               className="w-full flex items-center justify-between p-6 text-warm-900 font-medium hover:bg-warm-50 transition-colors"
             >
-              <span>More preferences</span>
-              {showMore ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+              <span className="text-lg font-semibold">More preferences</span>
+              {showMore ? <ChevronUp className="w-5 h-5 text-warm-500" /> : <ChevronDown className="w-5 h-5 text-warm-500" />}
             </button>
             
             {showMore && (
-              <div className="px-6 pb-6 space-y-8 animate-slide-up">
-                <div className="space-y-4">
-                  <div className="flex justify-between text-sm font-medium text-warm-700">
+              <div className="px-6 pb-8 pt-2 space-y-10 animate-slide-up">
+                <div className="space-y-5">
+                  <div className="flex justify-between text-base font-semibold text-warm-900">
                     <span>Trip pace</span>
                   </div>
                   <Slider 
@@ -125,8 +125,8 @@ export const PreferencesPage = () => {
                   />
                 </div>
 
-                <div className="space-y-4">
-                  <div className="flex justify-between text-sm font-medium text-warm-700">
+                <div className="space-y-5">
+                  <div className="flex justify-between text-base font-semibold text-warm-900">
                     <span>Budget preference</span>
                   </div>
                   <Slider 
@@ -137,8 +137,8 @@ export const PreferencesPage = () => {
                   />
                 </div>
 
-                <div className="space-y-4">
-                  <div className="flex justify-between text-sm font-medium text-warm-700">
+                <div className="space-y-5">
+                  <div className="flex justify-between text-base font-semibold text-warm-900">
                     <span>Morning preference</span>
                   </div>
                   <Slider 
@@ -153,10 +153,10 @@ export const PreferencesPage = () => {
           </section>
         </main>
 
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-md border-t border-warm-200 flex justify-center">
+        <div className="fixed bottom-0 left-0 right-0 p-4 glass-heavy shadow-up border-t border-warm-200/50 flex justify-center z-10">
           <div className="max-w-2xl w-full">
             <Button 
-              className="w-full" 
+              className="w-full shadow-lg shadow-accent-500/20" 
               size="lg"
               disabled={selectedCategories.size === 0}
               onClick={handleSubmit}

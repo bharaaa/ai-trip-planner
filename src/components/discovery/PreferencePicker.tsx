@@ -1,7 +1,7 @@
 import React from 'react';
+
 import { cn } from '@/lib/utils/cn';
 import type { PreferenceCategory } from '@/types';
-// Use emoji instead of lucide-react
 
 interface PreferencePickerProps {
   selectedCategories: Map<PreferenceCategory, number>;
@@ -25,7 +25,7 @@ export const PreferencePicker: React.FC<PreferencePickerProps> = ({
   onToggle,
 }) => {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 w-full">
       {CATEGORIES.map((category) => {
         const isSelected = selectedCategories.has(category.id);
         
@@ -36,22 +36,22 @@ export const PreferencePicker: React.FC<PreferencePickerProps> = ({
             aria-pressed={isSelected}
             role="button"
             className={cn(
-              "relative flex flex-col items-center justify-center p-6 rounded-2xl border text-center transition-all duration-200 ease-out outline-none focus-visible:ring-2 focus-visible:ring-accent-400 focus-visible:ring-offset-2",
+              "relative flex flex-col items-center justify-center p-5 rounded-2xl border text-center transition-all duration-200 ease-out outline-none focus-visible:ring-2 focus-visible:ring-accent-400 focus-visible:ring-offset-2",
               "hover:scale-[1.02] hover:shadow-sm active:scale-[0.98]",
               isSelected
-                ? "border-accent-400 bg-accent-50"
-                : "border-warm-200 bg-white"
+                ? "border-accent-400 bg-accent-50/50"
+                : "border-warm-200/60 bg-white"
             )}
           >
             {isSelected && (
-              <div className="absolute top-3 right-3 bg-accent-400 text-white rounded-full p-1 animate-scale-in">
-                <span className="text-xs text-white">✔️</span>
+              <div className="absolute top-2.5 right-2.5 bg-accent-400 text-white rounded-full p-0.5 animate-scale-in">
+                <span className="text-[10px] text-white">✔️</span>
               </div>
             )}
-            <span className="text-4xl mb-3 block" aria-hidden="true">
+            <span className="text-3xl mb-2 block" aria-hidden="true">
               {category.emoji}
             </span>
-            <span className="font-medium text-warm-900">{category.label}</span>
+            <span className="text-sm font-medium text-warm-800">{category.label}</span>
           </button>
         );
       })}

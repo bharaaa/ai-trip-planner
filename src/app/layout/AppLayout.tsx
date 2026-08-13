@@ -1,6 +1,9 @@
+import React, { useEffect } from 'react'
 import { Outlet, useLocation, Link } from 'react-router'
 import { cn } from '@/lib/utils/cn'
 import { useUIStore } from '@/stores/uiStore'
+import { AnimatePresence, motion } from 'motion/react'
+import { useTripStore } from '@/stores/tripStore'
 
 const mobileNavItems = [
   { id: 'discover' as const, label: 'Discover', icon: '✨', path: 'discover' },
@@ -21,22 +24,35 @@ export function AppLayout() {
   const tripIdMatch = location.pathname.match(/\/trips\/([^/]+)/)
   const tripId = tripIdMatch ? tripIdMatch[1] : null
 
+  const setActiveTrip = useTripStore((state) => state.setActiveTrip)
+  const fetchTrips = useTripStore((state) => state.fetchTrips)
+
+  useEffect(() => {
+    fetchTrips()
+  }, [fetchTrips])
+
+  useEffect(() => {
+    if (tripId) {
+      setActiveTrip(tripId)
+    }
+  }, [tripId, setActiveTrip])
+
   return (
     <div className="min-h-dvh bg-warm-50 flex flex-col">
       {/* Top navigation - minimal */}
-      <header className="sticky top-0 z-40 bg-warm-50/80 backdrop-blur-lg border-b border-warm-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-14">
+      <header className="sticky top-0 z-40 glass-heavy h-14 border-b border-warm-200/30 flex items-center">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between">
             <Link
               to="/"
-              className="flex items-center gap-2 text-warm-900 font-semibold text-lg hover:text-accent-500 transition-colors"
+              className="flex items-center gap-2 text-warm-900 font-semibold text-lg hover:opacity-80 transition-opacity"
             >
-              <span className="text-accent-400">◆</span>
+              <span className="text-accent-500">◆</span>
               <span className="hidden sm:inline">Tripper</span>
             </Link>
 
             {!isHome && !isCreateTrip && (
-              <nav className="hidden md:flex items-center gap-1">
+              <nav className="hidden md:flex items-center gap-2">
                 {tripId && (
                   <>
                     <NavLink to={`/trips/${tripId}`} active={location.pathname === `/trips/${tripId}`}>
@@ -66,13 +82,17 @@ export function AppLayout() {
       </header>
 
       {/* Main content */}
-      <main className="flex-1">
-        <Outlet />
+      <main className="flex-1 relative">
+        <AnimatePresence mode="wait">
+          <motion.div key={location.pathname} className="h-full">
+            <Outlet />
+          </motion.div>
+        </AnimatePresence>
       </main>
 
       {/* Mobile bottom navigation - only on trip pages */}
       {isTripPage && tripId && (
-        <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/90 backdrop-blur-lg border-t border-warm-100 pb-[env(safe-area-inset-bottom)]">
+        <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 glass border-t border-warm-200/30 pb-[env(safe-area-inset-bottom)]">
           <div className="flex items-center justify-around h-14">
             {mobileNavItems.map((item) => {
               const isActive = item.path
@@ -85,14 +105,21 @@ export function AppLayout() {
                   to={item.path ? `/trips/${tripId}/${item.path}` : `/trips/${tripId}`}
                   onClick={() => setMobileNavTab(item.id)}
                   className={cn(
-                    'flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg transition-colors min-w-[64px]',
+                    'flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg transition-colors min-w-[64px] relative',
                     isActive
-                      ? 'text-accent-500'
-                      : 'text-warm-400 hover:text-warm-600'
+                      ? 'text-accent-600'
+                      : 'text-warm-500 hover:text-warm-700'
                   )}
                 >
-                  <span className="text-lg">{item.icon}</span>
-                  <span className="text-[10px] font-medium">{item.label}</span>
+                  <span className="text-lg relative z-10">{item.icon}</span>
+                  <span className="text-[10px] font-medium relative z-10">{item.label}</span>
+                  {isActive && (
+                    <motion.div 
+                      layoutId="mobile-nav-active"
+                      className="absolute inset-0 bg-accent-50 rounded-lg -z-0"
+                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
                 </Link>
               )
             })}
@@ -116,13 +143,18 @@ function NavLink({
     <Link
       to={to}
       className={cn(
-        'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
-        active
-          ? 'bg-accent-50 text-accent-700'
-          : 'text-warm-500 hover:text-warm-800 hover:bg-warm-100'
+        'relative px-4 py-1.5 rounded-lg text-sm font-medium transition-colors',
+        active ? 'text-accent-700' : 'text-warm-600 hover:text-warm-900'
       )}
     >
-      {children}
+      <span className="relative z-10">{children}</span>
+      {active && (
+        <motion.div
+          layoutId="desktop-nav-active"
+          className="absolute inset-0 bg-accent-50 rounded-lg -z-0"
+          transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+        />
+      )}
     </Link>
   )
 }

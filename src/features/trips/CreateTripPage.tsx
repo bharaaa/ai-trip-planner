@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
+import { AnimatePresence, motion } from 'motion/react';
+import { PageTransition } from '@/components/motion/PageTransition';
 import { cn } from '@/lib/utils/cn';
 import { useTripStore } from '@/stores/tripStore';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
-import { Slider } from '@/components/ui/Slider';
 import { StepIndicator } from './components/StepIndicator';
 import { formatCurrency } from '@/lib/utils/formatting';
 
@@ -31,8 +32,8 @@ export function CreateTripPage() {
   const nextStep = () => setStep(s => s + 1);
   const prevStep = () => setStep(s => Math.max(1, s - 1));
 
-  const handleCreate = () => {
-    const tripId = createTrip({
+  const handleCreate = async () => {
+    const tripId = await createTrip({
       name: formData.name,
       origin: formData.startingLocation,
       travelers: formData.travelers.length,
@@ -58,19 +59,22 @@ export function CreateTripPage() {
   };
 
   return (
-    <div className="max-w-xl mx-auto px-4 py-12 min-h-[80vh] flex flex-col">
+    <PageTransition className="max-w-xl mx-auto px-6 py-12 min-h-screen flex flex-col">
       <StepIndicator 
         currentStep={step} 
         totalSteps={5} 
         className="mb-12"
       />
 
-      <div className="flex-1">
+      <div className="flex-1 w-full max-w-lg mx-auto">
+        <AnimatePresence mode="wait">
         {step === 1 && (
-          <div className="animate-slide-up space-y-6">
-            <h1 className="text-3xl font-semibold text-warm-900">Let's start planning</h1>
-            <p className="text-warm-600">You don't need to know where yet. We'll figure it out together.</p>
-            <div className="space-y-4">
+          <motion.div key={1} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
+            <div className="text-center space-y-3">
+              <h1 className="text-3xl font-semibold text-warm-900 tracking-tight">Let's start planning</h1>
+              <p className="text-warm-600">You don't need to know where yet. We'll figure it out together.</p>
+            </div>
+            <div className="space-y-6">
               <Input
                 label="Trip Name"
                 placeholder="e.g. Summer Getaway"
@@ -78,21 +82,25 @@ export function CreateTripPage() {
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 autoFocus
               />
-              <Button 
-                onClick={nextStep} 
-                disabled={!formData.name.trim()}
-                className="w-full mt-4"
-              >
-                Continue
-              </Button>
+              <div className="flex gap-4 mt-10">
+                <Button 
+                  onClick={nextStep} 
+                  disabled={!formData.name.trim()}
+                  className="w-full flex-1"
+                >
+                  Continue
+                </Button>
+              </div>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {step === 2 && (
-          <div className="animate-slide-up space-y-6">
-            <h1 className="text-3xl font-semibold text-warm-900">Who's coming?</h1>
-            <p className="text-warm-600">{formData.travelers.length} traveler{formData.travelers.length > 1 ? 's' : ''}</p>
+          <motion.div key={2} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
+            <div className="text-center space-y-3">
+              <h1 className="text-3xl font-semibold text-warm-900 tracking-tight">Who's coming?</h1>
+              <p className="text-warm-600">{formData.travelers.length} traveler{formData.travelers.length > 1 ? 's' : ''}</p>
+            </div>
             <div className="space-y-4">
               {formData.travelers.map((t, i) => (
                 <div key={i} className="flex gap-2 items-end">
@@ -116,32 +124,35 @@ export function CreateTripPage() {
                 + Add traveler
               </Button>
             </div>
-            <div className="flex gap-4 mt-8">
+            <div className="flex gap-4 pt-4">
               <Button variant="secondary" onClick={prevStep} className="flex-1">Back</Button>
               <Button onClick={nextStep} className="flex-1">Continue</Button>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {step === 3 && (
-          <div className="animate-slide-up space-y-6">
-            <h1 className="text-3xl font-semibold text-warm-900">When are you thinking?</h1>
+          <motion.div key={3} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
+            <div className="text-center space-y-3">
+              <h1 className="text-3xl font-semibold text-warm-900 tracking-tight">When are you thinking?</h1>
+            </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {(['exact', 'month', 'flexible'] as const).map(type => (
+              {[
+                { type: 'exact', label: 'I have exact dates', emoji: '📅' },
+                { type: 'month', label: 'Sometime in...', emoji: '📆' },
+                { type: 'flexible', label: "I'm flexible", emoji: '🤷' }
+              ].map(opt => (
                 <Card 
-                  key={type}
+                  key={opt.type}
                   className={cn(
-                    "p-4 cursor-pointer hover:border-accent-400 transition-colors",
-                    formData.dateFlexibility === type ? "border-accent-400 bg-accent-50/50" : ""
+                    "p-5 cursor-pointer hover:border-accent-400 transition-colors flex flex-col items-center gap-2",
+                    formData.dateFlexibility === opt.type ? "border-accent-400 bg-accent-50/50" : "border-warm-200"
                   )}
-                  onClick={() => setFormData({ ...formData, dateFlexibility: type })}
+                  onClick={() => setFormData({ ...formData, dateFlexibility: opt.type })}
                 >
-                  <p className="font-medium text-center">
-                    {type === 'exact' && "I have exact dates"}
-                    {type === 'month' && "Sometime in..."}
-                    {type === 'flexible' && "I'm flexible"}
-                  </p>
+                  <span className="text-2xl">{opt.emoji}</span>
+                  <span className="font-medium text-sm text-center text-warm-900">{opt.label}</span>
                 </Card>
               ))}
             </div>
@@ -156,21 +167,23 @@ export function CreateTripPage() {
               />
             </div>
 
-            <div className="flex gap-4 mt-8">
+            <div className="flex gap-4 pt-4">
               <Button variant="secondary" onClick={prevStep} className="flex-1">Back</Button>
               <Button onClick={nextStep} className="flex-1">Continue</Button>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {step === 4 && (
-          <div className="animate-slide-up space-y-6">
-            <h1 className="text-3xl font-semibold text-warm-900">What's the budget?</h1>
+          <motion.div key={4} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
+            <div className="text-center space-y-3">
+              <h1 className="text-3xl font-semibold text-warm-900 tracking-tight">What's the budget?</h1>
+            </div>
             
-            <div className="flex bg-warm-100 p-1 rounded-lg">
+            <div className="flex bg-warm-100 p-1 rounded-full">
               <button 
                 className={cn(
-                  "flex-1 py-2 text-sm font-medium rounded-md transition-all",
+                  "flex-1 py-2 text-sm font-medium rounded-full transition-all",
                   formData.budgetType === 'per_person' ? "bg-white shadow-sm text-warm-900" : "text-warm-600 hover:text-warm-900"
                 )}
                 onClick={() => setFormData({ ...formData, budgetType: 'per_person' })}
@@ -179,7 +192,7 @@ export function CreateTripPage() {
               </button>
               <button 
                 className={cn(
-                  "flex-1 py-2 text-sm font-medium rounded-md transition-all",
+                  "flex-1 py-2 text-sm font-medium rounded-full transition-all",
                   formData.budgetType === 'total' ? "bg-white shadow-sm text-warm-900" : "text-warm-600 hover:text-warm-900"
                 )}
                 onClick={() => setFormData({ ...formData, budgetType: 'total' })}
@@ -195,7 +208,7 @@ export function CreateTripPage() {
                 value={formData.budgetPerPerson}
                 onChange={(e) => setFormData({ ...formData, budgetPerPerson: parseInt(e.target.value) || 0 })}
               />
-              <p className="text-sm text-warm-500">
+              <p className="text-sm font-medium text-warm-500">
                 {formatCurrency(formData.budgetPerPerson)}
               </p>
             </div>
@@ -203,82 +216,101 @@ export function CreateTripPage() {
             <div className="pt-4 space-y-4">
               <p className="text-sm font-medium text-warm-900">Trip Style</p>
               <div className="grid grid-cols-2 gap-4">
-                {(['budget', 'comfortable', 'premium', 'dont_know'] as const).map(style => (
+                {[
+                  { id: 'budget', label: 'Budget', emoji: '💸' },
+                  { id: 'comfortable', label: 'Comfortable', emoji: '🛋️' },
+                  { id: 'premium', label: 'Premium', emoji: '✨' },
+                  { id: 'dont_know', label: "I don't know", emoji: '🤔' }
+                ].map(style => (
                   <Card 
-                    key={style}
+                    key={style.id}
                     className={cn(
-                      "p-3 cursor-pointer text-center text-sm transition-colors",
-                      formData.budgetFlexibility === style ? "border-accent-400 bg-accent-50/50 text-accent-700" : ""
+                      "p-4 cursor-pointer flex items-center justify-center gap-3 transition-colors",
+                      formData.budgetFlexibility === style.id ? "border-accent-400 bg-accent-50/50" : "border-warm-200 hover:border-warm-300"
                     )}
-                    onClick={() => setFormData({ ...formData, budgetFlexibility: style })}
+                    onClick={() => setFormData({ ...formData, budgetFlexibility: style.id })}
                   >
-                    {style === 'dont_know' ? "I don't know" : style.charAt(0).toUpperCase() + style.slice(1).replace('_', ' ')}
+                    <span className="text-xl">{style.emoji}</span>
+                    <span className={cn("text-sm font-medium", formData.budgetFlexibility === style.id ? "text-accent-700" : "text-warm-700")}>
+                      {style.label}
+                    </span>
                   </Card>
                 ))}
               </div>
             </div>
 
-            <div className="flex gap-4 mt-8">
+            <div className="flex gap-4 pt-4">
               <Button variant="secondary" onClick={prevStep} className="flex-1">Back</Button>
               <Button onClick={nextStep} className="flex-1">Continue</Button>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {step === 5 && (
-          <div className="animate-slide-up space-y-6">
-            <h1 className="text-3xl font-semibold text-warm-900">A few more details</h1>
+          <motion.div key={5} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
+            <div className="text-center space-y-3">
+              <h1 className="text-3xl font-semibold text-warm-900 tracking-tight">A few more details</h1>
+            </div>
             
-            <div className="space-y-6">
+            <div className="space-y-8">
               <Input
                 label="Starting Location"
                 value={formData.startingLocation}
                 onChange={(e) => setFormData({ ...formData, startingLocation: e.target.value })}
               />
 
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <p className="text-sm font-medium text-warm-900">Destination Type</p>
-                <div className="flex gap-4">
+                <div className="flex gap-6">
                   {(['domestic', 'international'] as const).map(type => (
-                    <label key={type} className="flex items-center gap-2 cursor-pointer">
-                      <input 
-                        type="radio" 
-                        checked={formData.destinationType === type}
-                        onChange={() => setFormData({ ...formData, destinationType: type })}
-                        className="text-accent-500 focus:ring-accent-500"
-                      />
-                      <span className="capitalize">{type}</span>
+                    <label key={type} className="flex items-center gap-3 cursor-pointer group">
+                      <div className={cn(
+                        "w-5 h-5 rounded-full border flex items-center justify-center transition-colors",
+                        formData.destinationType === type ? "border-accent-500 bg-accent-50" : "border-warm-300 group-hover:border-accent-400"
+                      )}>
+                        {formData.destinationType === type && <div className="w-2.5 h-2.5 rounded-full bg-accent-500" />}
+                      </div>
+                      <span className="capitalize font-medium text-warm-700">{type}</span>
                     </label>
                   ))}
                 </div>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <p className="text-sm font-medium text-warm-900">Preferred Transport</p>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  {(['any', 'flight', 'train', 'car'] as const).map(t => (
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { id: 'any', label: 'Any', emoji: '🚖' },
+                    { id: 'flight', label: 'Flight', emoji: '✈️' },
+                    { id: 'train', label: 'Train', emoji: '🚆' },
+                    { id: 'car', label: 'Car', emoji: '🚗' }
+                  ].map(t => (
                     <Card 
-                      key={t}
+                      key={t.id}
                       className={cn(
-                        "p-3 cursor-pointer text-center text-sm transition-colors",
-                        formData.transport === t ? "border-accent-400 bg-accent-50/50 text-accent-700" : ""
+                        "p-4 cursor-pointer flex items-center justify-center gap-3 transition-colors",
+                        formData.transport === t.id ? "border-accent-400 bg-accent-50/50" : "border-warm-200 hover:border-warm-300"
                       )}
-                      onClick={() => setFormData({ ...formData, transport: t })}
+                      onClick={() => setFormData({ ...formData, transport: t.id })}
                     >
-                      <span className="capitalize">{t}</span>
+                      <span className="text-xl">{t.emoji}</span>
+                      <span className={cn("capitalize text-sm font-medium", formData.transport === t.id ? "text-accent-700" : "text-warm-700")}>
+                        {t.label}
+                      </span>
                     </Card>
                   ))}
                 </div>
               </div>
             </div>
 
-            <div className="flex gap-4 mt-8">
+            <div className="flex gap-4 pt-8">
               <Button variant="secondary" onClick={prevStep} className="flex-1">Back</Button>
-              <Button onClick={handleCreate} className="flex-1" variant="secondary">Create Trip</Button>
+              <Button onClick={handleCreate} className="flex-1">Create Trip</Button>
             </div>
-          </div>
+          </motion.div>
         )}
+        </AnimatePresence>
       </div>
-    </div>
+    </PageTransition>
   );
 }

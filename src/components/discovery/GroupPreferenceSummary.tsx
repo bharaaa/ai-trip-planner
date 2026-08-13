@@ -28,7 +28,7 @@ export const GroupPreferenceSummary: React.FC<GroupPreferenceSummaryProps> = ({
   const sortedPreferences = [...preferences].sort((a, b) => b.score - a.score);
 
   return (
-    <div className={cn("bg-white border border-warm-200 rounded-2xl p-6", className)}>
+    <div className={cn("bg-white border border-warm-200 rounded-2xl p-6 shadow-sm", className)}>
       <h3 className="text-lg font-semibold text-warm-900 mb-6">
         Your group seems to like
       </h3>
@@ -39,7 +39,7 @@ export const GroupPreferenceSummary: React.FC<GroupPreferenceSummaryProps> = ({
               <span className="text-xl">{pref.emoji}</span>
               <span className="text-sm font-medium text-warm-700">{pref.label}</span>
             </div>
-            <div className="flex-grow h-2.5 bg-warm-100 rounded-full overflow-hidden">
+            <div className="flex-grow h-2 bg-warm-100 rounded-full overflow-hidden">
               <div
                 className="h-full bg-accent-400 rounded-full transition-all duration-1000 ease-out"
                 style={{ width: mounted ? `${pref.score}%` : '0%' }}

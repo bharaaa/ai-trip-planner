@@ -1,6 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils/cn';
 import type { TripReaction } from '@/types';
+import { motion } from 'motion/react';
 
 interface GroupConsensusProps {
   ideaName: string;
@@ -36,9 +37,11 @@ export const GroupConsensus: React.FC<GroupConsensusProps> = ({
           <span className="text-accent-500">~{fitScore}%</span>
         </div>
         <div className="h-2 w-full bg-warm-100 rounded-full overflow-hidden">
-          <div 
-            className="h-full bg-accent-400 rounded-full transition-all duration-1000 ease-out"
-            style={{ width: `${fitScore}%` }}
+          <motion.div 
+            className="h-full bg-accent-400 rounded-full"
+            initial={{ width: 0 }}
+            animate={{ width: `${fitScore}%` }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
           />
         </div>
         <p className="text-xs text-warm-400 mt-2 italic">

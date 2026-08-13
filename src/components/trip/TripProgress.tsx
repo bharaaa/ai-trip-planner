@@ -15,47 +15,60 @@ export interface TripProgressProps {
 }
 
 export function TripProgress({ trip, className }: TripProgressProps) {
-  const completedCount = trip.checkpoints.filter(c => c.completed).length;
-  const nextCheckpoint = trip.checkpoints.find(c => !c.completed);
-
+  const checkpoints = trip.checkpoints;
+  const firstIncompleteIndex = checkpoints.findIndex(c => !c.completed);
+  
   return (
-    <div className={cn('bg-warm-50 rounded-2xl p-6 border border-warm-200', className)}>
-      <h3 className="text-lg font-medium text-warm-900 mb-4">Your trip is taking shape.</h3>
-      
-      <div className="flex flex-col gap-3 mb-6">
-        {trip.checkpoints.map(checkpoint => (
-          <div 
-            key={checkpoint.id} 
-            className={cn(
-              'flex items-center gap-3 text-sm',
-              checkpoint.completed ? 'text-warm-700' : 'text-warm-400'
-            )}
-          >
-            <div className={cn(
-              'w-5 h-5 rounded-full flex items-center justify-center border',
-              checkpoint.completed 
-                ? 'bg-accent-400 border-accent-400 text-white' 
-                : 'border-warm-300 bg-white'
-            )}>
-              {checkpoint.completed && (
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M10 3L4.5 8.5L2 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
+    <div className={cn('py-2', className)}>
+      <div className="flex items-center justify-between relative">
+        {/* Connecting Lines Base */}
+        <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-0.5 bg-warm-200 -z-10" />
+        
+        {checkpoints.map((checkpoint, index) => {
+          const isCompleted = checkpoint.completed;
+          const isActive = !isCompleted && index === firstIncompleteIndex;
+          
+          return (
+            <div key={checkpoint.id} className="relative flex flex-col items-center gap-2 group">
+              {/* Progress Line */}
+              {isCompleted && index < checkpoints.length - 1 && (
+                <div 
+                  className="absolute left-1/2 top-3 -translate-y-1/2 h-0.5 bg-accent-400 -z-10"
+                  style={{ width: '100%', right: '-100%' }}
+                />
               )}
+              
+              {/* Node */}
+              <div 
+                className={cn(
+                  'w-6 h-6 rounded-full flex items-center justify-center text-xs transition-colors',
+                  isCompleted ? 'bg-accent-400 text-white' : 
+                  isActive ? 'bg-white border-2 border-accent-400 animate-pulse-subtle' : 
+                  'bg-warm-200 text-transparent'
+                )}
+              >
+                {isCompleted && (
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10 3L4.5 8.5L2 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+              </div>
+              
+              {/* Label */}
+              <span 
+                className={cn(
+                  'text-xs font-medium absolute top-8 whitespace-nowrap',
+                  isCompleted ? 'text-warm-900' :
+                  isActive ? 'text-warm-900' : 'text-warm-400'
+                )}
+              >
+                {checkpoint.label}
+              </span>
             </div>
-            <span className={checkpoint.completed ? 'line-through opacity-70' : ''}>
-              {checkpoint.label}
-            </span>
-          </div>
-        ))}
+          );
+        })}
       </div>
-
-      {nextCheckpoint && (
-        <div className="bg-white rounded-xl p-4 border border-warm-200">
-          <p className="text-sm text-warm-500 mb-1">Next up</p>
-          <p className="font-medium text-warm-900">{nextCheckpoint.label}</p>
-        </div>
-      )}
+      <div className="h-6" /> {/* Spacer for absolute labels */}
     </div>
   );
 }

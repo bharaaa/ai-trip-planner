@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { Outlet, useLocation, Link } from 'react-router'
 import { cn } from '@/lib/utils/cn'
 import { useUIStore } from '@/stores/uiStore'
 import { AnimatePresence, motion } from 'motion/react'
 import { useTripStore } from '@/stores/tripStore'
+import { useAuthStore } from '@/stores/authStore'
 
 const mobileNavItems = [
   { id: 'discover' as const, label: 'Discover', icon: '✨', path: 'discover' },
@@ -15,6 +16,19 @@ const mobileNavItems = [
 export function AppLayout() {
   const location = useLocation()
   const { mobileNavTab, setMobileNavTab } = useUIStore()
+  const { user, signOut } = useAuthStore()
+  const [isProfileOpen, setIsProfileOpen] = useState(false)
+  const profileRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setIsProfileOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   const isHome = location.pathname === '/'
   const isCreateTrip = location.pathname === '/trips/new'
@@ -72,10 +86,43 @@ export function AppLayout() {
               </nav>
             )}
 
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-accent-100 text-accent-700 flex items-center justify-center text-sm font-medium">
-                B
-              </div>
+            <div className="relative" ref={profileRef}>
+              <button 
+                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                className="flex items-center gap-2 hover:opacity-80 transition-opacity focus:outline-none"
+              >
+                <div className="w-8 h-8 rounded-full bg-accent-100 text-accent-700 flex items-center justify-center text-sm font-medium uppercase">
+                  {user?.name?.[0] || user?.email?.[0] || 'U'}
+                </div>
+              </button>
+
+              <AnimatePresence>
+                {isProfileOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute right-0 mt-2 w-56 rounded-xl bg-white shadow-lg border border-warm-200/50 overflow-hidden z-50"
+                  >
+                    <div className="px-4 py-3 border-b border-warm-100 bg-warm-50/50">
+                      <p className="text-sm font-semibold text-warm-900 truncate">{user?.name || 'User'}</p>
+                      <p className="text-xs text-warm-500 truncate">{user?.email}</p>
+                    </div>
+                    <div className="p-2">
+                      <button 
+                        onClick={() => {
+                          setIsProfileOpen(false)
+                          signOut()
+                        }}
+                        className="w-full text-left px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      >
+                        Sign out
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </div>

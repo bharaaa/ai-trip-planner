@@ -276,7 +276,11 @@ export const DiscoveryPage = () => {
       </div>
 
       {/* Modal for Exploring Idea */}
-      <Dialog open={!!selectedIdeaId} onClose={() => setSelectedIdeaId(null)}>
+      <Dialog 
+        open={!!selectedIdeaId} 
+        onClose={() => setSelectedIdeaId(null)}
+        className="sm:max-w-xl md:max-w-2xl lg:max-w-4xl"
+      >
         {selectedIdea && (
           <div className="flex flex-col gap-6">
             {/* Header Image & Core Info */}

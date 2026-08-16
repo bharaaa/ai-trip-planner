@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { Outlet, useLocation, Link } from 'react-router'
+import { Outlet, useLocation, Link, useNavigate } from 'react-router'
 import { cn } from '@/lib/utils/cn'
 import { useUIStore } from '@/stores/uiStore'
 import { AnimatePresence, motion } from 'motion/react'
 import { useTripStore } from '@/stores/tripStore'
 import { useAuthStore } from '@/stores/authStore'
+import { Bell } from 'lucide-react'
 
 const mobileNavItems = [
   { id: 'discover' as const, label: 'Discover', icon: '✨', path: 'discover' },
@@ -18,12 +19,18 @@ export function AppLayout() {
   const { mobileNavTab, setMobileNavTab } = useUIStore()
   const { user, signOut } = useAuthStore()
   const [isProfileOpen, setIsProfileOpen] = useState(false)
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false)
   const profileRef = useRef<HTMLDivElement>(null)
+  const notificationsRef = useRef<HTMLDivElement>(null)
+  const navigate = useNavigate()
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
         setIsProfileOpen(false)
+      }
+      if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
+        setIsNotificationsOpen(false)
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
@@ -40,6 +47,11 @@ export function AppLayout() {
 
   const setActiveTrip = useTripStore((state) => state.setActiveTrip)
   const fetchTrips = useTripStore((state) => state.fetchTrips)
+  const trips = useTripStore((state) => state.trips)
+  
+  const invitedTrips = trips.filter(trip => 
+    trip.members.find(m => m.userId === user?.id)?.status === 'invited'
+  )
 
   useEffect(() => {
     fetchTrips()
@@ -97,7 +109,59 @@ export function AppLayout() {
               </nav>
             )}
 
-            <div className="relative" ref={profileRef}>
+            <div className="flex items-center gap-4">
+              <div className="relative" ref={notificationsRef}>
+                <button
+                  onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+                  className="relative p-2 rounded-full hover:bg-warm-100 text-warm-600 transition-colors focus:outline-none"
+                >
+                  <Bell className="w-5 h-5" />
+                  {invitedTrips.length > 0 && (
+                    <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-error-500 rounded-full border-2 border-white"></span>
+                  )}
+                </button>
+
+                <AnimatePresence>
+                  {isNotificationsOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute right-0 mt-2 w-72 rounded-xl bg-white shadow-lg border border-warm-200/50 overflow-hidden z-50"
+                    >
+                      <div className="px-4 py-3 border-b border-warm-100 bg-warm-50">
+                        <p className="text-sm font-semibold text-warm-900">Notifications</p>
+                      </div>
+                      <div className="max-h-80 overflow-y-auto">
+                        {invitedTrips.length > 0 ? (
+                          invitedTrips.map(trip => (
+                            <div 
+                              key={trip.id}
+                              onClick={() => {
+                                setIsNotificationsOpen(false)
+                                navigate(`/trips/${trip.id}`)
+                              }}
+                              className="px-4 py-3 hover:bg-warm-50 cursor-pointer transition-colors border-b border-warm-100 last:border-0"
+                            >
+                              <p className="text-sm font-medium text-warm-900">Trip Invitation</p>
+                              <p className="text-sm text-warm-600 mt-0.5 line-clamp-2">
+                                You have been invited to join <strong>{trip.name}</strong>
+                              </p>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="p-4 text-center text-sm text-warm-500">
+                            No new notifications
+                          </div>
+                        )}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              <div className="relative" ref={profileRef}>
               <button 
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
                 className="flex items-center gap-2 hover:opacity-80 transition-opacity focus:outline-none"
@@ -134,6 +198,7 @@ export function AppLayout() {
                   </motion.div>
                 )}
               </AnimatePresence>
+              </div>
             </div>
           </div>
         </div>

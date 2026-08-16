@@ -19,6 +19,11 @@ export function HomePage() {
 
   const firstName = user?.name?.split(' ')[0] || 'there';
 
+  const activeTrips = trips.filter(trip => {
+    const member = trip.members.find(m => m.userId === user?.id);
+    return member?.status !== 'invited';
+  });
+
   return (
     <PageTransition>
       <div className="min-h-screen bg-warm-50 pb-20">
@@ -48,9 +53,9 @@ export function HomePage() {
             <h2 className="text-2xl font-bold text-warm-900">Your adventures</h2>
           </div>
           
-          {trips && trips.length > 0 ? (
+          {activeTrips && activeTrips.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {trips.map(trip => (
+              {activeTrips.map(trip => (
                 <TripCard 
                   key={trip.id} 
                   trip={trip} 

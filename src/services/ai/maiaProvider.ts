@@ -46,10 +46,12 @@ export class MaiaProvider implements AIProvider {
 }
 
 Return EXACTLY 3 distinct destination ideas that fit the following trip context:
+- Starting Location (Origin): ${context.origin}
 - Travelers: ${context.travelers}
 - Duration: ${context.duration} days
 - Budget Per Person: ${context.budgetPerPerson}
 - Group Preferences (Top 3): ${preferencesList}
+- Travel Constraints (e.g., Destination Type, Transport): ${context.constraints || 'None specified'}
 
 Ensure the response is valid JSON. Do not include markdown formatting like \`\`\`json around the response.`;
   }

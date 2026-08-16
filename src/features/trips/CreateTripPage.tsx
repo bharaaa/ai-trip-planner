@@ -104,6 +104,7 @@ export function CreateTripPage() {
       budgetPerPerson: formData.budgetType === 'per_person' ? formData.budgetPerPerson : undefined,
       totalBudget: formData.budgetType === 'total' ? formData.budgetPerPerson : undefined,
       budgetFlexibility: formData.budgetFlexibility,
+      travelConstraints: `Destination Type: ${formData.destinationType}, Transport: ${formData.transport}`,
       invitedUserIds: formData.invitedUsers.map(u => u.id)
     });
     navigate(`/trips/${tripId}/preferences`);

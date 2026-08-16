@@ -38,7 +38,8 @@ export const DiscoveryPage = () => {
     dateMonth: activeTrip?.dateMonth || '',
     flexibleDates: activeTrip?.flexibleDates || false,
     duration: activeTrip?.duration || 1,
-    preferences: activeTrip?.preferences?.[0]?.categories || { food: 5, beach: 4, nature: 4, culture: 3, cafes: 2, nightlife: 1, adventure: 1, shopping: 1 }
+    preferences: activeTrip?.preferences?.[0]?.categories || { food: 5, beach: 4, nature: 4, culture: 3, cafes: 2, nightlife: 1, adventure: 1, shopping: 1 },
+    constraints: activeTrip?.travelConstraints
   };
 
   const aggregatedScores: Record<string, number> = {};

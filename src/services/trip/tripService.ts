@@ -66,6 +66,7 @@ export const tripService = {
         budget_per_person: tripData.budgetPerPerson,
         total_budget: tripData.totalBudget,
         budget_flexibility: tripData.budgetFlexibility,
+        travel_constraints: tripData.travelConstraints,
         status: 'draft',
         phase: 'discover'
       })

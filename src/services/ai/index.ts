@@ -1,6 +1,6 @@
-import { MockAIProvider } from './mockProvider';
+import { MaiaProvider } from './maiaProvider';
 
-const aiService = new MockAIProvider();
+const aiService = new MaiaProvider();
 
 export { aiService };
 export type { AIProvider } from './types';

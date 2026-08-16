@@ -10,6 +10,7 @@ const getActivityIcon = (type: TripActivity['actionType']) => {
     case 'MEMBER_INVITED': return { icon: <Users className="w-5 h-5 text-info-700" />, bg: 'bg-info-100' };
     case 'MEMBER_REMOVED': return { icon: <UserMinus className="w-5 h-5 text-error-700" />, bg: 'bg-error-100' };
     case 'MEMBER_REJECTED': return { icon: <X className="w-5 h-5 text-warm-600" />, bg: 'bg-warm-200' };
+    case 'INVITATION_CANCELLED': return { icon: <X className="w-5 h-5 text-warm-500" />, bg: 'bg-warm-100' };
     case 'MEMBER_LEFT': return { icon: <LogOut className="w-5 h-5 text-warm-600 ml-1" />, bg: 'bg-warm-200' };
     case 'DATES_CHANGED': return { icon: <Calendar className="w-5 h-5 text-info-700" />, bg: 'bg-info-100' };
     case 'DESTINATION_SELECTED': return { icon: <MapPin className="w-5 h-5 text-success-700" />, bg: 'bg-success-100' };
@@ -47,6 +48,8 @@ const getActivityMessage = (activity: TripActivity, memberName: string) => {
       return <span><strong>{name}</strong> removed <strong>{details.name || 'a member'}</strong> from the trip</span>;
     case 'MEMBER_REJECTED':
       return <span><strong>{details.name || name}</strong> declined the trip invitation</span>;
+    case 'INVITATION_CANCELLED':
+      return <span><strong>{name}</strong> cancelled the invitation for <strong>{details.name || 'someone'}</strong></span>;
     case 'MEMBER_LEFT':
       return <span><strong>{details.name || name}</strong> left the trip</span>;
     case 'DATES_CHANGED': {

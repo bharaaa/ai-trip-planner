@@ -67,7 +67,8 @@ export type ActionType =
   | 'MEMBER_REMOVED'
   | 'MEMBER_LEFT'
   | 'MEMBER_INVITED'
-  | 'MEMBER_REJECTED';
+  | 'MEMBER_REJECTED'
+  | 'INVITATION_CANCELLED';
 
 export interface TripActivity {
   id: string;

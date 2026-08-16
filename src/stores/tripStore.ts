@@ -21,6 +21,7 @@ interface TripStoreState {
   joinTrip: (tripId: string) => Promise<void>;
   rejectInvitation: (tripId: string) => Promise<void>;
   removeMember: (tripId: string, memberId: string, memberName: string) => void;
+  cancelInvitation: (tripId: string, memberId: string, memberName: string) => void;
   leaveTrip: (tripId: string) => Promise<void>;
   submitPreferences: (tripId: string, userId: string, preferences: Preference) => void;
   setTripIdeas: (tripId: string, ideas: TripIdea[]) => void;
@@ -191,6 +192,21 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
     }
 
     logAndSyncActivity(tripId, 'MEMBER_REMOVED', { name: memberName });
+
+    return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
+  }),
+
+  cancelInvitation: (tripId, memberId, memberName) => set((state) => {
+    const trips = updateTrip(state.trips, tripId, trip => ({
+      ...trip,
+      members: trip.members.filter(m => m.userId !== memberId)
+    }));
+
+    tripService.removeMember(tripId, memberId).catch(err => {
+      console.error('Failed to sync invitation cancellation:', err);
+    });
+
+    logAndSyncActivity(tripId, 'INVITATION_CANCELLED', { name: memberName });
 
     return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
   }),

@@ -42,9 +42,9 @@ export function InviteMemberModal({ open, onClose, tripId, existingMembers }: In
       setIsSearching(true);
       const results = await searchUsers(searchQuery);
       
-      // Filter out users already in the trip
+      // Filter out users already in the trip with 'joined' status
       const filtered = results.filter(u => 
-        !existingMembers.some(member => member.userId === u.id)
+        !existingMembers.some(member => member.userId === u.id && member.status === 'joined')
       );
       
       setSearchResults(filtered);
@@ -66,9 +66,11 @@ export function InviteMemberModal({ open, onClose, tripId, existingMembers }: In
       joinedAt: new Date(),
       preferencesSubmitted: false
     };
-    
     inviteMember(tripId, newMember);
-    onClose();
+  };
+
+  const handleCancel = (user: User) => {
+    useTripStore.getState().removeMember(tripId, user.id, user.name);
   };
 
   return (
@@ -93,7 +95,10 @@ export function InviteMemberModal({ open, onClose, tripId, existingMembers }: In
             ) : searchQuery.trim().length >= 2 ? (
               searchResults.length > 0 ? (
                 <div className="space-y-2">
-                  {searchResults.map(user => (
+                  {searchResults.map(user => {
+                    const isInvited = existingMembers.some(m => m.userId === user.id && m.status === 'invited');
+                    
+                    return (
                     <div
                       key={user.id}
                       className="w-full flex items-center justify-between p-3 border border-warm-200 rounded-lg bg-warm-50"
@@ -107,11 +112,20 @@ export function InviteMemberModal({ open, onClose, tripId, existingMembers }: In
                           <p className="text-xs text-warm-500">{user.email}</p>
                         </div>
                       </div>
-                      <Button size="sm" onClick={() => handleInvite(user)}>
-                        Invite
-                      </Button>
+                      {isInvited ? (
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-medium text-warm-500 px-2 py-1 bg-warm-200 rounded-md">Invited</span>
+                          <Button size="sm" variant="outline" onClick={() => handleCancel(user)}>
+                            Cancel
+                          </Button>
+                        </div>
+                      ) : (
+                        <Button size="sm" onClick={() => handleInvite(user)}>
+                          Invite
+                        </Button>
+                      )}
                     </div>
-                  ))}
+                  )})}
                 </div>
               ) : (
                 <p className="text-sm text-warm-500 p-4 text-center">No users found.</p>

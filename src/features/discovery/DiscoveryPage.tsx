@@ -278,59 +278,80 @@ export const DiscoveryPage = () => {
       {/* Modal for Exploring Idea */}
       <Dialog open={!!selectedIdeaId} onClose={() => setSelectedIdeaId(null)}>
         {selectedIdea && (
-          <div>
-            {selectedIdea.imageUrl && (
-              <div className="w-full h-48 sm:h-56 mb-5 rounded-xl overflow-hidden shadow-sm">
-                <img 
-                  src={selectedIdea.imageUrl} 
-                  alt={selectedIdea.destination}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                  }}
-                />
-              </div>
-            )}
-            <div className="flex items-center gap-3 mb-1">
-              <h2 className="text-2xl font-bold text-warm-900 tracking-tight">{selectedIdea.destination}</h2>
-              {selectedIdea.fitScore !== undefined && (
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-accent-100 text-accent-700">
-                  {selectedIdea.fitScore}% match
-                </span>
-              )}
-            </div>
-            
-            {selectedIdea.title && (
-              <p className="text-warm-700 font-medium mb-4">{selectedIdea.title}</p>
-            )}
+          <div className="flex flex-col gap-6">
+            {/* Header Image & Core Info */}
+            <div className="relative -mt-2 -mx-5 sm:-mt-5 sm:-mx-5 mb-2">
+              {selectedIdea.imageUrl && (
+                <div className="w-full aspect-[4/3] sm:aspect-[16/9] overflow-hidden relative sm:rounded-t-2xl">
+                  <img 
+                    src={selectedIdea.imageUrl} 
+                    alt={selectedIdea.destination}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                  {/* Overlay gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  
+                  {/* Destination Name floating on image */}
+                  <div className="absolute bottom-0 left-0 p-6 w-full">
+                    <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-1.5 drop-shadow-md">
+                      {selectedIdea.destination}
+                    </h2>
+                    {selectedIdea.title && (
+                      <p className="text-white/90 font-medium text-sm sm:text-base drop-shadow">
+                        {selectedIdea.title}
+                      </p>
+                    )}
+                  </div>
 
-            <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-warm-600 font-medium mb-6">
-              <div className="flex items-center gap-1.5">
-                <span>💳</span>
-                {formatBudgetRange(selectedIdea.estimatedBudget.min, selectedIdea.estimatedBudget.max)}
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span>⏰</span>
-                {selectedIdea.suggestedDuration} days
-              </div>
-              {selectedIdea.travelStyle && (
-                <div className="flex items-center gap-1.5">
-                  <span>✨</span>
-                  {selectedIdea.travelStyle}
+                  {/* Fit Score floating top-right */}
+                  {selectedIdea.fitScore !== undefined && (
+                    <div className="absolute top-5 right-5 bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-full shadow-lg flex items-center gap-1.5">
+                      <span className="text-accent-600">✨</span>
+                      <span className="text-sm font-bold text-warm-950">{selectedIdea.fitScore}% match</span>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
 
-            <p className="text-warm-700 mb-6 leading-relaxed">
-              {selectedIdea.summary || selectedIdea.reasons?.[0]}
-            </p>
+            {/* Quick Stats Grid */}
+            <div className="grid grid-cols-3 gap-3 px-1">
+               <div className="bg-warm-50 rounded-2xl p-4 flex flex-col items-center justify-center text-center border border-warm-100/60 shadow-sm">
+                 <span className="text-2xl mb-1.5">💳</span>
+                 <span className="text-[10px] font-bold text-warm-500 uppercase tracking-wider mb-0.5">Budget</span>
+                 <span className="text-sm font-bold text-warm-900">{formatBudgetRange(selectedIdea.estimatedBudget.min, selectedIdea.estimatedBudget.max)}</span>
+               </div>
+               <div className="bg-warm-50 rounded-2xl p-4 flex flex-col items-center justify-center text-center border border-warm-100/60 shadow-sm">
+                 <span className="text-2xl mb-1.5">⏰</span>
+                 <span className="text-[10px] font-bold text-warm-500 uppercase tracking-wider mb-0.5">Duration</span>
+                 <span className="text-sm font-bold text-warm-900">{selectedIdea.suggestedDuration} days</span>
+               </div>
+               <div className="bg-warm-50 rounded-2xl p-4 flex flex-col items-center justify-center text-center border border-warm-100/60 shadow-sm">
+                 <span className="text-2xl mb-1.5">🎯</span>
+                 <span className="text-[10px] font-bold text-warm-500 uppercase tracking-wider mb-0.5">Style</span>
+                 <span className="text-sm font-bold text-warm-900 line-clamp-1">{selectedIdea.travelStyle || 'Varied'}</span>
+               </div>
+            </div>
 
+            {/* Summary */}
+            <div className="px-2 mt-2">
+              <h4 className="text-xl font-bold text-warm-950 mb-3 tracking-tight">Why it fits your group</h4>
+              <p className="text-warm-700 leading-relaxed text-[15px]">
+                {selectedIdea.summary || selectedIdea.reasons?.[0]}
+              </p>
+            </div>
+
+            {/* Activities */}
             {selectedIdea.keyActivities && selectedIdea.keyActivities.length > 0 && (
-              <div className="mb-6">
-                <h4 className="font-semibold text-warm-900 mb-3 tracking-tight">Key Activities</h4>
-                <div className="flex flex-wrap gap-2">
+              <div className="px-2 mt-4">
+                <h4 className="text-xl font-bold text-warm-950 mb-4 tracking-tight">Key Highlights</h4>
+                <div className="flex flex-wrap gap-2.5">
                   {selectedIdea.keyActivities.map((activity, idx) => (
-                    <span key={idx} className="px-3 py-1.5 bg-warm-100 text-warm-800 rounded-lg text-sm font-medium border border-warm-200 shadow-sm">
+                    <span key={idx} className="px-4 py-2 bg-white text-warm-800 rounded-xl text-sm font-medium border border-warm-200 shadow-sm flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-accent-400"></span>
                       {activity}
                     </span>
                   ))}
@@ -338,27 +359,31 @@ export const DiscoveryPage = () => {
               </div>
             )}
             
-            <div className="mb-8 pt-4 border-t border-warm-200/60">
-              <h4 className="font-semibold text-warm-900 mb-4 tracking-tight">How do you feel about this destination?</h4>
-              <ReactionBar 
-                ideaId={selectedIdea.id}
-                currentReaction={userReactions[selectedIdea.id]}
-                onReact={(r) => handleReact(selectedIdea.id, r)}
-              />
-            </div>
-            
-            {isAdmin ? (
-              <button 
-                className="w-full py-3.5 bg-warm-900 text-white rounded-xl font-medium shadow-sm hover:bg-warm-800 transition-colors"
-                onClick={() => handleSelectDestination(selectedIdea)}
-              >
-                Select this destination
-              </button>
-            ) : (
-              <div className="w-full py-3.5 bg-warm-100 text-warm-500 rounded-xl font-medium text-center border border-warm-200/50">
-                Only the organizer can select the destination
+            {/* Reaction & Action */}
+            <div className="bg-warm-50 rounded-2xl p-6 mt-6 border border-warm-100 shadow-inner">
+              <h4 className="font-semibold text-warm-950 mb-5 text-center">How do you feel about this idea?</h4>
+              <div className="flex justify-center mb-8">
+                <ReactionBar 
+                  ideaId={selectedIdea.id}
+                  currentReaction={userReactions[selectedIdea.id]}
+                  onReact={(r) => handleReact(selectedIdea.id, r)}
+                />
               </div>
-            )}
+              
+              {isAdmin ? (
+                <button 
+                  className="w-full py-4 bg-warm-900 text-white rounded-xl font-bold shadow-md hover:bg-black transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                  onClick={() => handleSelectDestination(selectedIdea)}
+                >
+                  Select {selectedIdea.destination}
+                  <span>➡️</span>
+                </button>
+              ) : (
+                <div className="w-full py-4 bg-warm-200/50 text-warm-600 rounded-xl font-medium text-center border border-warm-200/50">
+                  Only the organizer can select the destination
+                </div>
+              )}
+            </div>
           </div>
         )}
       </Dialog>

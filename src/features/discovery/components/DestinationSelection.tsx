@@ -13,6 +13,7 @@ interface DestinationSelectionProps {
   budget: { min: number; max: number };
   onConfirm: () => void;
   onChangeDestination?: () => void;
+  isAdmin?: boolean;
   className?: string;
 }
 
@@ -23,6 +24,7 @@ export const DestinationSelection: React.FC<DestinationSelectionProps> = ({
   budget,
   onConfirm,
   onChangeDestination,
+  isAdmin = false,
   className,
 }) => {
   return (
@@ -77,23 +79,29 @@ export const DestinationSelection: React.FC<DestinationSelectionProps> = ({
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          {onChangeDestination && (
+        {isAdmin ? (
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            {onChangeDestination && (
+              <button
+                onClick={onChangeDestination}
+                className="px-6 py-3 text-sm font-medium text-warm-600 hover:text-warm-900 hover:bg-warm-100 rounded-xl transition-colors order-2 sm:order-1"
+              >
+                Change destination
+              </button>
+            )}
             <button
-              onClick={onChangeDestination}
-              className="px-6 py-3 text-sm font-medium text-warm-600 hover:text-warm-900 hover:bg-warm-100 rounded-xl transition-colors order-2 sm:order-1"
+              onClick={onConfirm}
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-3 bg-warm-900 hover:bg-black text-white text-base font-semibold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-md order-1 sm:order-2"
             >
-              Change destination
+              Start planning
+              <span className="text-lg">➡️</span>
             </button>
-          )}
-          <button
-            onClick={onConfirm}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-3 bg-warm-900 hover:bg-black text-white text-base font-semibold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-md order-1 sm:order-2"
-          >
-            Start planning
-            <span className="text-lg">➡️</span>
-          </button>
-        </div>
+          </div>
+        ) : (
+          <div className="text-center p-4 bg-warm-100/50 rounded-xl">
+            <p className="text-sm font-medium text-warm-600">Waiting for the trip organizer to finalize the destination...</p>
+          </div>
+        )}
       </div>
     </div>
   );

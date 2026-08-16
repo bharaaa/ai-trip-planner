@@ -23,6 +23,8 @@ export const DiscoveryPage = () => {
   const { user: currentUser } = useAuthStore();
   const { activeTrip, setTripIdeas, addReaction, selectDestination } = useTripStore();
 
+  const isAdmin = activeTrip?.members.find(m => m.userId === currentUser?.id)?.role === 'admin';
+
   const [isLoading, setIsLoading] = useState(false);
   const [isRefining, setIsRefining] = useState(false);
   const [selectedIdeaId, setSelectedIdeaId] = useState<string | null>(null);
@@ -230,6 +232,7 @@ export const DiscoveryPage = () => {
                         travelers={activeTrip.travelers}
                         dates={activeTrip.flexibleDates ? (activeTrip.dateMonth || 'TBD') : 'TBD'}
                         budget={{ min: activeTrip.tripIdeas[0].estimatedBudget?.min || 0, max: activeTrip.tripIdeas[0].estimatedBudget?.max || 0 }}
+                        isAdmin={isAdmin}
                         onConfirm={() => handleSelectDestination(activeTrip.tripIdeas[0])}
                       />
                     </div>
@@ -257,12 +260,18 @@ export const DiscoveryPage = () => {
               />
             </div>
             
-            <button 
-              className="w-full py-3.5 bg-warm-900 text-white rounded-xl font-medium shadow-sm hover:bg-warm-800 transition-colors"
-              onClick={() => handleSelectDestination(selectedIdea)}
-            >
-              Select this destination
-            </button>
+            {isAdmin ? (
+              <button 
+                className="w-full py-3.5 bg-warm-900 text-white rounded-xl font-medium shadow-sm hover:bg-warm-800 transition-colors"
+                onClick={() => handleSelectDestination(selectedIdea)}
+              >
+                Select this destination
+              </button>
+            ) : (
+              <div className="w-full py-3.5 bg-warm-100 text-warm-500 rounded-xl font-medium text-center border border-warm-200/50">
+                Only the organizer can select the destination
+              </div>
+            )}
           </div>
         )}
       </Dialog>

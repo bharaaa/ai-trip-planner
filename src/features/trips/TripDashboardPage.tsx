@@ -260,7 +260,7 @@ export const TripDashboardPage: React.FC = () => {
             <h2 className="text-xl font-bold text-warm-950 tracking-tight">The Crew</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {activeTrip.members?.map(member => {
+            {activeTrip.members?.filter(m => m.status !== 'invited').map(member => {
               const isCurrentUser = member.userId === currentUser?.id;
               const isOrganizer = activeTrip.members?.find(m => m.userId === currentUser?.id)?.role === 'admin';
               

@@ -10,6 +10,7 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Avatar, AvatarGroup } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
+import { Dialog } from '@/components/ui/Dialog';
 import { useTripStore } from '@/stores/tripStore';
 import { useAuthStore } from '@/stores/authStore';
 import { Users, Settings2, CalendarDays, LogOut, X } from 'lucide-react';
@@ -19,6 +20,8 @@ export const TripDashboardPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isEditDateOpen, setIsEditDateOpen] = useState(false);
+  const [memberToRemove, setMemberToRemove] = useState<{ id: string; name: string } | null>(null);
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const navigate = useNavigate();
   const { activeTrip, setActiveTrip, trips, fetchTrips } = useTripStore();
   const { user: currentUser } = useAuthStore();
@@ -35,16 +38,15 @@ export const TripDashboardPage: React.FC = () => {
     }
   }, [id, activeTrip, setActiveTrip]);
 
-  const handleLeaveTrip = async () => {
-    if (confirm('Are you sure you want to leave this trip?')) {
-      await useTripStore.getState().leaveTrip(activeTrip!.id);
-      navigate('/');
-    }
+  const confirmLeaveTrip = async () => {
+    await useTripStore.getState().leaveTrip(activeTrip!.id);
+    navigate('/');
   };
 
-  const handleRemoveMember = (memberId: string, memberName: string) => {
-    if (confirm(`Are you sure you want to remove ${memberName} from the trip?`)) {
-      useTripStore.getState().removeMember(activeTrip!.id, memberId, memberName);
+  const confirmRemoveMember = () => {
+    if (memberToRemove) {
+      useTripStore.getState().removeMember(activeTrip!.id, memberToRemove.id, memberToRemove.name);
+      setMemberToRemove(null);
     }
   };
 
@@ -248,7 +250,7 @@ export const TripDashboardPage: React.FC = () => {
 
                     {isCurrentUser && member.role !== 'admin' && (
                       <button 
-                        onClick={handleLeaveTrip}
+                        onClick={() => setShowLeaveConfirm(true)}
                         className="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity p-1.5 text-error-600 hover:bg-error-50 rounded-md"
                         title="Leave Trip"
                       >
@@ -258,7 +260,7 @@ export const TripDashboardPage: React.FC = () => {
                     
                     {isOrganizer && !isCurrentUser && (
                       <button 
-                        onClick={() => handleRemoveMember(member.userId, member.name)}
+                        onClick={() => setMemberToRemove({ id: member.userId, name: member.name })}
                         className="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity p-1.5 text-error-600 hover:bg-error-50 rounded-md"
                         title="Remove Member"
                       >
@@ -296,6 +298,31 @@ export const TripDashboardPage: React.FC = () => {
           trip={activeTrip}
           onUpdate={(data) => useTripStore.getState().updateTripDates(activeTrip.id, data)}
         />
+
+        {/* Modals for removing/leaving */}
+        <Dialog open={!!memberToRemove} onClose={() => setMemberToRemove(null)} title="Remove Member">
+          <div className="p-6">
+            <p className="text-warm-800 mb-6">
+              Are you sure you want to remove <strong>{memberToRemove?.name}</strong> from this trip?
+            </p>
+            <div className="flex gap-3 justify-end">
+              <Button variant="secondary" onClick={() => setMemberToRemove(null)}>Cancel</Button>
+              <Button variant="primary" className="bg-error-600 hover:bg-error-700 text-white border-error-600 shadow-sm" onClick={confirmRemoveMember}>Remove</Button>
+            </div>
+          </div>
+        </Dialog>
+
+        <Dialog open={showLeaveConfirm} onClose={() => setShowLeaveConfirm(false)} title="Leave Trip">
+          <div className="p-6">
+            <p className="text-warm-800 mb-6">
+              Are you sure you want to leave this trip? You will no longer have access to it unless invited again.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <Button variant="secondary" onClick={() => setShowLeaveConfirm(false)}>Cancel</Button>
+              <Button variant="primary" className="bg-error-600 hover:bg-error-700 text-white border-error-600 shadow-sm" onClick={confirmLeaveTrip}>Leave Trip</Button>
+            </div>
+          </div>
+        </Dialog>
       </main>
     </div>
   );

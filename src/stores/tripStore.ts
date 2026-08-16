@@ -84,9 +84,8 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
 
       const tripId = await tripService.createTrip(data, currentUser.id);
       
-      // We rely on the next fetchTrips to populate the full trip data
-      // For immediate optimistic UI, we could construct a partial trip here,
-      // but fetchTrips is typically called right after creation anyway.
+      // Fetch trips immediately so the newly created trip is in state
+      await get().fetchTrips();
       
       return tripId;
     } catch (err) {

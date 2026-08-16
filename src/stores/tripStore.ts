@@ -296,6 +296,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
         flexible_dates: newTrip.flexibleDates,
         start_date: newTrip.startDate?.toISOString().split('T')[0],
         end_date: newTrip.endDate?.toISOString().split('T')[0],
+        date_month: newTrip.dateMonth,
         duration: newTrip.duration
       }).select().single();
 

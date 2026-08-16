@@ -8,6 +8,8 @@ import { useAuthStore } from '@/stores/authStore';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
+import { Select } from '@/components/ui/Select';
+import { Badge } from '@/components/ui/Badge';
 import { StepIndicator } from './components/StepIndicator';
 import { DateRangePicker } from '@/components/ui/DateRangePicker';
 import { formatCurrency } from '@/lib/utils/formatting';
@@ -26,6 +28,7 @@ export function CreateTripPage() {
     name: '',
     invitedUsers: [] as User[],
     dateFlexibility: 'exact',
+    dateMonth: '',
     dateRange: undefined as DateRange | undefined,
     duration: 5,
     budgetPerPerson: 5000000,
@@ -65,6 +68,17 @@ export function CreateTripPage() {
     };
   }, [searchQuery, formData.invitedUsers, searchUsers, currentUser?.id]);
 
+  const next12Months = React.useMemo(() => {
+    return Array.from({ length: 12 }, (_, i) => {
+      const d = new Date();
+      d.setMonth(d.getMonth() + i);
+      return {
+        value: `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}`,
+        label: d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+      };
+    });
+  }, []);
+
   const nextStep = () => setStep(s => s + 1);
   const prevStep = () => setStep(s => Math.max(1, s - 1));
 
@@ -83,6 +97,7 @@ export function CreateTripPage() {
       name: formData.name,
       origin: formData.startingLocation,
       flexibleDates: formData.dateFlexibility !== 'exact',
+      dateMonth: formData.dateFlexibility === 'month' ? formData.dateMonth : undefined,
       startDate,
       endDate,
       duration: finalDuration,
@@ -249,7 +264,7 @@ export function CreateTripPage() {
             </div>
 
             <div className="space-y-4 pt-4 flex flex-col items-center">
-              {formData.dateFlexibility === 'exact' ? (
+              {formData.dateFlexibility === 'exact' && (
                 <div className="w-full">
                   <p className="text-sm font-medium text-warm-900 mb-3 text-center">Select your travel dates</p>
                   <DateRangePicker 
@@ -263,8 +278,31 @@ export function CreateTripPage() {
                     </p>
                   )}
                 </div>
-              ) : (
-                <div className="w-full">
+              )}
+              
+              {formData.dateFlexibility === 'month' && (
+                <div className="w-full max-w-sm space-y-4">
+                  <div className="space-y-1">
+                    <label className="text-sm font-medium text-warm-900">Which month?</label>
+                    <Select
+                      value={formData.dateMonth}
+                      onChange={(val) => setFormData({ ...formData, dateMonth: val })}
+                      options={next12Months}
+                      placeholder="Select a month"
+                    />
+                  </div>
+                  <Input
+                    type="number"
+                    label="How many days?"
+                    value={formData.duration}
+                    onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) || 1 })}
+                    min={1}
+                  />
+                </div>
+              )}
+
+              {formData.dateFlexibility === 'flexible' && (
+                <div className="w-full max-w-sm">
                   <Input
                     type="number"
                     label="How many days?"

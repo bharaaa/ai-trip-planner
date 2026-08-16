@@ -167,7 +167,12 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
       const newIdeas = trip.tripIdeas.map(idea => 
         idea.id === ideaId ? { ...idea, isSaved } : idea
       );
-      return { ...trip, tripIdeas: newIdeas };
+      
+      // Move saved ideas to the top
+      const savedIdeas = newIdeas.filter(i => i.isSaved);
+      const unsavedIdeas = newIdeas.filter(i => !i.isSaved);
+      
+      return { ...trip, tripIdeas: [...savedIdeas, ...unsavedIdeas] };
     });
 
     tripService.toggleIdeaSaved(ideaId, isSaved).catch(err => {

@@ -116,6 +116,15 @@ export const tripService = {
     if (error) throw error;
   },
 
+  removeMember: async (tripId: string, memberId: string): Promise<void> => {
+    const { error } = await supabase
+      .from('trip_members')
+      .delete()
+      .match({ trip_id: tripId, user_id: memberId });
+      
+    if (error) throw error;
+  },
+
   searchUsers: async (query: string): Promise<User[]> => {
     if (!query.trim()) return [];
     const { data, error } = await supabase

@@ -12,7 +12,7 @@ import { Avatar, AvatarGroup } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 import { useTripStore } from '@/stores/tripStore';
 import { useAuthStore } from '@/stores/authStore';
-import { Users, Settings2, CalendarDays } from 'lucide-react';
+import { Users, Settings2, CalendarDays, LogOut, X } from 'lucide-react';
 import { format } from 'date-fns';
 
 export const TripDashboardPage: React.FC = () => {
@@ -34,6 +34,19 @@ export const TripDashboardPage: React.FC = () => {
       setActiveTrip(id);
     }
   }, [id, activeTrip, setActiveTrip]);
+
+  const handleLeaveTrip = async () => {
+    if (confirm('Are you sure you want to leave this trip?')) {
+      await useTripStore.getState().leaveTrip(activeTrip!.id);
+      navigate('/');
+    }
+  };
+
+  const handleRemoveMember = (memberId: string, memberName: string) => {
+    if (confirm(`Are you sure you want to remove ${memberName} from the trip?`)) {
+      useTripStore.getState().removeMember(activeTrip!.id, memberId, memberName);
+    }
+  };
 
   if (!activeTrip) {
     return (
@@ -210,8 +223,12 @@ export const TripDashboardPage: React.FC = () => {
             <h2 className="text-xl font-bold text-warm-950 tracking-tight">The Crew</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {activeTrip.members?.map(member => (
-              <Card key={member.userId} className="p-4 flex items-center gap-4 bg-white border border-warm-200/60 hover:shadow-sm transition-all">
+            {activeTrip.members?.map(member => {
+              const isCurrentUser = member.userId === currentUser?.id;
+              const isOrganizer = activeTrip.members?.find(m => m.userId === currentUser?.id)?.role === 'admin';
+              
+              return (
+              <Card key={member.userId} className="p-4 flex items-center gap-4 bg-white border border-warm-200/60 hover:shadow-sm transition-all group">
                 <Avatar name={member.name} src={member.avatarUrl} size="lg" />
                 <div className="flex-1 min-w-0">
                   <h3 className="font-bold text-warm-900 truncate">{member.name}</h3>
@@ -222,14 +239,36 @@ export const TripDashboardPage: React.FC = () => {
                   </div>
                 </div>
                 <div className="shrink-0 text-xs font-medium flex flex-col items-end gap-2">
-                  {member.preferencesSubmitted ? (
-                    <span className="text-success-700 flex items-center gap-1 bg-success-100 px-2 py-1 rounded-md shadow-xs">✓ Ready</span>
-                  ) : (
-                    <span className="text-warm-600 flex items-center gap-1 bg-warm-100 px-2 py-1 rounded-md shadow-xs">⏳ Pending</span>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {member.preferencesSubmitted ? (
+                      <span className="text-success-700 flex items-center gap-1 bg-success-100 px-2 py-1 rounded-md shadow-xs">✓ Ready</span>
+                    ) : (
+                      <span className="text-warm-600 flex items-center gap-1 bg-warm-100 px-2 py-1 rounded-md shadow-xs">⏳ Pending</span>
+                    )}
+
+                    {isCurrentUser && member.role !== 'admin' && (
+                      <button 
+                        onClick={handleLeaveTrip}
+                        className="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity p-1.5 text-error-600 hover:bg-error-50 rounded-md"
+                        title="Leave Trip"
+                      >
+                        <LogOut className="w-4 h-4" />
+                      </button>
+                    )}
+                    
+                    {isOrganizer && !isCurrentUser && (
+                      <button 
+                        onClick={() => handleRemoveMember(member.userId, member.name)}
+                        className="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity p-1.5 text-error-600 hover:bg-error-50 rounded-md"
+                        title="Remove Member"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
                 </div>
               </Card>
-            ))}
+            )})}
             
           </div>
         </section>

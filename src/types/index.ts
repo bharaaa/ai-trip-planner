@@ -49,7 +49,9 @@ export type ActionType =
   | 'POLL_DECIDED'
   | 'POLL_CLOSED'
   | 'ITINERARY_UPDATED'
-  | 'PREFERENCES_SUBMITTED';
+  | 'PREFERENCES_SUBMITTED'
+  | 'MEMBER_REMOVED'
+  | 'MEMBER_LEFT';
 
 export interface TripActivity {
   id: string;

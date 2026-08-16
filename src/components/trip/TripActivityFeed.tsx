@@ -7,6 +7,8 @@ import { MapPin, Calendar, CheckSquare, Settings2, Users, FileText } from 'lucid
 const getActivityIcon = (type: TripActivity['actionType']) => {
   switch (type) {
     case 'MEMBER_JOINED': return { icon: <Users className="w-5 h-5 text-accent-700" />, bg: 'bg-accent-100' };
+    case 'MEMBER_REMOVED': return { icon: <Users className="w-5 h-5 text-error-700" />, bg: 'bg-error-100' };
+    case 'MEMBER_LEFT': return { icon: <Users className="w-5 h-5 text-warm-600" />, bg: 'bg-warm-200' };
     case 'DATES_CHANGED': return { icon: <Calendar className="w-5 h-5 text-info-700" />, bg: 'bg-info-100' };
     case 'DESTINATION_SELECTED': return { icon: <MapPin className="w-5 h-5 text-success-700" />, bg: 'bg-success-100' };
     case 'POLL_CREATED': return { icon: <CheckSquare className="w-5 h-5 text-warning-700" />, bg: 'bg-warning-100' };
@@ -37,6 +39,10 @@ const getActivityMessage = (activity: TripActivity, memberName: string) => {
   switch (actionType) {
     case 'MEMBER_JOINED':
       return <span><strong>{details.name || name}</strong> joined the trip</span>;
+    case 'MEMBER_REMOVED':
+      return <span><strong>{name}</strong> removed <strong>{details.name || 'a member'}</strong> from the trip</span>;
+    case 'MEMBER_LEFT':
+      return <span><strong>{details.name || name}</strong> left the trip</span>;
     case 'DATES_CHANGED': {
       if (details.newDates) {
         const oldStr = formatDateDetails(details.oldDates);

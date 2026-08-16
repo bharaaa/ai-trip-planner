@@ -16,6 +16,8 @@ interface TripStoreState {
   createTrip: (data: Partial<Trip> & { invitedUserIds?: string[] }) => Promise<string>;
   setActiveTrip: (tripId: string) => void;
   addMember: (tripId: string, member: TripMember) => void;
+  removeMember: (tripId: string, memberId: string, memberName: string) => void;
+  leaveTrip: (tripId: string) => Promise<void>;
   submitPreferences: (tripId: string, userId: string, preferences: Preference) => void;
   setTripIdeas: (tripId: string, ideas: TripIdea[]) => void;
   toggleIdeaSaved: (tripId: string, ideaId: string, isSaved: boolean) => void;
@@ -149,6 +151,34 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
 
     return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
   }),
+
+  removeMember: (tripId, memberId, memberName) => set((state) => {
+    const trips = updateTrip(state.trips, tripId, trip => ({
+      ...trip,
+      members: trip.members.filter(m => m.userId !== memberId)
+    }));
+
+    tripService.removeMember(tripId, memberId).catch(err => {
+      console.error('Failed to sync member removal:', err);
+    });
+
+    logAndSyncActivity(tripId, 'MEMBER_REMOVED', { name: memberName });
+
+    return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
+  }),
+
+  leaveTrip: async (tripId) => {
+    const user = useAuthStore.getState().user;
+    if (!user) return;
+    
+    await activityService.logActivity(tripId, user.id, 'MEMBER_LEFT', { name: user.user_metadata?.full_name || user.email || 'Someone' });
+    await tripService.removeMember(tripId, user.id);
+    
+    useTripStore.setState(state => {
+      const trips = state.trips.filter(t => t.id !== tripId);
+      return { trips, activeTrip: state.activeTrip?.id === tripId ? null : state.activeTrip };
+    });
+  },
 
   submitPreferences: (tripId, userId, preferences) => set((state) => {
     const trips = updateTrip(state.trips, tripId, trip => {

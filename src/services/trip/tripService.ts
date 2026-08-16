@@ -161,8 +161,16 @@ export const tripService = {
     if (error) throw error;
   },
 
+  toggleIdeaSaved: async (ideaId: string, isSaved: boolean): Promise<void> => {
+    const { error } = await supabase.from('trip_ideas').update({
+      is_saved: isSaved,
+    }).eq('id', ideaId);
+    if (error) throw error;
+  },
+
   setTripIdeas: async (tripId: string, ideas: TripIdea[]): Promise<void> => {
-    await supabase.from('trip_ideas').delete().eq('trip_id', tripId);
+    // Only delete ideas that are NOT saved
+    await supabase.from('trip_ideas').delete().eq('trip_id', tripId).eq('is_saved', false);
     
     const payload = ideas.map(idea => ({
       trip_id: tripId,
@@ -182,7 +190,8 @@ export const tripService = {
       confidence: idea.confidence,
       reasons: idea.reasons || [],
       highlights: idea.highlights || [],
-      tradeoffs: idea.tradeoffs || []
+      tradeoffs: idea.tradeoffs || [],
+      is_saved: idea.isSaved || false
     }));
     const { error } = await supabase.from('trip_ideas').insert(payload);
     if (error) throw error;

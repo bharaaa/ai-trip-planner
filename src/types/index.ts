@@ -81,6 +81,7 @@ export interface TripIdea {
   keyActivities: string[];
   confidence: number;
   imageUrl?: string;
+  isSaved?: boolean;
 }
 
 export type ReactionType = 'love' | 'maybe' | 'nope' | 'save' | 'hide';

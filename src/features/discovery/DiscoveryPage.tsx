@@ -15,7 +15,7 @@ import { Dialog } from '@/components/ui/Dialog';
 import { Button } from '@/components/ui/Button';
 import { aiService } from '@/services/ai';
 import { formatCurrency, formatBudgetRange } from '@/lib/utils/formatting';
-import { Users, Calendar, Clock, Wallet, MapPin, RefreshCw } from 'lucide-react';
+import { Users, Calendar, Clock, Wallet, MapPin, RefreshCw, Bookmark } from 'lucide-react';
 import { format } from 'date-fns';
 import type { TripContext, ReactionType, TripIdea, TripReaction } from '@/types';
 
@@ -23,7 +23,7 @@ export const DiscoveryPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user: currentUser } = useAuthStore();
-  const { activeTrip, setTripIdeas, addReaction, selectDestination } = useTripStore();
+  const { activeTrip, setTripIdeas, addReaction, selectDestination, toggleIdeaSaved } = useTripStore();
 
   const isAdmin = activeTrip?.members.find(m => m.userId === currentUser?.id)?.role === 'admin';
 
@@ -233,6 +233,7 @@ export const DiscoveryPage = () => {
                 reactions={ideasReactions}
                 userReactions={userReactions}
                 onReact={handleReact}
+                onToggleSave={(id, isSaved) => toggleIdeaSaved(activeTrip.id, id, isSaved)}
                 onExplore={(id) => setSelectedIdeaId(id)}
               />
 
@@ -298,25 +299,41 @@ export const DiscoveryPage = () => {
                   {/* Overlay gradient */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                   
+                  {/* Floating Top Right Area */}
+                  <div className="absolute top-4 right-4 flex gap-2">
+                    {selectedIdea.fitScore !== undefined && (
+                      <div className="bg-black/40 backdrop-blur-md border border-white/20 text-white px-3 py-1.5 rounded-full text-sm font-semibold flex items-center gap-1.5 shadow-lg">
+                        ✨ {selectedIdea.fitScore}% Match
+                      </div>
+                    )}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleIdeaSaved(activeTrip.id, selectedIdea.id, !selectedIdea.isSaved);
+                      }}
+                      className="p-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/20 text-white hover:bg-white/30 transition-all shadow-lg"
+                      aria-label={selectedIdea.isSaved ? "Unsave idea" : "Save idea"}
+                    >
+                      <Bookmark 
+                        size={18} 
+                        className={selectedIdea.isSaved ? "fill-white" : ""} 
+                        strokeWidth={selectedIdea.isSaved ? 2 : 1.5}
+                      />
+                    </button>
+                  </div>
+
                   {/* Destination Name floating on image */}
                   <div className="absolute bottom-0 left-0 p-6 w-full">
                     <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-1.5 drop-shadow-md">
                       {selectedIdea.destination}
                     </h2>
-                    {selectedIdea.title && (
-                      <p className="text-white/90 font-medium text-sm sm:text-base drop-shadow">
-                        {selectedIdea.title}
+                    {selectedIdea.country && (
+                      <p className="text-white/90 text-lg font-medium drop-shadow-sm flex items-center gap-1.5">
+                        <MapPin size={18} className="text-accent-300" />
+                        {selectedIdea.country}
                       </p>
                     )}
                   </div>
-
-                  {/* Fit Score floating top-right */}
-                  {selectedIdea.fitScore !== undefined && (
-                    <div className="absolute top-5 right-5 bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-full shadow-lg flex items-center gap-1.5">
-                      <span className="text-accent-600">✨</span>
-                      <span className="text-sm font-bold text-warm-950">{selectedIdea.fitScore}% match</span>
-                    </div>
-                  )}
                 </div>
               )}
             </div>

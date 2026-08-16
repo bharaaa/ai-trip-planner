@@ -21,6 +21,7 @@ export const TripIdeaSchema = z.object({
   keyActivities: z.array(z.string()),
   confidence: z.number(),
   imageUrl: z.string().optional(),
+  isSaved: z.boolean().optional(),
 });
 
 export const ActivityTypeSchema = z.enum([

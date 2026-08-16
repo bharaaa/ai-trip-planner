@@ -10,6 +10,7 @@ interface RecommendationGridProps {
   reactions?: Record<string, TripReaction[]>;
   userReactions?: Record<string, ReactionType>;
   onReact?: (ideaId: string, reaction: ReactionType) => void;
+  onToggleSave?: (ideaId: string, isSaved: boolean) => void;
   onExplore?: (ideaId: string) => void;
   className?: string;
 }
@@ -19,6 +20,7 @@ export const RecommendationGrid: React.FC<RecommendationGridProps> = ({
   reactions = {},
   userReactions = {},
   onReact,
+  onToggleSave,
   onExplore,
   className,
 }) => {
@@ -35,6 +37,7 @@ export const RecommendationGrid: React.FC<RecommendationGridProps> = ({
             reactions={reactions[idea.id]}
             userReaction={userReactions[idea.id]}
             onReact={onReact ? (r) => onReact(idea.id, r) : undefined}
+            onToggleSave={onToggleSave}
             onExplore={onExplore ? () => onExplore(idea.id) : undefined}
           />
         </StaggerItem>

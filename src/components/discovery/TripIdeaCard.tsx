@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils/cn';
 import type { TripIdea, TripReaction, ReactionType } from '@/types';
 import { getReactionCounts } from '@/lib/utils/reactions';
 import { formatBudgetRange } from '@/lib/utils/formatting';
+import { Bookmark } from 'lucide-react';
 
 interface TripIdeaCardProps {
   idea: TripIdea;
@@ -11,6 +12,7 @@ interface TripIdeaCardProps {
   reactions?: TripReaction[];
   userReaction?: ReactionType;
   onReact?: (reaction: ReactionType) => void;
+  onToggleSave?: (ideaId: string, isSaved: boolean) => void;
   onExplore?: () => void;
   className?: string;
   style?: React.CSSProperties;
@@ -32,6 +34,7 @@ export const TripIdeaCard: React.FC<TripIdeaCardProps> = ({
   reactions = [],
   userReaction,
   onReact,
+  onToggleSave,
   onExplore,
   className,
   style,
@@ -65,6 +68,24 @@ export const TripIdeaCard: React.FC<TripIdeaCardProps> = ({
           />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/0 to-transparent" />
+        
+        {/* Bookmark Button */}
+        {onToggleSave && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleSave(idea.id, !idea.isSaved);
+            }}
+            className="absolute top-4 right-4 p-2.5 rounded-full bg-white/90 backdrop-blur shadow-sm hover:bg-white hover:scale-105 transition-all text-warm-700"
+            aria-label={idea.isSaved ? "Unsave idea" : "Save idea"}
+          >
+            <Bookmark 
+              size={18} 
+              className={idea.isSaved ? "fill-accent-500 text-accent-500" : ""} 
+              strokeWidth={idea.isSaved ? 2 : 1.5}
+            />
+          </button>
+        )}
       </div>
 
       <div className="flex flex-col flex-grow p-5 md:p-6">

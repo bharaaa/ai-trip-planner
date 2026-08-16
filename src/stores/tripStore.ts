@@ -17,6 +17,7 @@ interface TripStoreState {
   addMember: (tripId: string, member: TripMember) => void;
   submitPreferences: (tripId: string, userId: string, preferences: Preference) => void;
   setTripIdeas: (tripId: string, ideas: TripIdea[]) => void;
+  toggleIdeaSaved: (tripId: string, ideaId: string, isSaved: boolean) => void;
   addReaction: (tripId: string, reaction: TripReaction) => void;
   selectDestination: (tripId: string, destination: Destination) => void;
   setItinerary: (tripId: string, itinerary: Itinerary) => void;
@@ -137,13 +138,40 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
   }),
 
   setTripIdeas: (tripId, ideas) => set((state) => {
-    const trips = updateTrip(state.trips, tripId, trip => ({
-      ...trip,
-      tripIdeas: ideas
-    }));
+    let mergedIdeas = ideas;
     
-    tripService.setTripIdeas(tripId, ideas).catch(err => {
+    const trips = updateTrip(state.trips, tripId, trip => {
+      // Preserve saved ideas
+      const currentSaved = trip.tripIdeas.filter(i => i.isSaved);
+      // Filter out new ideas that have the same destination as a saved idea
+      const newIdeasFiltered = ideas.filter(newIdea => 
+        !currentSaved.some(saved => saved.destination === newIdea.destination)
+      );
+      mergedIdeas = [...currentSaved, ...newIdeasFiltered];
+      
+      return {
+        ...trip,
+        tripIdeas: mergedIdeas
+      };
+    });
+    
+    tripService.setTripIdeas(tripId, mergedIdeas).catch(err => {
       console.error('Failed to sync ideas:', err);
+    });
+
+    return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
+  }),
+
+  toggleIdeaSaved: (tripId, ideaId, isSaved) => set((state) => {
+    const trips = updateTrip(state.trips, tripId, trip => {
+      const newIdeas = trip.tripIdeas.map(idea => 
+        idea.id === ideaId ? { ...idea, isSaved } : idea
+      );
+      return { ...trip, tripIdeas: newIdeas };
+    });
+
+    tripService.toggleIdeaSaved(ideaId, isSaved).catch(err => {
+      console.error('Failed to sync idea save state:', err);
     });
 
     return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };

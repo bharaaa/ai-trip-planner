@@ -38,6 +38,7 @@ export function mapSingleTrip(t: any): Trip {
       keyActivities: idea.key_activities || [],
       confidence: idea.confidence || 0,
       imageUrl: idea.image_url,
+      isSaved: idea.is_saved || false,
     };
     
     const parseResult = TripIdeaSchema.safeParse(result);

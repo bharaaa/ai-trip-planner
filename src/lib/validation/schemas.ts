@@ -68,11 +68,11 @@ export const DecisionStatusSchema = z.enum([
 export const DecisionOptionSchema = z.object({
   id: z.string(),
   title: z.string(),
-  description: z.string().optional(),
+  description: z.string().nullable().optional().transform(val => val || undefined),
   votes: z.array(z.object({
     userId: z.string(),
     vote: z.enum(['for', 'against', 'neutral']),
-  })),
+  })).nullable().optional().transform(val => val || []),
   metadata: z.any().optional(),
 });
 
@@ -80,12 +80,12 @@ export const DecisionSchema = z.object({
   id: z.string(),
   type: DecisionTypeSchema,
   title: z.string(),
-  description: z.string().optional(),
+  description: z.string().nullable().optional().transform(val => val || undefined),
   status: DecisionStatusSchema,
-  options: z.array(DecisionOptionSchema),
-  participants: z.array(z.string()),
-  deadline: z.date().optional(),
-  decidedOption: z.string().optional(),
+  options: z.array(DecisionOptionSchema).nullable().optional().transform(val => val || []),
+  participants: z.array(z.string()).nullable().optional().transform(val => val || []),
+  deadline: z.date().nullable().optional().transform(val => val || undefined),
+  decidedOption: z.string().nullable().optional().transform(val => val || undefined),
   createdAt: z.date(),
 });
 

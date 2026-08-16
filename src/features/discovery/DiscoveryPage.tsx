@@ -38,14 +38,38 @@ export const DiscoveryPage = () => {
     preferences: activeTrip?.preferences?.[0]?.categories || { food: 5, beach: 4, nature: 4, culture: 3, cafes: 2, nightlife: 1, adventure: 1, shopping: 1 }
   };
 
-  const aggregatePreferences = [
-    { category: 'food', label: 'Food', score: 95, emoji: '🍜' },
-    { category: 'beach', label: 'Beach', score: 80, emoji: '🌊' },
-    { category: 'nature', label: 'Nature', score: 75, emoji: '🌿' },
-    { category: 'culture', label: 'Culture', score: 60, emoji: '🏛' },
-    { category: 'cafes', label: 'Cafés', score: 40, emoji: '☕' },
-    { category: 'nightlife', label: 'Nightlife', score: 20, emoji: '🎉' },
-  ];
+  const aggregatedScores: Record<string, number> = {};
+  if (activeTrip?.preferences?.length) {
+    activeTrip.preferences.forEach(p => {
+      Object.entries(p.categories).forEach(([cat, val]) => {
+        aggregatedScores[cat] = (aggregatedScores[cat] || 0) + val;
+      });
+    });
+  }
+
+  const maxCategoryScore = Math.max(...Object.values(aggregatedScores), 1);
+  
+  const getCategoryMeta = (cat: string) => {
+    const meta: Record<string, { label: string; emoji: string }> = {
+      food: { label: 'Food', emoji: '🍜' },
+      beach: { label: 'Beach', emoji: '🌊' },
+      nature: { label: 'Nature', emoji: '🌿' },
+      culture: { label: 'Culture', emoji: '🏛' },
+      cafes: { label: 'Cafés', emoji: '☕' },
+      nightlife: { label: 'Nightlife', emoji: '🎉' },
+      adventure: { label: 'Adventure', emoji: '🏄' },
+      shopping: { label: 'Shopping', emoji: '🛍' },
+    };
+    return meta[cat] || { label: cat, emoji: '✨' };
+  };
+
+  const aggregatePreferences = Object.entries(aggregatedScores)
+    .map(([cat, score]) => ({
+      category: cat,
+      ...getCategoryMeta(cat),
+      score: Math.round((score / maxCategoryScore) * 100)
+    }))
+    .sort((a, b) => b.score - a.score);
 
   useEffect(() => {
     if (!activeTrip) return;

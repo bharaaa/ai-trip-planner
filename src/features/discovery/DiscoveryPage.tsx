@@ -111,6 +111,7 @@ export const DiscoveryPage = () => {
       name: idea.destination,
       country: idea.country,
       countryCode: idea.countryCode,
+      imageUrl: idea.imageUrl,
       selectedAt: new Date()
     });
     navigate(`/trips/${activeTrip.id}/plan`);

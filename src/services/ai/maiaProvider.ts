@@ -16,8 +16,8 @@ const openai = new OpenAI({
 export class MaiaProvider implements AIProvider {
   
   private buildSystemPrompt(context: TripContext): string {
-    const preferencesList = context.groupPreferences 
-      ? Object.entries(context.groupPreferences.topCategories)
+    const preferencesList = context.preferences 
+      ? Object.entries(context.preferences)
           .sort((a, b) => b[1] - a[1])
           .slice(0, 3)
           .map(([cat, val]) => `${cat} (${val}%)`)

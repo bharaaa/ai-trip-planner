@@ -55,6 +55,7 @@ export const PlannerPage: React.FC = () => {
       setIsGenerating(false);
     }
   };
+  if (!activeTrip) return null;
 
   return (
     <PageTransition>

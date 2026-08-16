@@ -1,4 +1,5 @@
 import React from 'react';
+import { Check } from 'lucide-react';
 
 import { cn } from '@/lib/utils/cn';
 import type { PreferenceCategory } from '@/types';
@@ -43,8 +44,8 @@ export const PreferencePicker: React.FC<PreferencePickerProps> = ({
             )}
           >
             {isSelected && (
-              <div className="absolute top-2.5 right-2.5 bg-accent-400 text-white rounded-full p-0.5 animate-scale-in">
-                <span className="text-[10px] text-white">✔️</span>
+              <div className="absolute top-2.5 right-2.5 bg-accent-500 text-white rounded-full w-5 h-5 flex items-center justify-center shadow-xs animate-scale-in">
+                <Check className="w-3.5 h-3.5 stroke-[3]" />
               </div>
             )}
             <span className="text-3xl mb-2 block" aria-hidden="true">

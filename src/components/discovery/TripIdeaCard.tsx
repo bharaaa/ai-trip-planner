@@ -50,13 +50,19 @@ export const TripIdeaCard: React.FC<TripIdeaCardProps> = ({
     >
       {/* Header Image */}
       <div className={cn(
-        "w-full relative overflow-hidden",
-        featured ? "aspect-[16/9] md:aspect-[21/9]" : "aspect-[4/3]"
+        "w-full relative overflow-hidden transition-transform duration-700 group-hover:scale-105",
+        featured ? "aspect-[16/9] md:aspect-[21/9]" : "aspect-[4/3]",
+        getGradient(idea.destination)
       )}>
-        {idea.imageUrl ? (
-          <img src={idea.imageUrl} alt={idea.destination} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-        ) : (
-          <div className={cn("w-full h-full bg-gradient-to-br transition-transform duration-700 group-hover:scale-105", getGradient(idea.destination))} />
+        {idea.imageUrl && (
+          <img 
+            src={idea.imageUrl} 
+            alt={idea.destination} 
+            className="w-full h-full object-cover" 
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+            }}
+          />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/0 to-transparent" />
       </div>

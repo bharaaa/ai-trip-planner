@@ -39,18 +39,19 @@ export function TripCard({ trip, onClick, className }: TripCardProps) {
       )}
     >
       {/* Image Header */}
-      <div className="relative h-40 w-full shrink-0 overflow-hidden bg-warm-100">
-        {bgImage ? (
+      <div className={cn(
+        "relative h-40 w-full shrink-0 overflow-hidden bg-warm-100",
+        isAdmin ? "bg-gradient-to-br from-accent-400 to-warm-600" : "bg-gradient-to-br from-blue-400 to-indigo-600"
+      )}>
+        {bgImage && (
           <img 
             src={bgImage} 
             alt={trip.name} 
-            className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" 
+            className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+            }}
           />
-        ) : (
-          <div className={cn(
-            "absolute inset-0 w-full h-full opacity-90 transition-transform duration-700 ease-out group-hover:scale-105", 
-            isAdmin ? "bg-gradient-to-br from-accent-400 to-warm-600" : "bg-gradient-to-br from-blue-400 to-indigo-600"
-          )} />
         )}
         
         {/* Overlay gradient so text/badges pop */}

@@ -65,7 +65,7 @@ export function TripCard({ trip, onClick, className }: TripCardProps) {
         <div className="absolute top-4 left-4">
            {isAdmin ? (
              <Badge variant="accent" className="text-[10px] uppercase py-1 px-2.5 bg-accent-500/95 text-white border-0 shadow-md backdrop-blur-md font-bold tracking-wider flex items-center gap-1.5">
-               <Crown className="w-3 h-3" /> Trip Leader
+               <Crown className="w-3 h-3" /> Organizer
              </Badge>
            ) : (
              <Badge variant="default" className="text-[10px] uppercase py-1 px-2.5 bg-blue-500/95 text-white border-0 shadow-md backdrop-blur-md font-bold tracking-wider flex items-center gap-1.5">

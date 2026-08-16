@@ -80,20 +80,8 @@ export const TripIdeaCard: React.FC<TripIdeaCardProps> = ({
           )}
         </div>
 
-        {/* Title */}
-        {idea.title && (
-          <p className="text-warm-700 font-medium text-sm mb-3">{idea.title}</p>
-        )}
-
-        {/* AI Insight / Summary */}
-        {(idea.summary || idea.reasons?.[0]) && (
-          <p className="text-warm-600 mb-4 leading-relaxed text-sm">
-            {idea.summary || idea.reasons?.[0]}
-          </p>
-        )}
-
         {/* Key Info */}
-        <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-warm-500 mb-3 font-medium">
+        <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-warm-500 mb-5 font-medium">
           <div className="flex items-center gap-1.5">
             <span>💳</span>
             {formatBudgetRange(idea.estimatedBudget.min, idea.estimatedBudget.max)}
@@ -109,17 +97,6 @@ export const TripIdeaCard: React.FC<TripIdeaCardProps> = ({
             </div>
           )}
         </div>
-
-        {/* Key Activities */}
-        {idea.keyActivities && idea.keyActivities.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mb-5">
-            {idea.keyActivities.slice(0, 4).map((activity, idx) => (
-              <span key={idx} className="px-2 py-1 bg-warm-100 text-warm-700 rounded-md text-xs font-medium border border-warm-200">
-                {activity}
-              </span>
-            ))}
-          </div>
-        )}
 
         {/* Reactions Summary & Actions */}
         <div className="flex items-center justify-between pt-4 mt-auto border-t border-warm-100">

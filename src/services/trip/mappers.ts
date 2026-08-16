@@ -25,18 +25,18 @@ export function mapSingleTrip(t: any): Trip {
       title: idea.title,
       summary: idea.summary,
       estimatedBudget: {
-        min: idea.estimated_budget_min,
-        max: idea.estimated_budget_max,
+        min: idea.estimated_budget_min || 0,
+        max: idea.estimated_budget_max || 0,
         currency: idea.currency || 'IDR'
       },
-      fitScore: idea.fit_score,
+      fitScore: idea.fit_score || 0,
       reasons: idea.reasons || [],
       highlights: idea.highlights || [],
       tradeoffs: idea.tradeoffs || [],
-      suggestedDuration: idea.suggested_duration,
-      travelStyle: idea.travel_style,
+      suggestedDuration: idea.suggested_duration || 0,
+      travelStyle: idea.travel_style || '',
       keyActivities: idea.key_activities || [],
-      confidence: idea.confidence,
+      confidence: idea.confidence || 0,
       imageUrl: idea.image_url,
     };
     

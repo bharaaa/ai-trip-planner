@@ -14,7 +14,7 @@ import { ReactionBar } from '@/features/discovery/components/ReactionBar';
 import { Dialog } from '@/components/ui/Dialog';
 import { Button } from '@/components/ui/Button';
 import { aiService } from '@/services/ai';
-import { formatCurrency } from '@/lib/utils/formatting';
+import { formatCurrency, formatBudgetRange } from '@/lib/utils/formatting';
 import { Users, Calendar, Clock, Wallet, MapPin, RefreshCw } from 'lucide-react';
 import { format } from 'date-fns';
 import type { TripContext, ReactionType, TripIdea, TripReaction } from '@/types';
@@ -278,12 +278,68 @@ export const DiscoveryPage = () => {
       {/* Modal for Exploring Idea */}
       <Dialog open={!!selectedIdeaId} onClose={() => setSelectedIdeaId(null)}>
         {selectedIdea && (
-          <div className="p-6">
-            <h2 className="text-2xl font-bold mb-4 text-warm-900 tracking-tight">{selectedIdea.destination}</h2>
-            <p className="text-warm-600 mb-6">{selectedIdea.reasons?.[0]}</p>
+          <div>
+            {selectedIdea.imageUrl && (
+              <div className="w-full h-48 sm:h-56 mb-5 rounded-xl overflow-hidden shadow-sm">
+                <img 
+                  src={selectedIdea.imageUrl} 
+                  alt={selectedIdea.destination}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+              </div>
+            )}
+            <div className="flex items-center gap-3 mb-1">
+              <h2 className="text-2xl font-bold text-warm-900 tracking-tight">{selectedIdea.destination}</h2>
+              {selectedIdea.fitScore !== undefined && (
+                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-accent-100 text-accent-700">
+                  {selectedIdea.fitScore}% match
+                </span>
+              )}
+            </div>
             
-            <div className="mb-8">
-              <h4 className="font-medium text-warm-900 mb-4">How do you feel about this destination?</h4>
+            {selectedIdea.title && (
+              <p className="text-warm-700 font-medium mb-4">{selectedIdea.title}</p>
+            )}
+
+            <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-warm-600 font-medium mb-6">
+              <div className="flex items-center gap-1.5">
+                <span>💳</span>
+                {formatBudgetRange(selectedIdea.estimatedBudget.min, selectedIdea.estimatedBudget.max)}
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span>⏰</span>
+                {selectedIdea.suggestedDuration} days
+              </div>
+              {selectedIdea.travelStyle && (
+                <div className="flex items-center gap-1.5">
+                  <span>✨</span>
+                  {selectedIdea.travelStyle}
+                </div>
+              )}
+            </div>
+
+            <p className="text-warm-700 mb-6 leading-relaxed">
+              {selectedIdea.summary || selectedIdea.reasons?.[0]}
+            </p>
+
+            {selectedIdea.keyActivities && selectedIdea.keyActivities.length > 0 && (
+              <div className="mb-6">
+                <h4 className="font-semibold text-warm-900 mb-3 tracking-tight">Key Activities</h4>
+                <div className="flex flex-wrap gap-2">
+                  {selectedIdea.keyActivities.map((activity, idx) => (
+                    <span key={idx} className="px-3 py-1.5 bg-warm-100 text-warm-800 rounded-lg text-sm font-medium border border-warm-200 shadow-sm">
+                      {activity}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            <div className="mb-8 pt-4 border-t border-warm-200/60">
+              <h4 className="font-semibold text-warm-900 mb-4 tracking-tight">How do you feel about this destination?</h4>
               <ReactionBar 
                 ideaId={selectedIdea.id}
                 currentReaction={userReactions[selectedIdea.id]}

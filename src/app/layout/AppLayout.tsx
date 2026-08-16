@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import { Outlet, useLocation, Link, useNavigate } from 'react-router'
 import { cn } from '@/lib/utils/cn'
 import { useUIStore } from '@/stores/uiStore'
+import { useNotificationStore } from '@/stores/notificationStore'
 import { AnimatePresence, motion } from 'motion/react'
 import { useTripStore } from '@/stores/tripStore'
 import { useAuthStore } from '@/stores/authStore'
@@ -47,15 +48,14 @@ export function AppLayout() {
 
   const setActiveTrip = useTripStore((state) => state.setActiveTrip)
   const fetchTrips = useTripStore((state) => state.fetchTrips)
-  const trips = useTripStore((state) => state.trips)
   
-  const invitedTrips = trips.filter(trip => 
-    trip.members.find(m => m.userId === user?.id)?.status === 'invited'
-  )
+  const { notifications, fetchNotifications, markAsRead, markAllAsRead } = useNotificationStore()
+  const unreadCount = notifications.filter(n => !n.isRead).length
 
   useEffect(() => {
     fetchTrips()
-  }, [fetchTrips])
+    fetchNotifications()
+  }, [fetchTrips, fetchNotifications])
 
   useEffect(() => {
     if (tripId) {
@@ -116,7 +116,7 @@ export function AppLayout() {
                   className="relative p-2 rounded-full hover:bg-warm-100 text-warm-600 transition-colors focus:outline-none"
                 >
                   <Bell className="w-5 h-5" />
-                  {invitedTrips.length > 0 && (
+                  {unreadCount > 0 && (
                     <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-error-500 rounded-full border-2 border-white"></span>
                   )}
                 </button>
@@ -128,31 +128,51 @@ export function AppLayout() {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 10, scale: 0.95 }}
                       transition={{ duration: 0.2 }}
-                      className="absolute right-0 mt-2 w-72 rounded-xl bg-white shadow-lg border border-warm-200/50 overflow-hidden z-50"
+                      className="absolute right-0 mt-2 w-80 rounded-xl bg-white shadow-lg border border-warm-200/50 overflow-hidden z-50"
                     >
-                      <div className="px-4 py-3 border-b border-warm-100 bg-warm-50">
+                      <div className="px-4 py-3 border-b border-warm-100 bg-warm-50 flex items-center justify-between">
                         <p className="text-sm font-semibold text-warm-900">Notifications</p>
+                        {unreadCount > 0 && (
+                          <button 
+                            onClick={() => markAllAsRead()}
+                            className="text-xs text-accent-600 hover:text-accent-700 font-medium"
+                          >
+                            Mark all as read
+                          </button>
+                        )}
                       </div>
                       <div className="max-h-80 overflow-y-auto">
-                        {invitedTrips.length > 0 ? (
-                          invitedTrips.map(trip => (
+                        {notifications.length > 0 ? (
+                          notifications.map(notification => (
                             <div 
-                              key={trip.id}
+                              key={notification.id}
                               onClick={() => {
+                                if (!notification.isRead) markAsRead(notification.id)
                                 setIsNotificationsOpen(false)
-                                navigate(`/trips/${trip.id}`)
+                                if (notification.type === 'trip_invite' && notification.metadata?.tripId) {
+                                  navigate(`/trips/${notification.metadata.tripId}`)
+                                }
                               }}
-                              className="px-4 py-3 hover:bg-warm-50 cursor-pointer transition-colors border-b border-warm-100 last:border-0"
+                              className={cn(
+                                "px-4 py-3 cursor-pointer transition-colors border-b border-warm-100 last:border-0",
+                                notification.isRead ? "bg-white hover:bg-warm-50" : "bg-accent-50/30 hover:bg-accent-50/50"
+                              )}
                             >
-                              <p className="text-sm font-medium text-warm-900">Trip Invitation</p>
-                              <p className="text-sm text-warm-600 mt-0.5 line-clamp-2">
-                                You have been invited to join <strong>{trip.name}</strong>
-                              </p>
+                              <div className="flex items-start gap-3">
+                                <div className={cn(
+                                  "mt-1 w-2 h-2 rounded-full shrink-0",
+                                  notification.isRead ? "bg-transparent" : "bg-accent-500"
+                                )} />
+                                <div>
+                                  <p className="text-sm font-medium text-warm-900">{notification.title}</p>
+                                  <p className="text-sm text-warm-600 mt-0.5 line-clamp-2">{notification.message}</p>
+                                </div>
+                              </div>
                             </div>
                           ))
                         ) : (
                           <div className="p-4 text-center text-sm text-warm-500">
-                            No new notifications
+                            No notifications
                           </div>
                         )}
                       </div>

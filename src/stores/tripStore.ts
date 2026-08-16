@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import type { User, Trip, TripMember, Preference, TripIdea, TripReaction, Destination, Itinerary, ItineraryItem, Decision, DecisionStatus, TripPhase } from '@/types';
 import { tripService } from '@/services/trip/tripService';
 import { activityService } from '@/services/trip/activityService';
+import { notificationService } from '@/services/notification/notificationService';
+import { useNotificationStore } from '@/stores/notificationStore';
 import { useAuthStore } from './authStore';
 
 interface TripStoreState {
@@ -149,6 +151,18 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
       console.error('Failed to sync member invitation:', err);
     });
 
+    const activeTripData = state.trips.find(t => t.id === tripId);
+    if (activeTripData) {
+      notificationService.createNotification({
+        userId: member.userId,
+        actorId: useAuthStore.getState().user?.id,
+        type: 'trip_invite',
+        title: 'Trip Invitation',
+        message: `You have been invited to join ${activeTripData.name}`,
+        metadata: { tripId: activeTripData.id, tripName: activeTripData.name }
+      }).catch(err => console.error('Failed to create notification:', err));
+    }
+
     logAndSyncActivity(tripId, 'MEMBER_INVITED', { name: member.name });
 
     return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
@@ -163,6 +177,18 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
     tripService.removeMember(tripId, memberId).catch(err => {
       console.error('Failed to sync member removal:', err);
     });
+
+    const activeTripData = state.trips.find(t => t.id === tripId);
+    if (activeTripData) {
+      notificationService.createNotification({
+        userId: memberId,
+        actorId: useAuthStore.getState().user?.id,
+        type: 'trip_removed',
+        title: 'Removed from Trip',
+        message: `You have been removed from ${activeTripData.name}`,
+        metadata: { tripId: activeTripData.id, tripName: activeTripData.name }
+      }).catch(err => console.error('Failed to create notification:', err));
+    }
 
     logAndSyncActivity(tripId, 'MEMBER_REMOVED', { name: memberName });
 
@@ -188,6 +214,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
 
     await tripService.updateMemberStatus(tripId, user.id, 'joined');
     await activityService.logActivity(tripId, user.id, 'MEMBER_JOINED', { name: user.name || 'Someone' });
+    useNotificationStore.getState().fetchNotifications();
 
     useTripStore.setState(state => {
       const trips = updateTrip(state.trips, tripId, trip => ({
@@ -203,7 +230,8 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
     if (!user) return;
 
     await tripService.removeMember(tripId, user.id);
-    // Optionally log rejected: await activityService.logActivity(tripId, user.id, 'MEMBER_REJECTED', { name: user.name });
+    await activityService.logActivity(tripId, user.id, 'MEMBER_REJECTED', { name: user.name || 'Someone' });
+    useNotificationStore.getState().fetchNotifications();
 
     useTripStore.setState(state => {
       const trips = state.trips.filter(t => t.id !== tripId);

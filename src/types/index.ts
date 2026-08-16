@@ -41,6 +41,20 @@ export interface Trip {
   memberCount?: number;
 }
 
+export type NotificationType = 'trip_invite' | 'trip_removed' | 'poll_created' | 'itinerary_updated';
+
+export interface AppNotification {
+  id: string;
+  userId: string;
+  actorId?: string;
+  type: NotificationType;
+  title: string;
+  message?: string;
+  metadata: Record<string, any>;
+  isRead: boolean;
+  createdAt: Date;
+}
+
 export type ActionType = 
   | 'MEMBER_JOINED'
   | 'DATES_CHANGED'

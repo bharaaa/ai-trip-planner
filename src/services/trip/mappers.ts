@@ -133,6 +133,11 @@ export function mapSingleTrip(t: any): Trip {
 
   return {
     ...t,
+    createdAt: new Date(t.created_at),
+    updatedAt: new Date(t.updated_at),
+    startDate: t.start_date ? new Date(t.start_date) : undefined,
+    endDate: t.end_date ? new Date(t.end_date) : undefined,
+    dateMonth: t.date_month,
     flexibleDates: t.flexible_dates,
     budgetPerPerson: t.budget_per_person,
     totalBudget: t.total_budget,

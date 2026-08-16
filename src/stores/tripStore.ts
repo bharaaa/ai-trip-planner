@@ -49,6 +49,22 @@ const syncActiveTrip = (trips: Trip[], activeTripId?: string): Trip | null => {
   return trips.find(t => t.id === activeTripId) || null;
 };
 
+// Helper to log and sync activity to the local state
+const logAndSyncActivity = (tripId: string, actionType: any, details: any = {}) => {
+  const user = useAuthStore.getState().user;
+  activityService.logActivity(tripId, user?.id, actionType, details).then(activity => {
+    if (activity) {
+      useTripStore.setState(state => {
+        const trips = updateTrip(state.trips, tripId, trip => ({
+          ...trip,
+          activities: [activity, ...(trip.activities || [])]
+        }));
+        return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
+      });
+    }
+  }).catch(console.error);
+};
+
 export const useTripStore = create<TripStoreState>((set, get) => ({
   trips: [],
   activeTrip: null,
@@ -129,6 +145,8 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
       console.error('Failed to sync member:', err);
     });
 
+    logAndSyncActivity(tripId, 'MEMBER_JOINED', { name: member.name });
+
     return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
   }),
 
@@ -152,6 +170,8 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
     tripService.submitPreferences(tripId, userId, preferences).catch(err => {
       console.error('Failed to sync preferences:', err);
     });
+
+    logAndSyncActivity(tripId, 'PREFERENCES_SUBMITTED');
 
     return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
   }),
@@ -232,6 +252,8 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
       console.error('Failed to update destination:', err);
     });
 
+    logAndSyncActivity(tripId, 'DESTINATION_SELECTED', { destination: destination.name });
+
     return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
   }),
 
@@ -245,8 +267,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
       console.error('Failed to sync itinerary:', err);
     });
 
-    const user = useAuthStore.getState().user;
-    activityService.logActivity(tripId, user?.id, 'ITINERARY_UPDATED', { type: 'generated' }).catch(console.error);
+    logAndSyncActivity(tripId, 'ITINERARY_UPDATED', { type: 'generated' });
 
     return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
   }),
@@ -314,8 +335,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
       console.error('Failed to sync decision:', err);
     });
 
-    const user = useAuthStore.getState().user;
-    activityService.logActivity(tripId, user?.id, 'POLL_CREATED', { title: decision.title }).catch(console.error);
+    logAndSyncActivity(tripId, 'POLL_CREATED', { title: decision.title });
 
     return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
   }),
@@ -332,15 +352,14 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
       console.error('Failed to sync decision status:', err);
     });
 
-    const user = useAuthStore.getState().user;
     const trip = state.trips.find(t => t.id === tripId);
     const decision = trip?.decisions.find(d => d.id === decisionId);
     if (decision) {
       if (status === 'decided') {
         const option = decision.options.find(o => o.id === decidedOptionId);
-        activityService.logActivity(tripId, user?.id, 'POLL_DECIDED', { title: decision.title, winner: option?.title }).catch(console.error);
-      } else if (status === 'closed') {
-        activityService.logActivity(tripId, user?.id, 'POLL_CLOSED', { title: decision.title }).catch(console.error);
+        logAndSyncActivity(tripId, 'POLL_DECIDED', { title: decision.title, winner: option?.title });
+      } else if (status === 'deferred') {
+        logAndSyncActivity(tripId, 'POLL_CLOSED', { title: decision.title });
       }
     }
 
@@ -413,8 +432,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
   updateTripDates: async (tripId, data) => {
     await tripService.updateTripDates(tripId, data);
     
-    const user = useAuthStore.getState().user;
-    activityService.logActivity(tripId, user?.id, 'DATES_CHANGED', data).catch(console.error);
+    logAndSyncActivity(tripId, 'DATES_CHANGED', data);
 
     set(state => {
       const trips = updateTrip(state.trips, tripId, trip => ({

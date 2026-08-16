@@ -311,14 +311,16 @@ export const TripDashboardPage: React.FC = () => {
         </section>
 
         {/* Activity Log */}
-        <section>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-warm-950 tracking-tight">Activity Log</h2>
-          </div>
-          <Card className="p-6 bg-white border border-warm-200/60">
-            <TripActivityFeed />
-          </Card>
-        </section>
+        {!isInvited && (
+          <section>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-warm-950 tracking-tight">Activity Log</h2>
+            </div>
+            <Card className="p-6 bg-white border border-warm-200/60">
+              <TripActivityFeed />
+            </Card>
+          </section>
+        )}
 
         <InviteMemberModal 
           open={isInviteModalOpen}

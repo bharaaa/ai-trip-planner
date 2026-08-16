@@ -68,24 +68,6 @@ export const TripIdeaCard: React.FC<TripIdeaCardProps> = ({
           />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/0 to-transparent" />
-        
-        {/* Bookmark Button */}
-        {onToggleSave && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggleSave(idea.id, !idea.isSaved);
-            }}
-            className="absolute top-4 right-4 p-2.5 rounded-full bg-white/90 backdrop-blur shadow-sm hover:bg-white hover:scale-105 transition-all text-warm-700"
-            aria-label={idea.isSaved ? "Unsave idea" : "Save idea"}
-          >
-            <Bookmark 
-              size={18} 
-              className={idea.isSaved ? "fill-accent-500 text-accent-500" : ""} 
-              strokeWidth={idea.isSaved ? 2 : 1.5}
-            />
-          </button>
-        )}
       </div>
 
       <div className="flex flex-col flex-grow p-5 md:p-6">
@@ -98,6 +80,24 @@ export const TripIdeaCard: React.FC<TripIdeaCardProps> = ({
             <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-accent-50 text-accent-700 border border-accent-100">
               {idea.fitScore}% match
             </span>
+          )}
+          <div className="flex-grow" />
+          {/* Bookmark Button */}
+          {onToggleSave && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleSave(idea.id, !idea.isSaved);
+              }}
+              className="p-2 -mr-2 rounded-full hover:bg-warm-100 text-warm-500 hover:text-accent-600 transition-colors"
+              aria-label={idea.isSaved ? "Unsave idea" : "Save idea"}
+            >
+              <Bookmark 
+                size={20} 
+                className={idea.isSaved ? "fill-accent-500 text-accent-500" : ""} 
+                strokeWidth={idea.isSaved ? 2 : 1.5}
+              />
+            </button>
           )}
         </div>
 

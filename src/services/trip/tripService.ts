@@ -148,6 +148,18 @@ export const tripService = {
     if (memError) throw memError;
   },
 
+  updateTripDates: async (tripId: string, data: { flexibleDates: boolean, startDate?: Date, endDate?: Date, dateMonth?: string, duration?: number }): Promise<void> => {
+    const { error } = await supabase.from('trips').update({
+      flexible_dates: data.flexibleDates,
+      start_date: data.startDate?.toISOString(),
+      end_date: data.endDate?.toISOString(),
+      date_month: data.dateMonth,
+      duration: data.duration,
+      updated_at: new Date().toISOString()
+    }).eq('id', tripId);
+    if (error) throw error;
+  },
+
   setTripIdeas: async (tripId: string, ideas: TripIdea[]): Promise<void> => {
     const payload = ideas.map(idea => ({
       trip_id: tripId,

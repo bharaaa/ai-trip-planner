@@ -28,6 +28,7 @@ interface TripStoreState {
   updateDecisionStatus: (tripId: string, decisionId: string, status: DecisionStatus) => void;
   addDecisionVote: (tripId: string, decisionId: string, optionId: string, userId: string, vote: 'for' | 'against' | 'neutral') => void;
   setPhase: (tripId: string, phase: TripPhase) => void;
+  updateTripDates: (tripId: string, data: { flexibleDates: boolean, startDate?: Date, endDate?: Date, dateMonth?: string, duration?: number }) => Promise<void>;
   setGeneratingIdeas: (value: boolean) => void;
   setGeneratingItinerary: (value: boolean) => void;
 }
@@ -313,6 +314,26 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
 
     return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
   }),
+
+  updateTripDates: async (tripId, data) => {
+    try {
+      await tripService.updateTripDates(tripId, data);
+      set((state) => {
+        const trips = updateTrip(state.trips, tripId, trip => ({
+          ...trip,
+          flexibleDates: data.flexibleDates,
+          startDate: data.startDate,
+          endDate: data.endDate,
+          dateMonth: data.dateMonth,
+          duration: data.duration,
+        }));
+        return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
+      });
+    } catch (err) {
+      console.error('Failed to update dates:', err);
+      throw err;
+    }
+  },
 
   setGeneratingIdeas: (value) => set({ isGeneratingIdeas: value }),
   setGeneratingItinerary: (value) => set({ isGeneratingItinerary: value }),

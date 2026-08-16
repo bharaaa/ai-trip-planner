@@ -10,11 +10,14 @@ import { Avatar, AvatarGroup } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 import { useTripStore } from '@/stores/tripStore';
 import { useAuthStore } from '@/stores/authStore';
-import { Users, Settings2, Plus } from 'lucide-react';
+import { Users, Settings2, CalendarDays } from 'lucide-react';
+import { format } from 'date-fns';
+import { EditTripDateModal } from './components/EditTripDateModal';
 
 export const TripDashboardPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [isEditDateOpen, setIsEditDateOpen] = useState(false);
   const navigate = useNavigate();
   const { activeTrip, setActiveTrip, trips, fetchTrips } = useTripStore();
   const { user: currentUser } = useAuthStore();
@@ -43,9 +46,19 @@ export const TripDashboardPage: React.FC = () => {
   
   const currentMember = activeTrip.members?.find(m => m.userId === currentUser?.id);
   const needsPreferences = currentMember && !currentMember.preferencesSubmitted;
+  const isAdmin = currentMember?.role === 'admin';
 
   // Find the next open decision, or just show a fallback if none exist
   const nextDecision = activeTrip.decisions?.find(d => d.status === 'open' || d.status === 'voting') || null;
+
+  let travelDateLabel = '';
+  if (!activeTrip.flexibleDates && activeTrip.startDate && activeTrip.endDate) {
+    travelDateLabel = `${format(new Date(activeTrip.startDate), 'MMM d, yyyy')} - ${format(new Date(activeTrip.endDate), 'MMM d, yyyy')}`;
+  } else if (activeTrip.flexibleDates && activeTrip.dateMonth) {
+    travelDateLabel = `Sometime in ${activeTrip.dateMonth} • ${activeTrip.duration} days`;
+  } else {
+    travelDateLabel = `Sometime in the future • ${activeTrip.duration || 7} days`;
+  }
 
   return (
     <div className="min-h-screen bg-warm-50 flex flex-col">
@@ -55,7 +68,22 @@ export const TripDashboardPage: React.FC = () => {
         <section className="relative rounded-[var(--radius-xl)] p-8 md:p-12 border border-warm-200/60 shadow-sm overflow-hidden bg-white mt-4">
           <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-accent-400 to-warm-400" />
           <div className="relative z-10">
-            <Badge variant="accent" className="mb-6 shadow-xs">Trip Overview</Badge>
+            <div className="flex flex-wrap items-center gap-3 mb-6">
+              <Badge variant="accent" className="shadow-xs">Trip Overview</Badge>
+              <div className="flex items-center gap-2 px-3 py-1 bg-warm-100 text-warm-700 text-sm font-medium rounded-full shadow-xs">
+                <CalendarDays className="w-4 h-4" />
+                {travelDateLabel}
+              </div>
+              {isAdmin && (
+                <button 
+                  onClick={() => setIsEditDateOpen(true)}
+                  className="text-xs uppercase font-bold text-warm-500 hover:text-accent-600 transition-colors tracking-wider"
+                >
+                  Edit Dates
+                </button>
+              )}
+            </div>
+            
             <h1 className="text-4xl md:text-5xl font-bold text-warm-950 tracking-tight mb-3">
               {hasDestination ? `${activeTrip.selectedDestination?.name}, ${activeTrip.selectedDestination?.country}` : 'Still discovering...'}
             </h1>
@@ -210,6 +238,13 @@ export const TripDashboardPage: React.FC = () => {
           onClose={() => setIsInviteModalOpen(false)}
           tripId={activeTrip.id}
           existingMembers={activeTrip.members}
+        />
+
+        <EditTripDateModal 
+          open={isEditDateOpen}
+          onClose={() => setIsEditDateOpen(false)}
+          trip={activeTrip}
+          onUpdate={(data) => useTripStore.getState().updateTripDates(activeTrip.id, data)}
         />
       </main>
     </div>

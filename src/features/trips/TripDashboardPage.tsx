@@ -10,6 +10,7 @@ import { Avatar, AvatarGroup } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 import { useTripStore } from '@/stores/tripStore';
 import { useAuthStore } from '@/stores/authStore';
+import { Users, Settings2, Plus } from 'lucide-react';
 
 export const TripDashboardPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -69,6 +70,17 @@ export const TripDashboardPage: React.FC = () => {
                   ]
                 }} 
               />
+            </div>
+            
+            <div className="mt-8 flex flex-wrap gap-4">
+              <Button onClick={() => setIsInviteModalOpen(true)} className="rounded-full shadow-md bg-warm-900 hover:bg-warm-800 text-white border-0">
+                <Users className="w-4 h-4 mr-2" />
+                Invite Friends
+              </Button>
+              <Button variant="outline" onClick={() => navigate(`/trips/${id}/preferences`)} className="rounded-full bg-white/80 backdrop-blur-sm border-warm-200/60 hover:bg-white shadow-sm">
+                <Settings2 className="w-4 h-4 mr-2" />
+                Edit Preferences
+              </Button>
             </div>
           </div>
         </section>
@@ -153,9 +165,6 @@ export const TripDashboardPage: React.FC = () => {
         <section>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-warm-950 tracking-tight">The Crew</h2>
-            <Button variant="secondary" size="sm" onClick={() => setIsInviteModalOpen(true)} className="rounded-full shadow-xs">
-              + Invite
-            </Button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {activeTrip.members?.map(member => (
@@ -171,17 +180,7 @@ export const TripDashboardPage: React.FC = () => {
                 </div>
                 <div className="shrink-0 text-xs font-medium flex flex-col items-end gap-2">
                   {member.preferencesSubmitted ? (
-                    <>
-                      <span className="text-success-700 flex items-center gap-1 bg-success-100 px-2 py-1 rounded-md shadow-xs">✓ Ready</span>
-                      {member.userId === currentUser?.id && (
-                        <button 
-                          className="text-[10px] uppercase font-bold text-warm-500 hover:text-accent-600 transition-colors tracking-wider"
-                          onClick={() => navigate(`/trips/${id}/preferences`)}
-                        >
-                          Edit
-                        </button>
-                      )}
-                    </>
+                    <span className="text-success-700 flex items-center gap-1 bg-success-100 px-2 py-1 rounded-md shadow-xs">✓ Ready</span>
                   ) : (
                     <span className="text-warm-600 flex items-center gap-1 bg-warm-100 px-2 py-1 rounded-md shadow-xs">⏳ Pending</span>
                   )}

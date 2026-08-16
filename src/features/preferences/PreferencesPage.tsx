@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils/cn';
 import { useTripStore } from '@/stores/tripStore';
 import { useAuthStore } from '@/stores/authStore';
@@ -25,6 +25,22 @@ export const PreferencesPage = () => {
   const [pace, setPace] = useState(50);
   const [budget, setBudget] = useState(50);
   const [morning, setMorning] = useState(50);
+
+  useEffect(() => {
+    if (activeTrip && currentUser) {
+      const existingPref = activeTrip.preferences?.find(p => p.userId === currentUser.id);
+      if (existingPref) {
+        const initialCategories = new Map<PreferenceCategory, number>();
+        Object.entries(existingPref.categories).forEach(([key, val]) => {
+          initialCategories.set(key as PreferenceCategory, val as number);
+        });
+        setSelectedCategories(initialCategories);
+        setPace(existingPref.pace ?? 50);
+        setBudget(existingPref.budgetPreference ?? 50);
+        setMorning(existingPref.morningPreference ?? 50);
+      }
+    }
+  }, [activeTrip, currentUser]);
 
   const handleToggleCategory = (category: PreferenceCategory) => {
     const newMap = new Map(selectedCategories);

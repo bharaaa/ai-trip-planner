@@ -33,7 +33,7 @@ export function CreateTripPage() {
     duration: 5,
     budgetPerPerson: 5000000,
     budgetType: 'per_person',
-    budgetFlexibility: 'comfortable',
+    budgetFlexibility: 2, // 1: Budget, 2: Comfortable, 3: Premium, 4: Don't know
     startingLocation: 'Jakarta',
     destinationType: 'domestic',
     transport: 'flight'
@@ -101,6 +101,9 @@ export function CreateTripPage() {
       startDate,
       endDate,
       duration: finalDuration,
+      budgetPerPerson: formData.budgetType === 'per_person' ? formData.budgetPerPerson : undefined,
+      totalBudget: formData.budgetType === 'total' ? formData.budgetPerPerson : undefined,
+      budgetFlexibility: formData.budgetFlexibility,
       invitedUserIds: formData.invitedUsers.map(u => u.id)
     });
     navigate(`/trips/${tripId}/preferences`);
@@ -366,10 +369,10 @@ export function CreateTripPage() {
               <p className="text-sm font-medium text-warm-900">Trip Style</p>
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  { id: 'budget', label: 'Budget', icon: <Wallet className="w-5 h-5" /> },
-                  { id: 'comfortable', label: 'Comfortable', icon: <Armchair className="w-5 h-5" /> },
-                  { id: 'premium', label: 'Premium', icon: <Sparkles className="w-5 h-5" /> },
-                  { id: 'dont_know', label: "I don't know", icon: <HelpCircle className="w-5 h-5" /> }
+                  { id: 1, label: 'Budget', icon: <Wallet className="w-5 h-5" /> },
+                  { id: 2, label: 'Comfortable', icon: <Armchair className="w-5 h-5" /> },
+                  { id: 3, label: 'Premium', icon: <Sparkles className="w-5 h-5" /> },
+                  { id: 4, label: "I don't know", icon: <HelpCircle className="w-5 h-5" /> }
                 ].map(style => (
                   <Card 
                     key={style.id}
@@ -414,7 +417,11 @@ export function CreateTripPage() {
                 <p className="text-sm font-medium text-warm-900">Destination Type</p>
                 <div className="flex gap-6">
                   {(['domestic', 'international'] as const).map(type => (
-                    <label key={type} className="flex items-center gap-3 cursor-pointer group">
+                    <label 
+                      key={type} 
+                      className="flex items-center gap-3 cursor-pointer group"
+                      onClick={() => setFormData({ ...formData, destinationType: type })}
+                    >
                       <div className={cn(
                         "w-5 h-5 rounded-full border flex items-center justify-center transition-colors",
                         formData.destinationType === type ? "border-accent-500 bg-accent-50" : "border-warm-300 group-hover:border-accent-400"

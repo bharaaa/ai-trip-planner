@@ -57,13 +57,17 @@ export const tripService = {
       .from('trips')
       .insert({
         name: tripData.name,
+        origin: tripData.origin,
+        start_date: tripData.startDate,
+        end_date: tripData.endDate,
         date_month: tripData.dateMonth,
         flexible_dates: tripData.flexibleDates,
         duration: tripData.duration,
         budget_per_person: tripData.budgetPerPerson,
+        total_budget: tripData.totalBudget,
         budget_flexibility: tripData.budgetFlexibility,
-        status: 'onboarding',
-        phase: 'onboarding'
+        status: 'draft',
+        phase: 'discover'
       })
       .select()
       .single();

@@ -6,15 +6,15 @@ import { MapPin, Calendar, CheckSquare, Settings2, Users, FileText } from 'lucid
 
 const getActivityIcon = (type: TripActivity['actionType']) => {
   switch (type) {
-    case 'MEMBER_JOINED': return <Users className="w-4 h-4 text-accent-500" />;
-    case 'DATES_CHANGED': return <Calendar className="w-4 h-4 text-info-500" />;
-    case 'DESTINATION_SELECTED': return <MapPin className="w-4 h-4 text-success-500" />;
-    case 'POLL_CREATED': return <CheckSquare className="w-4 h-4 text-warning-500" />;
-    case 'POLL_DECIDED': return <CheckSquare className="w-4 h-4 text-success-500" />;
-    case 'POLL_CLOSED': return <CheckSquare className="w-4 h-4 text-warm-500" />;
-    case 'ITINERARY_UPDATED': return <FileText className="w-4 h-4 text-info-500" />;
-    case 'PREFERENCES_SUBMITTED': return <Settings2 className="w-4 h-4 text-accent-500" />;
-    default: return <div className="w-2 h-2 rounded-full bg-warm-400" />;
+    case 'MEMBER_JOINED': return { icon: <Users className="w-5 h-5 text-accent-700" />, bg: 'bg-accent-100' };
+    case 'DATES_CHANGED': return { icon: <Calendar className="w-5 h-5 text-info-700" />, bg: 'bg-info-100' };
+    case 'DESTINATION_SELECTED': return { icon: <MapPin className="w-5 h-5 text-success-700" />, bg: 'bg-success-100' };
+    case 'POLL_CREATED': return { icon: <CheckSquare className="w-5 h-5 text-warning-700" />, bg: 'bg-warning-100' };
+    case 'POLL_DECIDED': return { icon: <CheckSquare className="w-5 h-5 text-success-700" />, bg: 'bg-success-100' };
+    case 'POLL_CLOSED': return { icon: <CheckSquare className="w-5 h-5 text-warm-600" />, bg: 'bg-warm-200' };
+    case 'ITINERARY_UPDATED': return { icon: <FileText className="w-5 h-5 text-info-700" />, bg: 'bg-info-100' };
+    case 'PREFERENCES_SUBMITTED': return { icon: <Settings2 className="w-5 h-5 text-accent-700" />, bg: 'bg-accent-100' };
+    default: return { icon: <div className="w-3 h-3 rounded-full bg-warm-400" />, bg: 'bg-warm-100' };
   }
 };
 
@@ -60,23 +60,27 @@ export const TripActivityFeed: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-warm-200 before:to-transparent">
+    <div className="space-y-6 relative before:absolute before:inset-0 before:ml-6 before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-warm-200 before:via-warm-200 before:to-transparent">
       {activities.map((activity) => {
         const member = activeTrip.members?.find(m => m.userId === activity.userId);
         const memberName = member?.name || 'System';
+        const { icon, bg } = getActivityIcon(activity.actionType);
 
         return (
-          <div key={activity.id} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-            <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-warm-50 bg-white shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
-              {getActivityIcon(activity.actionType)}
+          <div key={activity.id} className="relative flex items-start gap-5 group">
+            {/* Timeline Node */}
+            <div className={`flex items-center justify-center w-12 h-12 rounded-full border-4 border-white ${bg} shadow-sm shrink-0 z-10`}>
+              {icon}
             </div>
-            <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-white p-4 rounded-xl border border-warm-200 shadow-sm">
-              <div className="flex items-center justify-between mb-1">
-                <time className="text-[10px] font-semibold text-warm-400 uppercase tracking-wider">
+            
+            {/* Content */}
+            <div className="flex-1 bg-white p-5 rounded-2xl border border-warm-200/60 shadow-sm hover:border-warm-300 transition-colors">
+              <div className="flex items-center justify-between mb-2">
+                <time className="text-[11px] font-bold text-warm-500 uppercase tracking-widest">
                   {formatDistanceToNow(activity.createdAt, { addSuffix: true })}
                 </time>
               </div>
-              <div className="text-sm text-warm-800 leading-relaxed">
+              <div className="text-base text-warm-900 leading-relaxed font-medium">
                 {getActivityMessage(activity, memberName)}
               </div>
             </div>

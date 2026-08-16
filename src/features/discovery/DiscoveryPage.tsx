@@ -12,10 +12,11 @@ import { RefinementSummary } from '@/features/discovery/components/RefinementSum
 import { DestinationSelection } from '@/features/discovery/components/DestinationSelection';
 import { ReactionBar } from '@/features/discovery/components/ReactionBar';
 import { Dialog } from '@/components/ui/Dialog';
+import { EditTripDialog } from '@/components/trip/EditTripDialog';
 import { Button } from '@/components/ui/Button';
 import { aiService } from '@/services/ai';
 import { formatCurrency, formatBudgetRange } from '@/lib/utils/formatting';
-import { Users, Calendar, Clock, Wallet, MapPin, RefreshCw, Bookmark } from 'lucide-react';
+import { Users, Calendar, Clock, Wallet, MapPin, RefreshCw, Bookmark, Settings2 } from 'lucide-react';
 import { format } from 'date-fns';
 import type { TripContext, ReactionType, TripIdea, TripReaction } from '@/types';
 
@@ -30,6 +31,7 @@ export const DiscoveryPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isRefining, setIsRefining] = useState(false);
   const [selectedIdeaId, setSelectedIdeaId] = useState<string | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const fetchStarted = useRef(false);
 
   // Derive Context from activeTrip
@@ -189,6 +191,18 @@ export const DiscoveryPage = () => {
             <MapPin className="w-4 h-4" />
             <span>{activeTrip.origin}</span>
           </div>
+          {isAdmin && (
+            <>
+              <div className="hidden sm:block text-warm-300">•</div>
+              <button 
+                onClick={() => setIsEditDialogOpen(true)}
+                className="flex items-center gap-1.5 text-accent-600 hover:text-accent-700 font-semibold transition-colors"
+              >
+                <Settings2 className="w-4 h-4" />
+                <span>Edit</span>
+              </button>
+            </>
+          )}
         </div>
 
         <GroupPreferenceSummary preferences={aggregatePreferences} />
@@ -408,6 +422,12 @@ export const DiscoveryPage = () => {
           </div>
         )}
       </Dialog>
+
+      <EditTripDialog 
+        open={isEditDialogOpen} 
+        onClose={() => setIsEditDialogOpen(false)} 
+        tripId={activeTrip.id} 
+      />
     </PageTransition>
   );
 };

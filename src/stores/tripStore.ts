@@ -30,6 +30,7 @@ interface TripStoreState {
   addDecisionVote: (tripId: string, decisionId: string, optionId: string, userId: string, vote: 'for' | 'against' | 'neutral') => void;
   setPhase: (tripId: string, phase: TripPhase) => void;
   updateTripDates: (tripId: string, data: { flexibleDates: boolean, startDate?: Date, endDate?: Date, dateMonth?: string, duration?: number }) => Promise<void>;
+  updateTripDetails: (tripId: string, data: { origin: string, travelers: number, duration: number, budgetPerPerson: number }) => Promise<void>;
   setGeneratingIdeas: (value: boolean) => void;
   setGeneratingItinerary: (value: boolean) => void;
 }
@@ -349,23 +350,32 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
   }),
 
   updateTripDates: async (tripId, data) => {
-    try {
-      await tripService.updateTripDates(tripId, data);
-      set((state) => {
-        const trips = updateTrip(state.trips, tripId, trip => ({
-          ...trip,
-          flexibleDates: data.flexibleDates,
-          startDate: data.startDate,
-          endDate: data.endDate,
-          dateMonth: data.dateMonth,
-          duration: data.duration,
-        }));
-        return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
-      });
-    } catch (err) {
-      console.error('Failed to update dates:', err);
-      throw err;
-    }
+    await tripService.updateTripDates(tripId, data);
+    set(state => {
+      const trips = updateTrip(state.trips, tripId, trip => ({
+        ...trip,
+        flexibleDates: data.flexibleDates,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        dateMonth: data.dateMonth,
+        duration: data.duration !== undefined ? data.duration : trip.duration
+      }));
+      return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
+    });
+  },
+
+  updateTripDetails: async (tripId, data) => {
+    await tripService.updateTripDetails(tripId, data);
+    set(state => {
+      const trips = updateTrip(state.trips, tripId, trip => ({
+        ...trip,
+        origin: data.origin,
+        travelers: data.travelers,
+        duration: data.duration,
+        budgetPerPerson: data.budgetPerPerson
+      }));
+      return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
+    });
   },
 
   setGeneratingIdeas: (value) => set({ isGeneratingIdeas: value }),

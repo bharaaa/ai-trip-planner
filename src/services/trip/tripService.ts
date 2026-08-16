@@ -161,6 +161,17 @@ export const tripService = {
     if (error) throw error;
   },
 
+  updateTripDetails: async (tripId: string, data: { origin: string, travelers: number, duration: number, budgetPerPerson: number }): Promise<void> => {
+    const { error } = await supabase.from('trips').update({
+      origin: data.origin,
+      travelers: data.travelers,
+      duration: data.duration,
+      budget_per_person: data.budgetPerPerson,
+      updated_at: new Date().toISOString()
+    }).eq('id', tripId);
+    if (error) throw error;
+  },
+
   toggleIdeaSaved: async (ideaId: string, isSaved: boolean): Promise<void> => {
     const { error } = await supabase.from('trip_ideas').update({
       is_saved: isSaved,

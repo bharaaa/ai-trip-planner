@@ -432,7 +432,21 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
   updateTripDates: async (tripId, data) => {
     await tripService.updateTripDates(tripId, data);
     
-    logAndSyncActivity(tripId, 'DATES_CHANGED', data);
+    const trip = get().trips.find(t => t.id === tripId);
+    if (trip) {
+      logAndSyncActivity(tripId, 'DATES_CHANGED', {
+        oldDates: {
+          flexibleDates: trip.flexibleDates,
+          startDate: trip.startDate,
+          endDate: trip.endDate,
+          dateMonth: trip.dateMonth,
+          duration: trip.duration
+        },
+        newDates: data
+      });
+    } else {
+      logAndSyncActivity(tripId, 'DATES_CHANGED', { newDates: data });
+    }
 
     set(state => {
       const trips = updateTrip(state.trips, tripId, trip => ({

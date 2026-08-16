@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTripStore } from '@/stores/tripStore';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, format } from 'date-fns';
 import type { TripActivity } from '@/types';
 import { MapPin, Calendar, CheckSquare, Settings2, Users, FileText } from 'lucide-react';
 
@@ -18,6 +18,18 @@ const getActivityIcon = (type: TripActivity['actionType']) => {
   }
 };
 
+const formatDateDetails = (dates: any) => {
+  if (!dates) return 'Unknown dates';
+  if (dates.flexibleDates) {
+    if (dates.dateMonth) return `Flexible in ${dates.dateMonth}`;
+    return 'Flexible dates';
+  }
+  if (dates.startDate && dates.endDate) {
+    return `${format(new Date(dates.startDate), 'MMM d, yyyy')} - ${format(new Date(dates.endDate), 'MMM d, yyyy')}`;
+  }
+  return 'Unknown dates';
+};
+
 const getActivityMessage = (activity: TripActivity, memberName: string) => {
   const { actionType, details } = activity;
   const name = memberName || 'Someone';
@@ -25,8 +37,14 @@ const getActivityMessage = (activity: TripActivity, memberName: string) => {
   switch (actionType) {
     case 'MEMBER_JOINED':
       return <span><strong>{details.name || name}</strong> joined the trip</span>;
-    case 'DATES_CHANGED':
-      return <span><strong>{name}</strong> updated the trip dates</span>;
+    case 'DATES_CHANGED': {
+      if (details.newDates) {
+        const oldStr = formatDateDetails(details.oldDates);
+        const newStr = formatDateDetails(details.newDates);
+        return <span><strong>{name}</strong> updated the trip dates from <strong>{oldStr}</strong> to <strong>{newStr}</strong></span>;
+      }
+      return <span><strong>{name}</strong> updated the trip dates to <strong>{formatDateDetails(details)}</strong></span>;
+    }
     case 'DESTINATION_SELECTED':
       return <span><strong>{name}</strong> selected <strong>{details.destination}</strong> as the destination</span>;
     case 'POLL_CREATED':

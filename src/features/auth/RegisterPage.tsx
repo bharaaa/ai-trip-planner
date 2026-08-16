@@ -4,7 +4,7 @@ import { PageTransition } from '@/components/motion/PageTransition';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { supabase } from '@/lib/supabase';
+import { authService } from '@/services/auth/authService';
 import { AnimatePresence, motion } from 'motion/react';
 
 export const RegisterPage: React.FC = () => {
@@ -28,21 +28,22 @@ export const RegisterPage: React.FC = () => {
       return;
     }
 
+    if (password.length < 6) {
+      setErrorMsg("Password must be at least 6 characters long.");
+      return;
+    }
+
     setIsLoading(true);
     
     // 1. Sign up the user in Supabase Auth
-    const { data, error } = await supabase.auth.signUp({ 
-      email, 
-      password,
-      options: {
-        data: {
-          full_name: name
-        }
-      }
-    });
+    const { data, error } = await authService.signUp(email, password, name);
 
     if (error) {
-      setErrorMsg(error.message);
+      if (error.message.toLowerCase().includes('already registered')) {
+        setErrorMsg('An account with this email already exists.');
+      } else {
+        setErrorMsg('Failed to create account. Please check your information and try again.');
+      }
       setIsLoading(false);
       return;
     }

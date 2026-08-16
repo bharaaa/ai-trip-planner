@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils/cn';
 import { useNavigate, useParams, Link } from 'react-router';
 import { TripProgress } from '@/components/trip/TripProgress';
 import { NextDecision } from '@/components/trip/NextDecision';
+import { InviteMemberModal } from './components/InviteMemberModal';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Avatar, AvatarGroup } from '@/components/ui/Avatar';
@@ -12,6 +13,7 @@ import { useAuthStore } from '@/stores/authStore';
 
 export const TripDashboardPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const navigate = useNavigate();
   const { activeTrip, setActiveTrip, trips, fetchTrips } = useTripStore();
   const { user: currentUser } = useAuthStore();
@@ -53,7 +55,7 @@ export const TripDashboardPage: React.FC = () => {
           <div className="relative z-10">
             <Badge variant="accent" className="mb-4">Trip Dashboard</Badge>
             <h1 className="text-3xl md:text-4xl font-bold text-warm-900 tracking-tight mb-2">
-              {hasDestination ? `${activeTrip.selectedDestination?.title}, ${activeTrip.selectedDestination?.country}` : 'Still discovering...'}
+              {hasDestination ? `${activeTrip.selectedDestination?.name}, ${activeTrip.selectedDestination?.country}` : 'Still discovering...'}
             </h1>
             <div className="mt-8 max-w-2xl">
               <TripProgress 
@@ -152,8 +154,8 @@ export const TripDashboardPage: React.FC = () => {
                       <span className="text-success-600 flex items-center gap-1 bg-success-50 px-2 py-1 rounded-md" title="Preferences Submitted">✓ Ready</span>
                       {member.userId === currentUser?.id && (
                         <Button 
-                          variant="outline" 
                           size="sm" 
+                          variant="secondary"
                           className="h-7 px-3 text-xs font-medium text-warm-700 border-warm-200 hover:border-warm-300 hover:bg-warm-50 shadow-sm transition-all"
                           onClick={() => navigate(`/trips/${id}/preferences`)}
                         >
@@ -169,7 +171,10 @@ export const TripDashboardPage: React.FC = () => {
             ))}
             
             {/* Add Member Placeholder */}
-            <button className="p-4 flex items-center gap-4 border-2 border-dashed border-warm-200 rounded-xl hover:border-accent-400 hover:bg-accent-50/50 transition-all text-left group">
+            <button 
+              className="p-4 flex items-center gap-4 border-2 border-dashed border-warm-200 rounded-xl hover:border-accent-400 hover:bg-accent-50/50 transition-all text-left group"
+              onClick={() => setIsInviteModalOpen(true)}
+            >
               <div className="w-12 h-12 rounded-full bg-warm-100 text-warm-400 flex items-center justify-center group-hover:bg-accent-100 group-hover:text-accent-500 transition-colors shrink-0">
                 <span className="text-xl">+</span>
               </div>
@@ -181,6 +186,12 @@ export const TripDashboardPage: React.FC = () => {
           </div>
         </section>
 
+        <InviteMemberModal 
+          open={isInviteModalOpen}
+          onClose={() => setIsInviteModalOpen(false)}
+          tripId={activeTrip.id}
+          existingMembers={activeTrip.members}
+        />
       </main>
     </div>
   );

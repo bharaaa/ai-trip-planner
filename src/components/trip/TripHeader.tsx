@@ -8,7 +8,6 @@ export interface TripHeaderProps {
   tripName: string;
   members: Member[];
   phase: string;
-  onSettingsClick?: () => void;
   className?: string;
 }
 

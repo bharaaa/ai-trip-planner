@@ -12,6 +12,12 @@ interface AuthState {
   signOut: () => Promise<void>;
 }
 
+const mapSessionToUser = (sessionUser: SupabaseUser): AppUser => ({
+  id: sessionUser.id,
+  email: sessionUser.email || '',
+  name: sessionUser.user_metadata?.full_name || sessionUser.email?.split('@')[0] || 'User'
+});
+
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   supabaseUser: null,
@@ -23,11 +29,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       if (session?.user) {
         set({ 
           supabaseUser: session.user, 
-          user: { 
-            id: session.user.id, 
-            email: session.user.email || '', 
-            name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'User' 
-          },
+          user: mapSessionToUser(session.user),
           isLoading: false 
         });
       } else {
@@ -40,11 +42,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       if (session?.user) {
         set({ 
           supabaseUser: session.user, 
-          user: { 
-            id: session.user.id, 
-            email: session.user.email || '', 
-            name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'User' 
-          },
+          user: mapSessionToUser(session.user),
           isLoading: false 
         });
       } else {

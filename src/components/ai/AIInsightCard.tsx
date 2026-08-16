@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils/cn';
+import { getInsightBorderClass, getInsightIcon } from './utils';
 
 export interface AIInsightCardProps {
   message: string;
@@ -9,18 +10,13 @@ export interface AIInsightCardProps {
 }
 
 export function AIInsightCard({ message, type = 'info', action, className }: AIInsightCardProps) {
-  const typeStyles = {
-    suggestion: 'border-l-accent-400',
-    warning: 'border-l-warning-500',
-    info: 'border-l-info-500',
-  };
-
-  const icon = type === 'warning' ? '⚠️' : type === 'suggestion' ? '✨' : '💡';
+  const borderClass = getInsightBorderClass(type);
+  const icon = getInsightIcon(type);
 
   return (
     <div className={cn(
       'rounded-xl border border-warm-200 border-l-4 p-4 bg-white shadow-sm',
-      typeStyles[type],
+      borderClass,
       className
     )}>
       <div className="flex items-start gap-3">

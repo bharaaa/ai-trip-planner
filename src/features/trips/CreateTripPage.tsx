@@ -42,7 +42,7 @@ export function CreateTripPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<User[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const searchRef = useRef<NodeJS.Timeout | null>(null);
+  const searchRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (searchQuery.trim().length < 2) {

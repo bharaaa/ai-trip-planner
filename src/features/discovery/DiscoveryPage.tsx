@@ -35,7 +35,7 @@ export const DiscoveryPage = () => {
     dateMonth: activeTrip?.dateMonth || '',
     flexibleDates: activeTrip?.flexibleDates || false,
     duration: activeTrip?.duration || 1,
-    preferences: { food: 5, beach: 4, nature: 4, culture: 3, cafes: 2, nightlife: 1, adventure: 1, shopping: 1 } as any // TODO: Aggregate real preferences
+    preferences: activeTrip?.preferences?.[0]?.categories || { food: 5, beach: 4, nature: 4, culture: 3, cafes: 2, nightlife: 1, adventure: 1, shopping: 1 }
   };
 
   const aggregatePreferences = [
@@ -195,7 +195,7 @@ export const DiscoveryPage = () => {
                       <DestinationSelection
                         destination={{ name: activeTrip.tripIdeas[0].destination }}
                         travelers={activeTrip.travelers}
-                        dates={activeTrip.flexibleDates ? activeTrip.dateMonth : 'TBD'}
+                        dates={activeTrip.flexibleDates ? (activeTrip.dateMonth || 'TBD') : 'TBD'}
                         budget={{ min: activeTrip.tripIdeas[0].estimatedBudget?.min || 0, max: activeTrip.tripIdeas[0].estimatedBudget?.max || 0 }}
                         onConfirm={() => handleSelectDestination(activeTrip.tripIdeas[0])}
                       />

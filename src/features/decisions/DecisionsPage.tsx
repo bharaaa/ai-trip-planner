@@ -47,9 +47,10 @@ export const DecisionsPage: React.FC = () => {
       status: 'open',
       createdAt: new Date(),
       options: [
-        { id: crypto.randomUUID(), title: 'Option 1', description: '', votes: [] },
+        { id: crypto.randomUUID(), title: 'Surf Lesson', description: '2 hours at Echo Beach', votes: [] },
         { id: crypto.randomUUID(), title: 'Option 2', description: '', votes: [] },
-      ]
+      ],
+      participants: []
     };
     addDecision(id, newDecision);
     setIsNewDecisionOpen(false);
@@ -83,7 +84,7 @@ export const DecisionsPage: React.FC = () => {
               { id: 'all', label: 'All' }
             ]}
             activeTab={filter} 
-            onTabChange={(v) => setFilter(v as any)} 
+            onTabChange={(v) => setFilter(v as 'open' | 'decided' | 'all')} 
             className="mb-6" 
           />
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils/cn';
 import type { ItineraryInsight } from '@/types';
+import { getInsightBorderClass, getInsightIcon } from './utils';
 
 interface AIItineraryInsightProps {
   insight: ItineraryInsight;
@@ -15,20 +16,14 @@ export const AIItineraryInsight: React.FC<AIItineraryInsightProps> = ({
 }) => {
   const isWarning = insight.type === 'warning';
   const isSuggestion = insight.type === 'suggestion';
-  const isInfo = insight.type === 'info';
 
-  const typeStyles = {
-    suggestion: 'border-l-accent-400',
-    warning: 'border-l-warning-500',
-    info: 'border-l-info-500',
-  };
-
-  const icon = isWarning ? '⚠️' : isSuggestion ? '✨' : '💡';
+  const borderClass = getInsightBorderClass(insight.type || 'info');
+  const icon = getInsightIcon(insight.type || 'info');
   
   return (
     <div className={cn(
       "flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-white border border-warm-200 border-l-4 rounded-xl p-4 shadow-sm animate-in slide-in-from-top-2 duration-300",
-      typeStyles[insight.type || 'info']
+      borderClass
     )}>
       <div className="flex-1 flex items-start gap-3">
         <span className="text-lg leading-none mt-0.5" role="img" aria-label="insight icon">

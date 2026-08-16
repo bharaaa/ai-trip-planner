@@ -4,9 +4,8 @@ import { PageTransition } from '@/components/motion/PageTransition';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { useTripStore } from '@/stores/tripStore';
 import { AnimatePresence, motion } from 'motion/react';
-import { supabase } from '@/lib/supabase';
+import { authService } from '@/services/auth/authService';
 
 export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -28,10 +27,7 @@ export const LoginPage: React.FC = () => {
 
     setIsLoading(true);
     
-    const { error } = await supabase.auth.signInWithPassword({ 
-      email, 
-      password 
-    });
+    const { error } = await authService.signIn(email, password);
     
     setIsLoading(false);
 

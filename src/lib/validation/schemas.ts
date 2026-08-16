@@ -104,7 +104,3 @@ export const TripContextSchema = z.object({
   constraints: z.string().optional(),
 });
 
-export type TripIdea = z.infer<typeof TripIdeaSchema>;
-export type Itinerary = z.infer<typeof ItinerarySchema>;
-export type Decision = z.infer<typeof DecisionSchema>;
-export type TripContext = z.infer<typeof TripContextSchema>;

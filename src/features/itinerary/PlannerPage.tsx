@@ -17,7 +17,6 @@ import { AILoadingState } from '@/components/ai/AILoadingState';
 import { AIItineraryInsight } from '@/components/ai/AIItineraryInsight';
 import { AIInsightCard } from '@/components/ai/AIInsightCard';
 import { aiService } from '@/services/ai';
-import type { ItineraryDay, ItineraryItem, ActivityType, Decision, DecisionStatus, DecisionType, Itinerary } from '@/types';
 import { PageTransition } from '@/components/motion/PageTransition';
 
 // Remove local mockGenerate since we use aiService
@@ -43,10 +42,12 @@ export const PlannerPage: React.FC = () => {
         dateMonth: 'September',
         flexibleDates: activeTrip.flexibleDates,
         duration: 5,
-        preferences: activeTrip.preferences?.[0] || {} as any
+        preferences: activeTrip.preferences?.[0]?.categories || {
+          nature: 5, culture: 5, food: 5, beach: 5, adventure: 5, nightlife: 5, shopping: 5, cafes: 5
+        }
       };
       
-      const generated = await aiService.generateItinerary(activeTrip.selectedDestination as any, context);
+      const generated = await aiService.generateItinerary(activeTrip.selectedDestination!, context);
       setItinerary(id, generated);
     } catch (e) {
       console.error(e);
@@ -118,7 +119,7 @@ export const PlannerPage: React.FC = () => {
                     { id: 'map', label: 'Map' }
                   ]}
                   activeTab={activeTab} 
-                  onTabChange={(v) => setActiveTab(v as any)} 
+                  onTabChange={(v) => setActiveTab(v as 'itinerary' | 'map')} 
                   className="w-full" 
                 />
               </div>

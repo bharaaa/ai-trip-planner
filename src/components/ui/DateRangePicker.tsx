@@ -30,7 +30,7 @@ export function DateRangePicker({ selected, onSelect, className }: DateRangePick
           const data2 = await res2.json();
           
           // Map to Date objects
-          const allHolidays = [...data1, ...data2].map((h: any) => new Date(h.date));
+          const allHolidays = [...data1, ...data2].map((h: { date: string }) => new Date(h.date));
           setHolidays(allHolidays);
         }
       } catch (error) {

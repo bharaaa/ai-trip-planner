@@ -91,7 +91,7 @@ export interface TripReaction {
   userName: string;
   tripIdeaId: string;
   reaction: ReactionType;
-  reason?: NegativeReason | string;
+  reason?: NegativeReason | (string & {});
 }
 
 export interface Destination {
@@ -147,7 +147,7 @@ export interface DecisionOption {
   title: string;
   description?: string;
   votes: { userId: string; vote: 'for' | 'against' | 'neutral' }[];
-  metadata?: any;
+  metadata?: Record<string, unknown>;
 }
 
 export interface Decision {

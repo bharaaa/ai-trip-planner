@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { cn } from '@/lib/utils/cn';
 import type { TripIdea, TripReaction, ReactionType } from '@/types';
+import { getReactionCounts } from '@/lib/utils/reactions';
 import { formatBudgetRange } from '@/lib/utils/formatting';
 
 interface TripIdeaCardProps {
@@ -35,13 +36,7 @@ export const TripIdeaCard: React.FC<TripIdeaCardProps> = ({
   className,
   style,
 }) => {
-  const reactionCounts = reactions.reduce(
-    (acc, reaction) => {
-      acc[reaction.reaction] = (acc[reaction.reaction] || 0) + 1;
-      return acc;
-    },
-    { love: 0, maybe: 0, no: 0 } as Record<string, number>
-  );
+  const reactionCounts = getReactionCounts(reactions);
 
   return (
     <motion.div 

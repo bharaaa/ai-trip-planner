@@ -8,7 +8,6 @@ import type { Decision } from '@/types';
 interface DecisionCardProps {
   decision: Decision;
   onVote?: (optionId: string) => void;
-  onMarkDecided?: (optionId: string) => void;
 }
 
 const getIconForType = (type: string) => {
@@ -22,7 +21,7 @@ const getIconForType = (type: string) => {
   }
 };
 
-export const DecisionCard: React.FC<DecisionCardProps> = ({ decision, onVote, onMarkDecided }) => {
+export const DecisionCard: React.FC<DecisionCardProps> = ({ decision, onVote }) => {
   const isDecided = decision.status === 'decided';
   
   return (

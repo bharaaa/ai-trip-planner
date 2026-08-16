@@ -6,7 +6,6 @@ import type { PreferenceCategory } from '@/types';
 interface PreferencePickerProps {
   selectedCategories: Map<PreferenceCategory, number>;
   onToggle: (category: PreferenceCategory) => void;
-  onRank?: (category: PreferenceCategory, rank: number) => void;
 }
 
 const CATEGORIES: { id: PreferenceCategory; label: string; emoji: string }[] = [

@@ -15,7 +15,9 @@ interface TripStoreState {
   searchUsers: (query: string) => Promise<User[]>;
   createTrip: (data: Partial<Trip> & { invitedUserIds?: string[] }) => Promise<string>;
   setActiveTrip: (tripId: string) => void;
-  addMember: (tripId: string, member: TripMember) => void;
+  inviteMember: (tripId: string, member: TripMember) => void;
+  joinTrip: (tripId: string) => Promise<void>;
+  rejectInvitation: (tripId: string) => Promise<void>;
   removeMember: (tripId: string, memberId: string, memberName: string) => void;
   leaveTrip: (tripId: string) => Promise<void>;
   submitPreferences: (tripId: string, userId: string, preferences: Preference) => void;
@@ -137,17 +139,17 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
     }
   },
 
-  addMember: (tripId, member) => set((state) => {
+  inviteMember: (tripId, member) => set((state) => {
     const trips = updateTrip(state.trips, tripId, trip => ({
       ...trip,
-      members: [...trip.members, member]
+      members: [...trip.members, { ...member, status: 'invited' }]
     }));
 
-    tripService.addMember(tripId, member.userId).catch(err => {
-      console.error('Failed to sync member:', err);
+    tripService.inviteMember(tripId, member.userId).catch(err => {
+      console.error('Failed to sync member invitation:', err);
     });
 
-    logAndSyncActivity(tripId, 'MEMBER_JOINED', { name: member.name });
+    logAndSyncActivity(tripId, 'MEMBER_INVITED', { name: member.name });
 
     return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
   }),
@@ -174,6 +176,35 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
     await activityService.logActivity(tripId, user.id, 'MEMBER_LEFT', { name: user.name || 'Someone' });
     await tripService.removeMember(tripId, user.id);
     
+    useTripStore.setState(state => {
+      const trips = state.trips.filter(t => t.id !== tripId);
+      return { trips, activeTrip: state.activeTrip?.id === tripId ? null : state.activeTrip };
+    });
+  },
+
+  joinTrip: async (tripId) => {
+    const user = useAuthStore.getState().user;
+    if (!user) return;
+
+    await tripService.updateMemberStatus(tripId, user.id, 'joined');
+    await activityService.logActivity(tripId, user.id, 'MEMBER_JOINED', { name: user.name || 'Someone' });
+
+    useTripStore.setState(state => {
+      const trips = updateTrip(state.trips, tripId, trip => ({
+        ...trip,
+        members: trip.members.map(m => m.userId === user.id ? { ...m, status: 'joined' } : m)
+      }));
+      return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
+    });
+  },
+
+  rejectInvitation: async (tripId) => {
+    const user = useAuthStore.getState().user;
+    if (!user) return;
+
+    await tripService.removeMember(tripId, user.id);
+    // Optionally log rejected: await activityService.logActivity(tripId, user.id, 'MEMBER_REJECTED', { name: user.name });
+
     useTripStore.setState(state => {
       const trips = state.trips.filter(t => t.id !== tripId);
       return { trips, activeTrip: state.activeTrip?.id === tripId ? null : state.activeTrip };

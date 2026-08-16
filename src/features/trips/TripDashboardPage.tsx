@@ -13,7 +13,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Dialog } from '@/components/ui/Dialog';
 import { useTripStore } from '@/stores/tripStore';
 import { useAuthStore } from '@/stores/authStore';
-import { Users, Settings2, CalendarDays, LogOut, X, UserMinus } from 'lucide-react';
+import { Users, Settings2, CalendarDays, LogOut, X, UserMinus, Check, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
 
 export const TripDashboardPage: React.FC = () => {
@@ -61,8 +61,9 @@ export const TripDashboardPage: React.FC = () => {
   const hasDestination = !!activeTrip.selectedDestination;
   
   const currentMember = activeTrip.members?.find(m => m.userId === currentUser?.id);
-  const needsPreferences = currentMember && !currentMember.preferencesSubmitted;
-  const isAdmin = currentMember?.role === 'admin';
+  const isInvited = currentMember?.status === 'invited';
+  const needsPreferences = currentMember && !currentMember.preferencesSubmitted && !isInvited;
+  const isAdmin = currentMember?.role === 'admin' && !isInvited;
 
   // Find the next open decision, or just show a fallback if none exist
   const nextDecision = activeTrip.decisions?.find(d => d.status === 'open' || d.status === 'voting') || null;
@@ -78,7 +79,41 @@ export const TripDashboardPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-warm-50 flex flex-col">
-      <main className="flex-1 max-w-5xl w-full mx-auto p-4 md:p-6 lg:p-8 space-y-4 animate-fade-in">
+      {isInvited && (
+        <div className="sticky top-0 z-50 bg-warm-900 text-white px-4 py-4 md:px-6 shadow-md border-b border-warm-950/20">
+          <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-white/10 rounded-full">
+                <AlertCircle className="w-5 h-5 text-accent-300" />
+              </div>
+              <div>
+                <p className="font-semibold text-warm-50 text-base">You've been invited!</p>
+                <p className="text-sm text-warm-300">Join the trip to start planning, voting, and adding preferences.</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <Button 
+                variant="outline" 
+                className="flex-1 sm:flex-none border-white/20 text-white hover:bg-white/10"
+                onClick={() => useTripStore.getState().rejectInvitation(activeTrip.id).then(() => navigate('/'))}
+              >
+                <X className="w-4 h-4 mr-2" />
+                Decline
+              </Button>
+              <Button 
+                variant="primary" 
+                className="flex-1 sm:flex-none bg-accent-500 hover:bg-accent-600 text-white border-none shadow-md"
+                onClick={() => useTripStore.getState().joinTrip(activeTrip.id)}
+              >
+                <Check className="w-4 h-4 mr-2" />
+                Join Trip
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      <main className={cn("flex-1 max-w-5xl w-full mx-auto p-4 md:p-6 lg:p-8 space-y-4 animate-fade-in", isInvited && "opacity-80 pointer-events-none pb-24")}>
         
         {/* Hero Section */}
         <section className="relative rounded-[var(--radius-xl)] p-8 md:p-12 border border-warm-200/60 shadow-sm overflow-hidden bg-white mt-4">

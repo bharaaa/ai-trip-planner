@@ -14,7 +14,7 @@ interface InviteMemberModalProps {
 }
 
 export function InviteMemberModal({ open, onClose, tripId, existingMembers }: InviteMemberModalProps) {
-  const { searchUsers, addMember } = useTripStore();
+  const { searchUsers, inviteMember } = useTripStore();
   const { user: currentUser } = useAuthStore();
   
   const [searchQuery, setSearchQuery] = useState('');
@@ -62,11 +62,12 @@ export function InviteMemberModal({ open, onClose, tripId, existingMembers }: In
       name: user.name,
       avatarUrl: user.avatarUrl,
       role: 'member',
+      status: 'invited',
       joinedAt: new Date(),
       preferencesSubmitted: false
     };
     
-    addMember(tripId, newMember);
+    inviteMember(tripId, newMember);
     onClose();
   };
 

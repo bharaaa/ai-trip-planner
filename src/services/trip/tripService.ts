@@ -91,7 +91,8 @@ export const tripService = {
       const invitedMembers = tripData.invitedUserIds.map((id: string) => ({
         trip_id: tripResult.id,
         user_id: id,
-        role: 'member'
+        role: 'member',
+        status: 'invited'
       }));
       
       const { error: inviteError } = await supabase
@@ -104,13 +105,14 @@ export const tripService = {
     return tripResult.id;
   },
 
-  addMember: async (tripId: string, memberId: string): Promise<void> => {
+  inviteMember: async (tripId: string, memberId: string): Promise<void> => {
     const { error } = await supabase
       .from('trip_members')
       .insert({
         trip_id: tripId,
         user_id: memberId,
-        role: 'member'
+        role: 'member',
+        status: 'invited'
       });
       
     if (error) throw error;
@@ -120,6 +122,15 @@ export const tripService = {
     const { error } = await supabase
       .from('trip_members')
       .delete()
+      .match({ trip_id: tripId, user_id: memberId });
+      
+    if (error) throw error;
+  },
+
+  updateMemberStatus: async (tripId: string, memberId: string, status: string): Promise<void> => {
+    const { error } = await supabase
+      .from('trip_members')
+      .update({ status })
       .match({ trip_id: tripId, user_id: memberId });
       
     if (error) throw error;

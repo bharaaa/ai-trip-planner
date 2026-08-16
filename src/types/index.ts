@@ -51,7 +51,9 @@ export type ActionType =
   | 'ITINERARY_UPDATED'
   | 'PREFERENCES_SUBMITTED'
   | 'MEMBER_REMOVED'
-  | 'MEMBER_LEFT';
+  | 'MEMBER_LEFT'
+  | 'MEMBER_INVITED'
+  | 'MEMBER_REJECTED';
 
 export interface TripActivity {
   id: string;
@@ -67,6 +69,7 @@ export interface TripMember {
   name: string;
   avatarUrl?: string;
   role: 'admin' | 'member';
+  status: 'invited' | 'joined';
   joinedAt: Date;
   preferencesSubmitted: boolean;
 }

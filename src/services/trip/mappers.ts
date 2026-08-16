@@ -128,6 +128,7 @@ export function mapSingleTrip(t: any): Trip {
     name: m.users?.name || 'Unknown',
     avatarUrl: m.users?.avatar_url,
     role: m.role,
+    status: m.status || 'joined',
     joinedAt: new Date(m.joined_at),
     preferencesSubmitted: m.preferences_submitted
   }));

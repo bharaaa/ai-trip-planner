@@ -28,6 +28,7 @@ interface TripStoreState {
   addDecision: (tripId: string, decision: Decision) => void;
   updateDecisionStatus: (tripId: string, decisionId: string, status: DecisionStatus) => void;
   addDecisionVote: (tripId: string, decisionId: string, optionId: string, userId: string, vote: 'for' | 'against' | 'neutral') => void;
+  removeDecisionVote: (tripId: string, decisionId: string, optionId: string, userId: string) => void;
   setPhase: (tripId: string, phase: TripPhase) => void;
   updateTripDates: (tripId: string, data: { flexibleDates: boolean, startDate?: Date, endDate?: Date, dateMonth?: string, duration?: number }) => Promise<void>;
   updateTripDetails: (tripId: string, data: { origin: string, travelers: number, duration: number, budgetPerPerson: number }) => Promise<void>;
@@ -331,6 +332,31 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
 
     tripService.addDecisionVote(optionId, userId, vote).catch(err => {
       console.error('Failed to sync vote:', err);
+    });
+
+    return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
+  }),
+
+  removeDecisionVote: (tripId, decisionId, optionId, userId) => set((state) => {
+    const trips = updateTrip(state.trips, tripId, trip => {
+      const decisions = trip.decisions.map(d => {
+        if (d.id === decisionId) {
+          const options = d.options.map(o => {
+            if (o.id === optionId) {
+              const filteredVotes = o.votes.filter(v => v.userId !== userId);
+              return { ...o, votes: filteredVotes };
+            }
+            return o;
+          });
+          return { ...d, options };
+        }
+        return d;
+      });
+      return { ...trip, decisions };
+    });
+
+    tripService.removeDecisionVote(optionId, userId).catch(err => {
+      console.error('Failed to sync remove vote:', err);
     });
 
     return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };

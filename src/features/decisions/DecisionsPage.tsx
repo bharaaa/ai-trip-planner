@@ -13,7 +13,7 @@ import { useAuthStore } from '@/stores/authStore';
 
 export const DecisionsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { activeTrip, addDecision, addDecisionVote } = useTripStore();
+  const { activeTrip, addDecision, addDecisionVote, removeDecisionVote } = useTripStore();
   const { user } = useAuthStore();
   const [filter, setFilter] = useState<'all' | 'open' | 'decided'>('open');
   const [isNewDecisionOpen, setIsNewDecisionOpen] = useState(false);
@@ -31,7 +31,17 @@ export const DecisionsPage: React.FC = () => {
 
   const handleVote = (decisionId: string, optionId: string) => {
     if (!id || !user) return;
-    addDecisionVote(id, decisionId, optionId, user.id, 'for');
+    
+    // Check if user has already voted for this option
+    const decision = decisions.find(d => d.id === decisionId);
+    const option = decision?.options.find(o => o.id === optionId);
+    const hasVoted = option?.votes.some(v => v.userId === user.id);
+
+    if (hasVoted) {
+      removeDecisionVote(id, decisionId, optionId, user.id);
+    } else {
+      addDecisionVote(id, decisionId, optionId, user.id, 'for');
+    }
   };
 
   const handleCreateDecision = () => {

@@ -313,6 +313,14 @@ export const tripService = {
     if (error) throw error;
   },
 
+  removeDecisionVote: async (optionId: string, userId: string): Promise<void> => {
+    const { error } = await supabase.from('decision_votes')
+      .delete()
+      .eq('decision_option_id', optionId)
+      .eq('user_id', userId);
+    if (error) throw error;
+  },
+
   setPhase: async (tripId: string, phase: TripPhase): Promise<void> => {
     const { error } = await supabase.from('trips').update({ phase }).eq('id', tripId);
     if (error) throw error;

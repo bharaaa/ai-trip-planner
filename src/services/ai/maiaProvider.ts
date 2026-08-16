@@ -39,6 +39,7 @@ export class MaiaProvider implements AIProvider {
       "bestTimeToVisit": "Months/Seasons",
       "travelStyle": "e.g., Relaxing, Adventurous",
       "keyActivities": ["Activity 1", "Activity 2", "Activity 3"],
+      "suggestedDuration": number (suggested number of days for this specific trip),
       "confidence": number between 0 and 1,
       "imageUrl": "https://image.pollinations.ai/prompt/beautiful%20travel%20landscape%20photo%20of%20[DESTINATION_NAME]?width=800&height=600&nologo=true"
     }

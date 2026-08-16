@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { User, Trip, TripMember, Preference, TripIdea, TripReaction, Destination, Itinerary, ItineraryItem, Decision, DecisionStatus, TripPhase } from '@/types';
 import { tripService } from '@/services/trip/tripService';
+import { activityService } from '@/services/trip/activityService';
 import { useAuthStore } from './authStore';
 
 interface TripStoreState {
@@ -32,6 +33,7 @@ interface TripStoreState {
   setPhase: (tripId: string, phase: TripPhase) => void;
   updateTripDates: (tripId: string, data: { flexibleDates: boolean, startDate?: Date, endDate?: Date, dateMonth?: string, duration?: number }) => Promise<void>;
   updateTripDetails: (tripId: string, data: { origin: string, travelers: number, duration: number, budgetPerPerson: number }) => Promise<void>;
+  fetchTripActivities: (tripId: string) => Promise<void>;
   setGeneratingIdeas: (value: boolean) => void;
   setGeneratingItinerary: (value: boolean) => void;
 }
@@ -98,9 +100,24 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
     }
   },
 
-  setActiveTrip: (tripId) => set((state) => ({
-    activeTrip: syncActiveTrip(state.trips, tripId)
-  })),
+  setActiveTrip: async (tripId) => {
+    set(state => ({ activeTrip: state.trips.find(t => t.id === tripId) || null }));
+    if (tripId) {
+      await get().fetchTripActivities(tripId);
+    }
+  },
+
+  fetchTripActivities: async (tripId) => {
+    try {
+      const activities = await activityService.getActivities(tripId);
+      set(state => {
+        const trips = updateTrip(state.trips, tripId, trip => ({ ...trip, activities }));
+        return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
+      });
+    } catch (err) {
+      console.error('Failed to fetch activities:', err);
+    }
+  },
 
   addMember: (tripId, member) => set((state) => {
     const trips = updateTrip(state.trips, tripId, trip => ({
@@ -228,6 +245,9 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
       console.error('Failed to sync itinerary:', err);
     });
 
+    const user = useAuthStore.getState().user;
+    activityService.logActivity(tripId, user?.id, 'ITINERARY_UPDATED', { type: 'generated' }).catch(console.error);
+
     return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
   }),
 
@@ -294,6 +314,9 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
       console.error('Failed to sync decision:', err);
     });
 
+    const user = useAuthStore.getState().user;
+    activityService.logActivity(tripId, user?.id, 'POLL_CREATED', { title: decision.title }).catch(console.error);
+
     return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
   }),
 
@@ -308,6 +331,18 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
     tripService.updateDecisionStatus(decisionId, status, decidedOptionId).catch(err => {
       console.error('Failed to sync decision status:', err);
     });
+
+    const user = useAuthStore.getState().user;
+    const trip = state.trips.find(t => t.id === tripId);
+    const decision = trip?.decisions.find(d => d.id === decisionId);
+    if (decision) {
+      if (status === 'decided') {
+        const option = decision.options.find(o => o.id === decidedOptionId);
+        activityService.logActivity(tripId, user?.id, 'POLL_DECIDED', { title: decision.title, winner: option?.title }).catch(console.error);
+      } else if (status === 'closed') {
+        activityService.logActivity(tripId, user?.id, 'POLL_CLOSED', { title: decision.title }).catch(console.error);
+      }
+    }
 
     return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
   }),
@@ -377,6 +412,10 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
 
   updateTripDates: async (tripId, data) => {
     await tripService.updateTripDates(tripId, data);
+    
+    const user = useAuthStore.getState().user;
+    activityService.logActivity(tripId, user?.id, 'DATES_CHANGED', data).catch(console.error);
+
     set(state => {
       const trips = updateTrip(state.trips, tripId, trip => ({
         ...trip,

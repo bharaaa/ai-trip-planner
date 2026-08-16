@@ -36,8 +36,28 @@ export interface Trip {
   decisions: Decision[];
   tasks: Task[];
   expenses: Expense[];
+  activities?: TripActivity[];
   progress?: number;
   memberCount?: number;
+}
+
+export type ActionType = 
+  | 'MEMBER_JOINED'
+  | 'DATES_CHANGED'
+  | 'DESTINATION_SELECTED'
+  | 'POLL_CREATED'
+  | 'POLL_DECIDED'
+  | 'POLL_CLOSED'
+  | 'ITINERARY_UPDATED'
+  | 'PREFERENCES_SUBMITTED';
+
+export interface TripActivity {
+  id: string;
+  tripId: string;
+  userId?: string; // null if AI or system
+  actionType: ActionType;
+  details: Record<string, any>;
+  createdAt: Date;
 }
 
 export interface TripMember {

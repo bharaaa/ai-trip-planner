@@ -72,13 +72,27 @@ export const TripDashboardPage: React.FC = () => {
               />
             </div>
             
-            <div className="mt-8 flex flex-wrap gap-4">
-              <Button onClick={() => setIsInviteModalOpen(true)} className="rounded-full shadow-md bg-warm-900 hover:bg-warm-800 text-white border-0">
-                <Users className="w-4 h-4 mr-2" />
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Button 
+                variant="primary" 
+                size="md"
+                onClick={() => setIsInviteModalOpen(true)} 
+                className="rounded-full pl-4 pr-5 shadow-sm"
+              >
+                <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center mr-2">
+                  <Users className="w-3.5 h-3.5 text-white" />
+                </div>
                 Invite Friends
               </Button>
-              <Button variant="outline" onClick={() => navigate(`/trips/${id}/preferences`)} className="rounded-full bg-white/80 backdrop-blur-sm border-warm-200/60 hover:bg-white shadow-sm">
-                <Settings2 className="w-4 h-4 mr-2" />
+              <Button 
+                variant="secondary" 
+                size="md"
+                onClick={() => navigate(`/trips/${id}/preferences`)} 
+                className="rounded-full pl-4 pr-5"
+              >
+                <div className="w-6 h-6 rounded-full bg-warm-100 flex items-center justify-center mr-2 text-warm-600 group-hover:bg-warm-200 transition-colors">
+                  <Settings2 className="w-3.5 h-3.5" />
+                </div>
                 Edit Preferences
               </Button>
             </div>

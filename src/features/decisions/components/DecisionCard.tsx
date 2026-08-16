@@ -34,6 +34,25 @@ export const DecisionCard: React.FC<DecisionCardProps> = ({ decision, onVote }) 
     const member = activeTrip?.members.find(m => m.userId === userId);
     return member?.name ? member.name.charAt(0).toUpperCase() : userId.charAt(0).toUpperCase();
   };
+
+  const handleClosePoll = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!activeTrip || decision.options.length === 0) return;
+
+    let winningOption = decision.options[0];
+    let maxVotes = winningOption.votes?.length || 0;
+    
+    for (let i = 1; i < decision.options.length; i++) {
+      const option = decision.options[i];
+      const votesCount = option.votes?.length || 0;
+      if (votesCount > maxVotes) {
+        winningOption = option;
+        maxVotes = votesCount;
+      }
+    }
+
+    updateDecisionStatus(activeTrip.id, decision.id, 'decided', winningOption.id);
+  };
   
   return (
     <Card className={cn(
@@ -104,17 +123,6 @@ export const DecisionCard: React.FC<DecisionCardProps> = ({ decision, onVote }) 
                     <span className={cn("text-xs font-semibold w-4 text-right", hasVotes ? "text-accent-600" : "text-warm-400 group-hover:text-accent-400")}>
                       {option.votes?.length || 0}
                     </span>
-                    {isAdmin && !isDecided && !isClosed && (
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          updateDecisionStatus(activeTrip!.id, decision.id, 'decided', option.id);
-                        }}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity ml-2 text-[10px] uppercase font-bold text-success-700 bg-success-100 hover:bg-success-200 px-2 py-1 rounded"
-                      >
-                        Winner
-                      </button>
-                    )}
                   </div>
                 </div>
               );
@@ -125,10 +133,10 @@ export const DecisionCard: React.FC<DecisionCardProps> = ({ decision, onVote }) 
         {isAdmin && !isDecided && !isClosed && (
           <div className="mt-4 pt-4 border-t border-warm-100/60 flex justify-end">
             <button 
-              onClick={(e) => { e.stopPropagation(); updateDecisionStatus(activeTrip!.id, decision.id, 'deferred'); }}
-              className="text-xs font-semibold text-warm-500 hover:text-warm-800 transition-colors"
+              onClick={handleClosePoll}
+              className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-warm-900 text-white hover:bg-black transition-colors shadow-sm"
             >
-              Close Poll without deciding
+              Close Poll & Select Winner
             </button>
           </div>
         )}

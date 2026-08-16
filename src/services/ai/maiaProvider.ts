@@ -29,7 +29,7 @@ export class MaiaProvider implements AIProvider {
   "ideas": [
     {
       "id": "unique-string-id",
-      "destination": "City Name",
+      "destination": "Specific Place or District (e.g. Curug Cibaliung, Sentul)",
       "country": "Country Name",
       "countryCode": "ISO code (e.g., ID)",
       "title": "A catchy title for the trip",
@@ -56,7 +56,8 @@ Return EXACTLY 3 distinct destination ideas that fit the following trip context:
 
 Ensure the response is valid JSON. Do not include markdown formatting like \`\`\`json around the response.
 
-CRITICAL INSTRUCTION: You MUST consider the trip duration (${context.duration} days) and starting location (${context.origin}) when suggesting destinations. Ensure that the travel time is realistic for this duration, and that the budget is sufficient for a ${context.duration}-day stay in the suggested destinations.`;
+CRITICAL INSTRUCTION 1: You MUST consider the trip duration (${context.duration} days) and starting location (${context.origin}) when suggesting destinations. Ensure that the travel time is realistic for this duration, and that the budget is sufficient for a ${context.duration}-day stay in the suggested destinations.
+CRITICAL INSTRUCTION 2: Instead of returning broad or generic cities (e.g. "Bogor" or "Sukabumi"), you MUST return specific, interesting places or precise districts that perfectly match the group's preferences, constraints, and budget (e.g. "Curug Cibaliung, Sentul" or "Pelabuhan Ratu, Sukabumi"). Set the "destination" field to this specific place.`;
   }
 
   async generateTripIdeas(context: TripContext): Promise<TripIdea[]> {

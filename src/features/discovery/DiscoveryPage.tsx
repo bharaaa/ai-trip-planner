@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { PageTransition } from '@/components/motion/PageTransition';
 import { cn } from '@/lib/utils/cn';
 import { useTripStore } from '@/stores/tripStore';
@@ -12,9 +12,10 @@ import { RefinementSummary } from '@/features/discovery/components/RefinementSum
 import { DestinationSelection } from '@/features/discovery/components/DestinationSelection';
 import { ReactionBar } from '@/features/discovery/components/ReactionBar';
 import { Dialog } from '@/components/ui/Dialog';
+import { Button } from '@/components/ui/Button';
 import { aiService } from '@/services/ai';
 import { formatCurrency } from '@/lib/utils/formatting';
-import { Users, Calendar, Clock, Wallet, MapPin } from 'lucide-react';
+import { Users, Calendar, Clock, Wallet, MapPin, RefreshCw } from 'lucide-react';
 import { format } from 'date-fns';
 import type { TripContext, ReactionType, TripIdea, TripReaction } from '@/types';
 
@@ -29,6 +30,7 @@ export const DiscoveryPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isRefining, setIsRefining] = useState(false);
   const [selectedIdeaId, setSelectedIdeaId] = useState<string | null>(null);
+  const fetchStarted = useRef(false);
 
   // Derive Context from activeTrip
   const context: TripContext = {
@@ -77,7 +79,8 @@ export const DiscoveryPage = () => {
 
   useEffect(() => {
     if (!activeTrip) return;
-    if (activeTrip.tripIdeas.length === 0 && !isLoading) {
+    if (activeTrip.tripIdeas.length === 0 && !isLoading && !fetchStarted.current) {
+      fetchStarted.current = true;
       const fetchIdeas = async () => {
         setIsLoading(true);
         const ideas = await aiService.generateTripIdeas(context);
@@ -86,9 +89,17 @@ export const DiscoveryPage = () => {
       };
       fetchIdeas();
     }
-  }, [activeTrip, activeTrip?.tripIdeas, isLoading, context, setTripIdeas]);
+  }, [activeTrip?.id, activeTrip?.tripIdeas.length, isLoading, setTripIdeas]);
 
   if (!activeTrip) return null;
+
+  const handleRefresh = async () => {
+    if (!activeTrip) return;
+    setIsLoading(true);
+    const ideas = await aiService.generateTripIdeas(context);
+    setTripIdeas(activeTrip.id, ideas);
+    setIsLoading(false);
+  };
 
   const handleReact = (ideaId: string, type: ReactionType) => {
     if (!currentUser) return;
@@ -185,7 +196,15 @@ export const DiscoveryPage = () => {
         <hr className="border-warm-200/60" />
 
         <div>
-          <h2 className="text-3xl font-bold text-warm-950 tracking-tight mb-8">Where to?</h2>
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-3xl font-bold text-warm-950 tracking-tight">Where to?</h2>
+            {!isLoading && !isRefining && (
+              <Button variant="outline" size="sm" onClick={handleRefresh}>
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Refresh Suggestions
+              </Button>
+            )}
+          </div>
           
           {isLoading ? (
             <div className="py-20 text-center space-y-6">

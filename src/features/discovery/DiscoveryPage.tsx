@@ -18,13 +18,13 @@ import { aiService } from '@/services/ai';
 import { formatCurrency, formatBudgetRange } from '@/lib/utils/formatting';
 import { Users, Calendar, Clock, Wallet, MapPin, RefreshCw, Bookmark, Settings2 } from 'lucide-react';
 import { format } from 'date-fns';
-import type { TripContext, ReactionType, TripIdea, TripReaction } from '@/types';
+import type { TripContext, ReactionType, TripIdea, TripReaction, Decision } from '@/types';
 
 export const DiscoveryPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user: currentUser } = useAuthStore();
-  const { activeTrip, setTripIdeas, addReaction, selectDestination, toggleIdeaSaved } = useTripStore();
+  const { activeTrip, setTripIdeas, addReaction, selectDestination, toggleIdeaSaved, addDecision } = useTripStore();
 
   const isAdmin = activeTrip?.members.find(m => m.userId === currentUser?.id)?.role === 'admin';
 
@@ -129,6 +129,25 @@ export const DiscoveryPage = () => {
       selectedAt: new Date()
     });
     navigate(`/trips/${activeTrip.id}/plan`);
+  };
+
+  const handleProposeDestination = (idea: TripIdea) => {
+    if (!activeTrip) return;
+    
+    const decision: Decision = {
+      id: crypto.randomUUID(),
+      type: 'destination',
+      title: `Should we go to ${idea.destination}?`,
+      description: idea.summary,
+      status: 'open',
+      options: [
+        { id: crypto.randomUUID(), title: 'Yes, let\'s go!', votes: [] },
+        { id: crypto.randomUUID(), title: 'No, keep looking', votes: [] }
+      ]
+    };
+    
+    addDecision(activeTrip.id, decision);
+    navigate(`/trips/${activeTrip.id}/decisions`);
   };
 
   // Maps for RecommendationGrid
@@ -406,13 +425,30 @@ export const DiscoveryPage = () => {
               </div>
               
               {isAdmin ? (
-                <button 
-                  className="w-full py-4 bg-warm-900 text-white rounded-xl font-bold shadow-md hover:bg-black transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2"
-                  onClick={() => handleSelectDestination(selectedIdea)}
-                >
-                  Select {selectedIdea.destination}
-                  <span>➡️</span>
-                </button>
+                activeTrip.members.length > 1 ? (
+                  <div className="grid grid-cols-2 gap-3">
+                    <button 
+                      className="w-full py-3.5 bg-white text-warm-800 border border-warm-200 rounded-xl font-bold shadow-sm hover:bg-warm-50 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                      onClick={() => handleProposeDestination(selectedIdea)}
+                    >
+                      🗣️ Propose to Group
+                    </button>
+                    <button 
+                      className="w-full py-3.5 bg-warm-900 text-white rounded-xl font-bold shadow-md hover:bg-black transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                      onClick={() => handleSelectDestination(selectedIdea)}
+                    >
+                      Select Direct ➡️
+                    </button>
+                  </div>
+                ) : (
+                  <button 
+                    className="w-full py-4 bg-warm-900 text-white rounded-xl font-bold shadow-md hover:bg-black transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                    onClick={() => handleSelectDestination(selectedIdea)}
+                  >
+                    Select {selectedIdea.destination}
+                    <span>➡️</span>
+                  </button>
+                )
               ) : (
                 <div className="w-full py-4 bg-warm-200/50 text-warm-600 rounded-xl font-medium text-center border border-warm-200/50">
                   Only the organizer can select the destination

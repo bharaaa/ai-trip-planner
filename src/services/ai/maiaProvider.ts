@@ -53,7 +53,9 @@ Return EXACTLY 3 distinct destination ideas that fit the following trip context:
 - Group Preferences (Top 3): ${preferencesList}
 - Travel Constraints & Preferred Transport: ${context.constraints || 'None specified'}
 
-Ensure the response is valid JSON. Do not include markdown formatting like \`\`\`json around the response.`;
+Ensure the response is valid JSON. Do not include markdown formatting like \`\`\`json around the response.
+
+CRITICAL INSTRUCTION: You MUST consider the trip duration (${context.duration} days) and starting location (${context.origin}) when suggesting destinations. Ensure that the travel time is realistic for this duration, and that the budget is sufficient for a ${context.duration}-day stay in the suggested destinations.`;
   }
 
   async generateTripIdeas(context: TripContext): Promise<TripIdea[]> {

@@ -14,6 +14,7 @@ import { PageTransition } from '@/components/motion/PageTransition';
 export function HomePage() {
   const navigate = useNavigate();
   const trips = useTripStore((state) => state.trips);
+  const isLoadingTrips = useTripStore((state) => state.isLoadingTrips);
   const { user } = useAuthStore();
   const greeting = getGreeting();
 
@@ -53,7 +54,12 @@ export function HomePage() {
             <h2 className="text-2xl font-bold text-warm-900">Your adventures</h2>
           </div>
           
-          {activeTrips && activeTrips.length > 0 ? (
+          {isLoadingTrips ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="h-64 bg-warm-200/50 rounded-2xl animate-pulse" />
+              <div className="h-64 bg-warm-200/50 rounded-2xl animate-pulse" />
+            </div>
+          ) : activeTrips && activeTrips.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {activeTrips.map(trip => (
                 <TripCard 

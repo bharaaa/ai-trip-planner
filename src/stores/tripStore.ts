@@ -11,6 +11,7 @@ interface TripStoreState {
   activeTrip: Trip | null;
   isGeneratingIdeas: boolean;
   isGeneratingItinerary: boolean;
+  isLoadingTrips: boolean;
   
   fetchTrips: () => Promise<void>;
   clearTrips: () => void;
@@ -77,19 +78,22 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
   activeTrip: null,
   isGeneratingIdeas: false,
   isGeneratingItinerary: false,
+  isLoadingTrips: true,
 
   fetchTrips: async () => {
     try {
+      set({ isLoadingTrips: true });
       const currentUser = useAuthStore.getState().user;
       if (!currentUser) {
-        set({ trips: [] });
+        set({ trips: [], isLoadingTrips: false });
         return;
       }
       
       const trips = await tripService.fetchUserTrips(currentUser.id);
-      set({ trips });
+      set({ trips, isLoadingTrips: false });
     } catch (err) {
       console.error('Error fetching trips:', err);
+      set({ isLoadingTrips: false });
     }
   },
 

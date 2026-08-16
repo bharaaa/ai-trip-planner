@@ -52,7 +52,7 @@ export const DecisionCard: React.FC<DecisionCardProps> = ({ decision, onVote }) 
             <p className="text-xs text-warm-500 font-medium">{decision.description || 'Make a choice'}</p>
           </div>
         </div>
-        <div className="flex flex-col items-end gap-2">
+        <div className="shrink-0">
           <Badge variant={isDecided ? 'success' : decision.status === 'voting' ? 'warning' : 'default'} className={cn(
             isDecided && "bg-success-100 text-success-700",
             isClosed && "bg-warm-100 text-warm-600",
@@ -61,14 +61,6 @@ export const DecisionCard: React.FC<DecisionCardProps> = ({ decision, onVote }) 
           )}>
             {isDecided ? 'Decided' : isClosed ? 'Closed' : decision.status === 'voting' ? 'Voting' : 'Open'}
           </Badge>
-          {isAdmin && !isDecided && !isClosed && (
-            <button 
-              onClick={(e) => { e.stopPropagation(); updateDecisionStatus(activeTrip!.id, decision.id, 'deferred'); }}
-              className="text-[10px] uppercase font-bold text-warm-500 hover:text-warm-700 bg-warm-100 hover:bg-warm-200 px-2 py-0.5 rounded transition-colors"
-            >
-              Close Poll
-            </button>
-          )}
         </div>
       </div>
       
@@ -127,6 +119,17 @@ export const DecisionCard: React.FC<DecisionCardProps> = ({ decision, onVote }) 
                 </div>
               );
             })}
+          </div>
+        )}
+        
+        {isAdmin && !isDecided && !isClosed && (
+          <div className="mt-4 pt-4 border-t border-warm-100/60 flex justify-end">
+            <button 
+              onClick={(e) => { e.stopPropagation(); updateDecisionStatus(activeTrip!.id, decision.id, 'deferred'); }}
+              className="text-xs font-semibold text-warm-500 hover:text-warm-800 transition-colors"
+            >
+              Close Poll without deciding
+            </button>
           </div>
         )}
       </div>

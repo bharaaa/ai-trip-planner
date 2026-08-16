@@ -4,7 +4,6 @@ import { useNavigate, useParams, Link } from 'react-router';
 import { TripProgress } from '@/components/trip/TripProgress';
 import { NextDecision } from '@/components/trip/NextDecision';
 import { InviteMemberModal } from './components/InviteMemberModal';
-import { Drawer } from '@/components/ui/Drawer';
 import { TripActivityFeed } from '@/components/trip/TripActivityFeed';
 import { EditTripDateModal } from './components/EditTripDateModal';
 import { Card } from '@/components/ui/Card';
@@ -20,7 +19,6 @@ export const TripDashboardPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isEditDateOpen, setIsEditDateOpen] = useState(false);
-  const [isActivityOpen, setIsActivityOpen] = useState(false);
   const navigate = useNavigate();
   const { activeTrip, setActiveTrip, trips, fetchTrips } = useTripStore();
   const { user: currentUser } = useAuthStore();
@@ -125,17 +123,6 @@ export const TripDashboardPage: React.FC = () => {
                   <Settings2 className="w-3.5 h-3.5" />
                 </div>
                 Edit Preferences
-              </Button>
-              <Button 
-                variant="secondary" 
-                size="md"
-                onClick={() => setIsActivityOpen(true)} 
-                className="rounded-full pl-4 pr-5 bg-white border border-warm-200"
-              >
-                <div className="w-6 h-6 rounded-full bg-warm-100 flex items-center justify-center mr-2 text-warm-600 group-hover:bg-warm-200 transition-colors">
-                  <span className="text-xs font-bold">A</span>
-                </div>
-                Activity Log
               </Button>
             </div>
           </div>
@@ -247,6 +234,16 @@ export const TripDashboardPage: React.FC = () => {
           </div>
         </section>
 
+        {/* Activity Log */}
+        <section>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-warm-950 tracking-tight">Activity Log</h2>
+          </div>
+          <Card className="p-6 bg-white border border-warm-200/60">
+            <TripActivityFeed />
+          </Card>
+        </section>
+
         <InviteMemberModal 
           open={isInviteModalOpen}
           onClose={() => setIsInviteModalOpen(false)}
@@ -260,14 +257,6 @@ export const TripDashboardPage: React.FC = () => {
           trip={activeTrip}
           onUpdate={(data) => useTripStore.getState().updateTripDates(activeTrip.id, data)}
         />
-
-        <Drawer 
-          open={isActivityOpen} 
-          onClose={() => setIsActivityOpen(false)} 
-          title="Activity Log"
-        >
-          <TripActivityFeed />
-        </Drawer>
       </main>
     </div>
   );

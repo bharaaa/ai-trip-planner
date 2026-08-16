@@ -171,7 +171,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
     const user = useAuthStore.getState().user;
     if (!user) return;
     
-    await activityService.logActivity(tripId, user.id, 'MEMBER_LEFT', { name: user.user_metadata?.full_name || user.email || 'Someone' });
+    await activityService.logActivity(tripId, user.id, 'MEMBER_LEFT', { name: user.name || 'Someone' });
     await tripService.removeMember(tripId, user.id);
     
     useTripStore.setState(state => {

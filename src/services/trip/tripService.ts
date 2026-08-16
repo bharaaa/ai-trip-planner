@@ -299,8 +299,12 @@ export const tripService = {
     if (optError) throw optError;
   },
 
-  updateDecisionStatus: async (decisionId: string, status: DecisionStatus): Promise<void> => {
-    const { error } = await supabase.from('decisions').update({ status }).eq('id', decisionId);
+  updateDecisionStatus: async (decisionId: string, status: DecisionStatus, decidedOptionId?: string): Promise<void> => {
+    const payload: any = { status };
+    if (decidedOptionId !== undefined) {
+      payload.decided_option_id = decidedOptionId;
+    }
+    const { error } = await supabase.from('decisions').update(payload).eq('id', decisionId);
     if (error) throw error;
   },
 

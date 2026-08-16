@@ -26,7 +26,7 @@ interface TripStoreState {
   removeItineraryItem: (tripId: string, dayIndex: number, itemIndex: number) => void;
   moveItineraryItem: (tripId: string, fromDay: number, fromIndex: number, toDay: number, toIndex: number) => void;
   addDecision: (tripId: string, decision: Decision) => void;
-  updateDecisionStatus: (tripId: string, decisionId: string, status: DecisionStatus) => void;
+  updateDecisionStatus: (tripId: string, decisionId: string, status: DecisionStatus, decidedOptionId?: string) => void;
   addDecisionVote: (tripId: string, decisionId: string, optionId: string, userId: string, vote: 'for' | 'against' | 'neutral') => void;
   removeDecisionVote: (tripId: string, decisionId: string, optionId: string, userId: string) => void;
   setPhase: (tripId: string, phase: TripPhase) => void;
@@ -297,15 +297,15 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
     return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
   }),
 
-  updateDecisionStatus: (tripId, decisionId, status) => set((state) => {
+  updateDecisionStatus: (tripId, decisionId, status, decidedOptionId) => set((state) => {
     const trips = updateTrip(state.trips, tripId, trip => {
       const decisions = trip.decisions.map(d => 
-        d.id === decisionId ? { ...d, status } : d
+        d.id === decisionId ? { ...d, status, decidedOption: decidedOptionId } : d
       );
       return { ...trip, decisions };
     });
 
-    tripService.updateDecisionStatus(decisionId, status).catch(err => {
+    tripService.updateDecisionStatus(decisionId, status, decidedOptionId).catch(err => {
       console.error('Failed to sync decision status:', err);
     });
 

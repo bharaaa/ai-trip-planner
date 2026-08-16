@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Avatar } from '@/components/ui/Avatar';
 import { useTripStore } from '@/stores/tripStore';
+import { useAuthStore } from '@/stores/authStore';
 import type { Decision } from '@/types';
 
 interface DecisionCardProps {
@@ -23,8 +24,11 @@ const getIconForType = (type: string) => {
 };
 
 export const DecisionCard: React.FC<DecisionCardProps> = ({ decision, onVote }) => {
-  const { activeTrip } = useTripStore();
+  const { activeTrip, updateDecisionStatus } = useTripStore();
+  const { user } = useAuthStore();
+  const isAdmin = activeTrip?.members.find(m => m.userId === user?.id)?.role === 'admin';
   const isDecided = decision.status === 'decided';
+  const isClosed = decision.status === 'deferred';
 
   const getUserInitial = (userId: string) => {
     const member = activeTrip?.members.find(m => m.userId === userId);
@@ -48,13 +52,24 @@ export const DecisionCard: React.FC<DecisionCardProps> = ({ decision, onVote }) 
             <p className="text-xs text-warm-500 font-medium">{decision.description || 'Make a choice'}</p>
           </div>
         </div>
-        <Badge variant={isDecided ? 'success' : decision.status === 'voting' ? 'warning' : 'default'} className={cn(
-          isDecided && "bg-success-100 text-success-700",
-          decision.status === 'voting' && "bg-warning-100 text-warning-700",
-          decision.status === 'open' && "bg-warm-100 text-warm-700"
-        )}>
-          {isDecided ? 'Decided' : decision.status === 'voting' ? 'Voting' : 'Open'}
-        </Badge>
+        <div className="flex flex-col items-end gap-2">
+          <Badge variant={isDecided ? 'success' : decision.status === 'voting' ? 'warning' : 'default'} className={cn(
+            isDecided && "bg-success-100 text-success-700",
+            isClosed && "bg-warm-100 text-warm-600",
+            decision.status === 'voting' && "bg-warning-100 text-warning-700",
+            decision.status === 'open' && "bg-warm-100 text-warm-700"
+          )}>
+            {isDecided ? 'Decided' : isClosed ? 'Closed' : decision.status === 'voting' ? 'Voting' : 'Open'}
+          </Badge>
+          {isAdmin && !isDecided && !isClosed && (
+            <button 
+              onClick={(e) => { e.stopPropagation(); updateDecisionStatus(activeTrip!.id, decision.id, 'deferred'); }}
+              className="text-[10px] uppercase font-bold text-warm-500 hover:text-warm-700 bg-warm-100 hover:bg-warm-200 px-2 py-0.5 rounded transition-colors"
+            >
+              Close Poll
+            </button>
+          )}
+        </div>
       </div>
       
       <div className="pb-4 px-6">
@@ -97,6 +112,17 @@ export const DecisionCard: React.FC<DecisionCardProps> = ({ decision, onVote }) 
                     <span className={cn("text-xs font-semibold w-4 text-right", hasVotes ? "text-accent-600" : "text-warm-400 group-hover:text-accent-400")}>
                       {option.votes?.length || 0}
                     </span>
+                    {isAdmin && !isDecided && !isClosed && (
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          updateDecisionStatus(activeTrip!.id, decision.id, 'decided', option.id);
+                        }}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity ml-2 text-[10px] uppercase font-bold text-success-700 bg-success-100 hover:bg-success-200 px-2 py-1 rounded"
+                      >
+                        Winner
+                      </button>
+                    )}
                   </div>
                 </div>
               );

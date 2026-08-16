@@ -2,7 +2,7 @@ import React from 'react';
 import { useTripStore } from '@/stores/tripStore';
 import { formatDistanceToNow, format } from 'date-fns';
 import type { TripActivity } from '@/types';
-import { MapPin, Calendar, CheckSquare, Settings2, Users, FileText, UserMinus, LogOut } from 'lucide-react';
+import { MapPin, Calendar, CheckSquare, Settings2, Users, FileText, UserMinus, LogOut, X } from 'lucide-react';
 
 const getActivityIcon = (type: TripActivity['actionType']) => {
   switch (type) {

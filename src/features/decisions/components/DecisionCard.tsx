@@ -35,6 +35,8 @@ export const DecisionCard: React.FC<DecisionCardProps> = ({ decision, onVote }) 
     return member?.name ? member.name.charAt(0).toUpperCase() : userId.charAt(0).toUpperCase();
   };
 
+  const totalVotes = decision.options.reduce((sum, opt) => sum + (opt.votes?.length || 0), 0);
+
   const handleClosePoll = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!activeTrip || decision.options.length === 0) return;
@@ -131,10 +133,18 @@ export const DecisionCard: React.FC<DecisionCardProps> = ({ decision, onVote }) 
         )}
         
         {isAdmin && !isDecided && !isClosed && (
-          <div className="mt-4 pt-4 border-t border-warm-100/60 flex justify-end">
+          <div className="mt-4 pt-4 border-t border-warm-100/60 flex justify-end gap-3">
+            <button 
+              onClick={(e) => { e.stopPropagation(); updateDecisionStatus(activeTrip!.id, decision.id, 'deferred'); }}
+              className="text-xs font-semibold px-3 py-1.5 rounded-lg text-warm-600 hover:text-warm-800 bg-warm-100 hover:bg-warm-200 transition-colors shadow-sm"
+            >
+              Close Without Winner
+            </button>
             <button 
               onClick={handleClosePoll}
-              className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-warm-900 text-white hover:bg-black transition-colors shadow-sm"
+              disabled={totalVotes === 0}
+              title={totalVotes === 0 ? "Cannot select a winner with zero votes" : ""}
+              className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-warm-900 text-white hover:bg-black disabled:bg-warm-300 disabled:text-warm-500 disabled:cursor-not-allowed transition-colors shadow-sm"
             >
               Close Poll & Select Winner
             </button>

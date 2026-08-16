@@ -15,6 +15,7 @@ import { Dialog } from '@/components/ui/Dialog';
 import { aiService } from '@/services/ai';
 import { formatCurrency } from '@/lib/utils/formatting';
 import { Users, Calendar, Clock, Wallet, MapPin } from 'lucide-react';
+import { format } from 'date-fns';
 import type { TripContext, ReactionType, TripIdea, TripReaction } from '@/types';
 
 export const DiscoveryPage = () => {
@@ -227,14 +228,27 @@ export const DiscoveryPage = () => {
 
                   {activeTrip.tripIdeas.length > 0 && (
                     <div className="pt-8">
-                      <DestinationSelection
-                        destination={{ name: activeTrip.tripIdeas[0].destination }}
-                        travelers={activeTrip.travelers}
-                        dates={activeTrip.flexibleDates ? (activeTrip.dateMonth || 'TBD') : 'TBD'}
-                        budget={{ min: activeTrip.tripIdeas[0].estimatedBudget?.min || 0, max: activeTrip.tripIdeas[0].estimatedBudget?.max || 0 }}
-                        isAdmin={isAdmin}
-                        onConfirm={() => handleSelectDestination(activeTrip.tripIdeas[0])}
-                      />
+                      {(() => {
+                        let travelDateLabel = '';
+                        if (!activeTrip.flexibleDates && activeTrip.startDate && activeTrip.endDate) {
+                          travelDateLabel = `${format(new Date(activeTrip.startDate), 'MMM d, yyyy')} - ${format(new Date(activeTrip.endDate), 'MMM d, yyyy')}`;
+                        } else if (activeTrip.flexibleDates && activeTrip.dateMonth) {
+                          travelDateLabel = `Sometime in ${activeTrip.dateMonth} • ${activeTrip.duration} days`;
+                        } else {
+                          travelDateLabel = `Sometime in the future • ${activeTrip.duration || 7} days`;
+                        }
+
+                        return (
+                          <DestinationSelection
+                            destination={{ name: activeTrip.tripIdeas[0].destination }}
+                            travelers={activeTrip.travelers}
+                            dates={travelDateLabel}
+                            budget={{ min: activeTrip.tripIdeas[0].estimatedBudget?.min || 0, max: activeTrip.tripIdeas[0].estimatedBudget?.max || 0 }}
+                            isAdmin={isAdmin}
+                            onConfirm={() => handleSelectDestination(activeTrip.tripIdeas[0])}
+                          />
+                        );
+                      })()}
                     </div>
                   )}
                 </div>

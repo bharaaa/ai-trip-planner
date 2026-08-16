@@ -70,7 +70,7 @@ export function InviteMemberModal({ open, onClose, tripId, existingMembers }: In
   };
 
   const handleCancel = (user: User) => {
-    useTripStore.getState().removeMember(tripId, user.id, user.name);
+    useTripStore.getState().cancelInvitation(tripId, user.id, user.name);
   };
 
   return (

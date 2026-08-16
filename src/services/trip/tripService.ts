@@ -162,6 +162,8 @@ export const tripService = {
   },
 
   setTripIdeas: async (tripId: string, ideas: TripIdea[]): Promise<void> => {
+    await supabase.from('trip_ideas').delete().eq('trip_id', tripId);
+    
     const payload = ideas.map(idea => ({
       trip_id: tripId,
       destination: idea.destination,
@@ -170,7 +172,17 @@ export const tripService = {
       title: idea.title,
       summary: idea.summary,
       fit_score: idea.fitScore,
-      image_url: idea.imageUrl
+      image_url: idea.imageUrl,
+      estimated_budget_min: idea.estimatedBudget?.min,
+      estimated_budget_max: idea.estimatedBudget?.max,
+      currency: idea.estimatedBudget?.currency,
+      suggested_duration: idea.suggestedDuration,
+      travel_style: idea.travelStyle,
+      key_activities: idea.keyActivities,
+      confidence: idea.confidence,
+      reasons: idea.reasons || [],
+      highlights: idea.highlights || [],
+      tradeoffs: idea.tradeoffs || []
     }));
     const { error } = await supabase.from('trip_ideas').insert(payload);
     if (error) throw error;

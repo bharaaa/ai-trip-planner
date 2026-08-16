@@ -137,6 +137,15 @@ export const DiscoveryPage = () => {
 
   const selectedIdea = activeTrip.tripIdeas.find(i => i.id === selectedIdeaId);
 
+  let travelDateLabel = '';
+  if (!activeTrip.flexibleDates && activeTrip.startDate && activeTrip.endDate) {
+    travelDateLabel = `${format(new Date(activeTrip.startDate), 'MMM d, yyyy')} - ${format(new Date(activeTrip.endDate), 'MMM d, yyyy')}`;
+  } else if (activeTrip.flexibleDates && activeTrip.dateMonth) {
+    travelDateLabel = `Sometime in ${activeTrip.dateMonth}`;
+  } else {
+    travelDateLabel = 'Sometime in the future';
+  }
+
   return (
     <PageTransition className="min-h-screen bg-warm-50 pb-32">
       <div className="max-w-6xl mx-auto px-6 pt-12 space-y-10">
@@ -150,7 +159,7 @@ export const DiscoveryPage = () => {
           <div className="hidden sm:block text-warm-300">•</div>
           <div className="flex items-center gap-2">
             <Calendar className="w-4 h-4" />
-            <span>{activeTrip.flexibleDates ? activeTrip.dateMonth || 'Flexible' : 'Specific Dates'}</span>
+            <span>{travelDateLabel}</span>
           </div>
           <div className="hidden sm:block text-warm-300">•</div>
           <div className="flex items-center gap-2">
@@ -228,27 +237,14 @@ export const DiscoveryPage = () => {
 
                   {activeTrip.tripIdeas.length > 0 && (
                     <div className="pt-8">
-                      {(() => {
-                        let travelDateLabel = '';
-                        if (!activeTrip.flexibleDates && activeTrip.startDate && activeTrip.endDate) {
-                          travelDateLabel = `${format(new Date(activeTrip.startDate), 'MMM d, yyyy')} - ${format(new Date(activeTrip.endDate), 'MMM d, yyyy')}`;
-                        } else if (activeTrip.flexibleDates && activeTrip.dateMonth) {
-                          travelDateLabel = `Sometime in ${activeTrip.dateMonth} • ${activeTrip.duration} days`;
-                        } else {
-                          travelDateLabel = `Sometime in the future • ${activeTrip.duration || 7} days`;
-                        }
-
-                        return (
-                          <DestinationSelection
-                            destination={{ name: activeTrip.tripIdeas[0].destination }}
-                            travelers={activeTrip.travelers}
-                            dates={travelDateLabel}
-                            budget={{ min: activeTrip.tripIdeas[0].estimatedBudget?.min || 0, max: activeTrip.tripIdeas[0].estimatedBudget?.max || 0 }}
-                            isAdmin={isAdmin}
-                            onConfirm={() => handleSelectDestination(activeTrip.tripIdeas[0])}
-                          />
-                        );
-                      })()}
+                      <DestinationSelection
+                        destination={{ name: activeTrip.tripIdeas[0].destination }}
+                        travelers={activeTrip.travelers}
+                        dates={travelDateLabel}
+                        budget={{ min: activeTrip.tripIdeas[0].estimatedBudget?.min || 0, max: activeTrip.tripIdeas[0].estimatedBudget?.max || 0 }}
+                        isAdmin={isAdmin}
+                        onConfirm={() => handleSelectDestination(activeTrip.tripIdeas[0])}
+                      />
                     </div>
                   )}
                 </div>

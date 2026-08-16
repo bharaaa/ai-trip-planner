@@ -62,7 +62,7 @@ export const TripDashboardPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-warm-50 flex flex-col">
-      <main className="flex-1 max-w-5xl w-full mx-auto p-4 md:p-6 lg:p-8 space-y-8 animate-fade-in">
+      <main className="flex-1 max-w-5xl w-full mx-auto p-4 md:p-6 lg:p-8 space-y-4 animate-fade-in">
         
         {/* Hero Section */}
         <section className="relative rounded-[var(--radius-xl)] p-8 md:p-12 border border-warm-200/60 shadow-sm overflow-hidden bg-white mt-4">

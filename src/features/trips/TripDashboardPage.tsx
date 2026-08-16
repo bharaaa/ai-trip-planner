@@ -13,7 +13,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Dialog } from '@/components/ui/Dialog';
 import { useTripStore } from '@/stores/tripStore';
 import { useAuthStore } from '@/stores/authStore';
-import { Users, Settings2, CalendarDays, LogOut, X } from 'lucide-react';
+import { Users, Settings2, CalendarDays, LogOut, X, UserMinus } from 'lucide-react';
 import { format } from 'date-fns';
 
 export const TripDashboardPage: React.FC = () => {
@@ -300,26 +300,34 @@ export const TripDashboardPage: React.FC = () => {
         />
 
         {/* Modals for removing/leaving */}
-        <Dialog open={!!memberToRemove} onClose={() => setMemberToRemove(null)} title="Remove Member">
-          <div className="p-6">
-            <p className="text-warm-800 mb-6">
-              Are you sure you want to remove <strong>{memberToRemove?.name}</strong> from this trip?
+        <Dialog open={!!memberToRemove} onClose={() => setMemberToRemove(null)}>
+          <div className="flex flex-col items-center text-center p-2">
+            <div className="w-16 h-16 bg-error-50 rounded-full flex items-center justify-center mb-5 border-[6px] border-error-50/50">
+              <UserMinus className="w-8 h-8 text-error-600" />
+            </div>
+            <h3 className="text-2xl font-bold text-warm-900 mb-3 tracking-tight">Remove Member</h3>
+            <p className="text-warm-600 text-base mb-8 leading-relaxed px-4">
+              Are you sure you want to remove <strong className="text-warm-900">{memberToRemove?.name}</strong> from this trip? They will lose access to the itinerary and decisions.
             </p>
-            <div className="flex gap-3 justify-end">
-              <Button variant="secondary" onClick={() => setMemberToRemove(null)}>Cancel</Button>
-              <Button variant="primary" className="bg-error-600 hover:bg-error-700 text-white border-error-600 shadow-sm" onClick={confirmRemoveMember}>Remove</Button>
+            <div className="flex gap-3 w-full">
+              <Button variant="secondary" className="flex-1" size="lg" onClick={() => setMemberToRemove(null)}>Cancel</Button>
+              <Button variant="primary" className="flex-1 bg-error-600 hover:bg-error-700 text-white border-error-600 shadow-sm" size="lg" onClick={confirmRemoveMember}>Remove Member</Button>
             </div>
           </div>
         </Dialog>
 
-        <Dialog open={showLeaveConfirm} onClose={() => setShowLeaveConfirm(false)} title="Leave Trip">
-          <div className="p-6">
-            <p className="text-warm-800 mb-6">
-              Are you sure you want to leave this trip? You will no longer have access to it unless invited again.
+        <Dialog open={showLeaveConfirm} onClose={() => setShowLeaveConfirm(false)}>
+          <div className="flex flex-col items-center text-center p-2">
+            <div className="w-16 h-16 bg-error-50 rounded-full flex items-center justify-center mb-5 border-[6px] border-error-50/50">
+              <LogOut className="w-8 h-8 text-error-600 ml-1" />
+            </div>
+            <h3 className="text-2xl font-bold text-warm-900 mb-3 tracking-tight">Leave Trip</h3>
+            <p className="text-warm-600 text-base mb-8 leading-relaxed px-4">
+              Are you sure you want to leave this trip? You will no longer have access to it unless you are invited again.
             </p>
-            <div className="flex gap-3 justify-end">
-              <Button variant="secondary" onClick={() => setShowLeaveConfirm(false)}>Cancel</Button>
-              <Button variant="primary" className="bg-error-600 hover:bg-error-700 text-white border-error-600 shadow-sm" onClick={confirmLeaveTrip}>Leave Trip</Button>
+            <div className="flex gap-3 w-full">
+              <Button variant="secondary" className="flex-1" size="lg" onClick={() => setShowLeaveConfirm(false)}>Cancel</Button>
+              <Button variant="primary" className="flex-1 bg-error-600 hover:bg-error-700 text-white border-error-600 shadow-sm" size="lg" onClick={confirmLeaveTrip}>Leave Trip</Button>
             </div>
           </div>
         </Dialog>

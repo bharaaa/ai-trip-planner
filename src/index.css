@@ -60,7 +60,10 @@
   --color-success-500: #10b981;
   --color-success-600: #059669;
   --color-error-50: #fef2f2;
+  --color-error-100: #fee2e2;
   --color-error-500: #ef4444;
+  --color-error-600: #dc2626;
+  --color-error-700: #b91c1c;
 
   /* ─── Radii ─── */
   --radius-sm: 0.375rem;

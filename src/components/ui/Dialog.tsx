@@ -17,9 +17,15 @@ export function Dialog({ open, onClose, title, children, className, ...props }: 
 
     if (open && !dialog.open) {
       dialog.showModal();
+      document.body.style.overflow = 'hidden';
     } else if (!open && dialog.open) {
       dialog.close();
+      document.body.style.overflow = '';
     }
+
+    return () => {
+      document.body.style.overflow = '';
+    };
   }, [open]);
 
   useEffect(() => {

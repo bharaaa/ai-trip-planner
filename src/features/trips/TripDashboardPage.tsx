@@ -51,13 +51,14 @@ export const TripDashboardPage: React.FC = () => {
       <main className="flex-1 max-w-5xl w-full mx-auto p-4 md:p-6 lg:p-8 space-y-8 animate-fade-in">
         
         {/* Hero Section */}
-        <section className="gradient-warm rounded-2xl p-6 md:p-8 border border-warm-200/40 shadow-sm relative overflow-hidden">
+        <section className="relative rounded-[var(--radius-xl)] p-8 md:p-12 border border-warm-200/60 shadow-sm overflow-hidden bg-white mt-4">
+          <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-accent-400 to-warm-400" />
           <div className="relative z-10">
-            <Badge variant="accent" className="mb-4">Trip Dashboard</Badge>
-            <h1 className="text-3xl md:text-4xl font-bold text-warm-900 tracking-tight mb-2">
+            <Badge variant="accent" className="mb-6 shadow-xs">Trip Overview</Badge>
+            <h1 className="text-4xl md:text-5xl font-bold text-warm-950 tracking-tight mb-3">
               {hasDestination ? `${activeTrip.selectedDestination?.name}, ${activeTrip.selectedDestination?.country}` : 'Still discovering...'}
             </h1>
-            <div className="mt-8 max-w-2xl">
+            <div className="mt-10 max-w-2xl">
               <TripProgress 
                 trip={{
                   checkpoints: [
@@ -97,36 +98,51 @@ export const TripDashboardPage: React.FC = () => {
 
         {/* Quick Links Grid */}
         <section>
-          <h2 className="text-sm font-semibold text-warm-500 uppercase tracking-wider mb-4">Workspaces</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <h2 className="text-xl font-bold text-warm-950 mb-6 tracking-tight">Explore the plan</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             
             <Link to={`/trips/${id}/discover`} className="block group">
-              <Card className="h-full bg-white border-warm-200/40 hover:border-accent-400/50 hover:shadow-md transition-all p-5">
-                <div className="w-10 h-10 rounded-lg bg-accent-50 text-accent-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  💡
+              <Card className="h-full bg-white border border-warm-200/60 group-hover:border-accent-300 group-hover:shadow-md transition-all duration-300 p-6 flex flex-col justify-between">
+                <div>
+                  <div className="w-12 h-12 rounded-full bg-accent-50 text-accent-600 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 text-xl">
+                    💡
+                  </div>
+                  <h3 className="text-lg font-bold text-warm-900 mb-2">Discover</h3>
+                  <p className="text-sm text-warm-600 leading-relaxed">Explore ideas and align group preferences.</p>
                 </div>
-                <h3 className="font-semibold text-warm-900 mb-1">Discover</h3>
-                <p className="text-sm text-warm-500">Explore ideas and align group preferences.</p>
+                <div className="mt-6 text-accent-600 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                  Open <span aria-hidden="true">&rarr;</span>
+                </div>
               </Card>
             </Link>
 
             <Link to={`/trips/${id}/decisions`} className="block group">
-              <Card className="h-full bg-white border-warm-200/40 hover:border-accent-400/50 hover:shadow-md transition-all p-5">
-                <div className="w-10 h-10 rounded-lg bg-info-50 text-info-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  ✓
+              <Card className="h-full bg-white border border-warm-200/60 group-hover:border-info-300 group-hover:shadow-md transition-all duration-300 p-6 flex flex-col justify-between">
+                <div>
+                  <div className="w-12 h-12 rounded-full bg-info-50 text-info-600 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 text-xl">
+                    ✓
+                  </div>
+                  <h3 className="text-lg font-bold text-warm-900 mb-2">Decisions</h3>
+                  <p className="text-sm text-warm-600 leading-relaxed">Vote on options and finalize details.</p>
                 </div>
-                <h3 className="font-semibold text-warm-900 mb-1">Decisions</h3>
-                <p className="text-sm text-warm-500">Vote on options and finalize details.</p>
+                <div className="mt-6 text-info-600 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                  Open <span aria-hidden="true">&rarr;</span>
+                </div>
               </Card>
             </Link>
 
             <Link to={`/trips/${id}/plan`} className="block group">
-              <Card className="h-full bg-white border-warm-200/40 hover:border-accent-400/50 hover:shadow-md transition-all p-5">
-                <div className="w-10 h-10 rounded-lg bg-success-50 text-success-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  🗺️
+              <Card className="h-full bg-white border border-warm-200/60 group-hover:border-success-300 group-hover:shadow-md transition-all duration-300 p-6 flex flex-col justify-between">
+                <div>
+                  <div className="w-12 h-12 rounded-full bg-success-50 text-success-600 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 text-xl">
+                    🗺️
+                  </div>
+                  <h3 className="text-lg font-bold text-warm-900 mb-2">Itinerary</h3>
+                  <p className="text-sm text-warm-600 leading-relaxed">Plan day-by-day activities and routes.</p>
                 </div>
-                <h3 className="font-semibold text-warm-900 mb-1">Itinerary</h3>
-                <p className="text-sm text-warm-500">Plan day-by-day activities and routes.</p>
+                <div className="mt-6 text-success-600 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                  Open <span aria-hidden="true">&rarr;</span>
+                </div>
               </Card>
             </Link>
 
@@ -135,15 +151,20 @@ export const TripDashboardPage: React.FC = () => {
 
         {/* The Crew */}
         <section>
-          <h2 className="text-sm font-semibold text-warm-500 uppercase tracking-wider mb-4">The Crew</h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-warm-950 tracking-tight">The Crew</h2>
+            <Button variant="secondary" size="sm" onClick={() => setIsInviteModalOpen(true)} className="rounded-full shadow-xs">
+              + Invite
+            </Button>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {activeTrip.members?.map(member => (
-              <Card key={member.userId} className="p-4 flex items-center gap-4 bg-white border-warm-200/40 hover:border-warm-300 transition-colors">
+              <Card key={member.userId} className="p-4 flex items-center gap-4 bg-white border border-warm-200/60 hover:shadow-sm transition-all">
                 <Avatar name={member.name} src={member.avatarUrl} size="lg" />
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-warm-900 truncate">{member.name}</h3>
+                  <h3 className="font-bold text-warm-900 truncate">{member.name}</h3>
                   <div className="flex items-center gap-2 mt-1">
-                    <Badge variant={member.role === 'admin' ? 'accent' : 'outline'} className="text-[10px] px-1.5 py-0 uppercase">
+                    <Badge variant={member.role === 'admin' ? 'accent' : 'outline'} className="text-[10px] px-2">
                       {member.role === 'admin' ? 'Organizer' : 'Member'}
                     </Badge>
                   </div>
@@ -151,38 +172,23 @@ export const TripDashboardPage: React.FC = () => {
                 <div className="shrink-0 text-xs font-medium flex flex-col items-end gap-2">
                   {member.preferencesSubmitted ? (
                     <>
-                      <span className="text-success-600 flex items-center gap-1 bg-success-50 px-2 py-1 rounded-md" title="Preferences Submitted">✓ Ready</span>
+                      <span className="text-success-700 flex items-center gap-1 bg-success-100 px-2 py-1 rounded-md shadow-xs">✓ Ready</span>
                       {member.userId === currentUser?.id && (
-                        <Button 
-                          size="sm" 
-                          variant="secondary"
-                          className="h-7 px-3 text-xs font-medium text-warm-700 border-warm-200 hover:border-warm-300 hover:bg-warm-50 shadow-sm transition-all"
+                        <button 
+                          className="text-[10px] uppercase font-bold text-warm-500 hover:text-accent-600 transition-colors tracking-wider"
                           onClick={() => navigate(`/trips/${id}/preferences`)}
                         >
-                          Edit Preferences
-                        </Button>
+                          Edit
+                        </button>
                       )}
                     </>
                   ) : (
-                    <span className="text-warm-500 flex items-center gap-1 bg-warm-100 px-2 py-1 rounded-md" title="Waiting for preferences">⏳ Pending</span>
+                    <span className="text-warm-600 flex items-center gap-1 bg-warm-100 px-2 py-1 rounded-md shadow-xs">⏳ Pending</span>
                   )}
                 </div>
               </Card>
             ))}
             
-            {/* Add Member Placeholder */}
-            <button 
-              className="p-4 flex items-center gap-4 border-2 border-dashed border-warm-200 rounded-xl hover:border-accent-400 hover:bg-accent-50/50 transition-all text-left group"
-              onClick={() => setIsInviteModalOpen(true)}
-            >
-              <div className="w-12 h-12 rounded-full bg-warm-100 text-warm-400 flex items-center justify-center group-hover:bg-accent-100 group-hover:text-accent-500 transition-colors shrink-0">
-                <span className="text-xl">+</span>
-              </div>
-              <div>
-                <h3 className="font-semibold text-warm-700 group-hover:text-accent-600 transition-colors">Invite someone</h3>
-                <p className="text-xs text-warm-500 mt-0.5">Add to this trip</p>
-              </div>
-            </button>
           </div>
         </section>
 

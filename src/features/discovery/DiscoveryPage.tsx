@@ -147,19 +147,28 @@ export const DiscoveryPage = () => {
         <hr className="border-warm-200/60" />
 
         <div>
-          <h2 className="text-2xl font-semibold text-warm-900 tracking-tight mb-8">Here's what we found</h2>
+          <h2 className="text-3xl font-bold text-warm-950 tracking-tight mb-8">Where to?</h2>
           
           {isLoading ? (
-            <AILoadingState 
-              message="Finding places that fit your group..."
-              steps={[
-                { label: "Analyzing group preferences", completed: true },
-                { label: "Checking travel constraints", completed: true },
-                { label: "Generating personalized ideas", completed: false }
-              ]} 
-            />
+            <div className="py-20 text-center space-y-6">
+              <div className="w-16 h-16 rounded-full bg-accent-100 flex items-center justify-center mx-auto text-accent-600 animate-pulse">
+                ✨
+              </div>
+              <div>
+                <p className="text-xl font-semibold text-warm-900 mb-2">Finding the perfect spots...</p>
+                <p className="text-warm-500">Checking group preferences and constraints.</p>
+              </div>
+            </div>
           ) : isRefining ? (
-            <AILoadingState message="Refining ideas based on your group's feedback..." />
+            <div className="py-20 text-center space-y-6">
+              <div className="w-16 h-16 rounded-full bg-accent-100 flex items-center justify-center mx-auto text-accent-600 animate-pulse">
+                🤔
+              </div>
+              <div>
+                <p className="text-xl font-semibold text-warm-900 mb-2">Taking notes...</p>
+                <p className="text-warm-500">Refining ideas based on what you liked and didn't like.</p>
+              </div>
+            </div>
           ) : (
             <div className="space-y-16">
               <RecommendationGrid 

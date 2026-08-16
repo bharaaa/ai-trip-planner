@@ -65,18 +65,20 @@ export const PlannerPage: React.FC = () => {
           <div className="flex flex-col gap-4">
             <div className="flex justify-between items-start">
               <div>
-                <h1 className="text-2xl font-semibold text-warm-900 tracking-tight">Bali Escape</h1>
-                <p className="text-warm-500 mt-1">Sep 15 - Sep 19 • 4 Days</p>
+                <h1 className="text-3xl font-bold text-warm-950 tracking-tight">{activeTrip.selectedDestination?.name || 'Itinerary'}</h1>
+                <p className="text-lg text-warm-600 mt-1">
+                  {activeTrip.flexibleDates ? `${activeTrip.duration} Days` : 'Locked In Dates'}
+                </p>
               </div>
               {!itinerary && !isGenerating && (
-                <Button onClick={handleGenerate} className="bg-accent-400 hover:bg-accent-500 text-white shadow-sm">
+                <Button onClick={handleGenerate} size="lg" className="rounded-full bg-accent-400 hover:bg-accent-500 text-white shadow-sm hover:shadow-md transition-all">
                   ✨ Generate Draft Itinerary
                 </Button>
               )}
             </div>
             
             {itinerary && (
-              <div className="bg-white rounded-xl p-4 border border-warm-200 shadow-sm flex items-start gap-4">
+              <div className="bg-white rounded-xl p-5 border border-warm-200/60 shadow-xs flex items-start gap-4">
                 <div className="flex-1">
                   <NextDecision 
                     title="Choose accommodation"

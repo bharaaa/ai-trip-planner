@@ -40,46 +40,46 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({
 
   return (
     <motion.div layout className={cn(
-      "group relative flex items-start gap-3 p-3 -mx-2 hover:bg-warm-50 rounded-xl transition-colors duration-200",
+      "group relative flex items-start gap-4 p-3 -mx-2 hover:bg-warm-50 rounded-[var(--radius-xl)] transition-all duration-300",
       className
     )}>
       {/* Time */}
-      <div className="w-16 flex-shrink-0 pt-0.5 text-sm text-warm-500 font-medium text-right relative">
+      <div className="w-16 flex-shrink-0 pt-1 text-sm text-warm-500 font-semibold text-right relative">
         {item.isMustDo && (
-          <div className="absolute -left-3 top-2 w-2 h-2 rounded-full bg-accent-400" />
+          <div className="absolute -left-4 top-2.5 w-2.5 h-2.5 rounded-full bg-accent-400 shadow-sm" />
         )}
         {item.time || <span className="opacity-0">--:--</span>}
       </div>
 
-      <div className="text-warm-300 pt-0.5">──</div>
+      <div className="text-warm-300 pt-1">──</div>
 
       {/* Content */}
-      <div className="flex-grow">
-        <div className="flex items-center gap-2 mb-1">
-          <span className="text-lg" role="img" aria-label={item.type}>{emoji}</span>
-          <h4 className="text-base font-medium text-warm-900">{item.title}</h4>
+      <div className="flex-grow bg-white p-4 rounded-[var(--radius-lg)] border border-warm-200/60 shadow-xs group-hover:shadow-sm transition-all duration-300 group-hover:border-warm-300">
+        <div className="flex items-center gap-2 mb-1.5">
+          <span className="text-xl" role="img" aria-label={item.type}>{emoji}</span>
+          <h4 className="text-base font-bold text-warm-900 tracking-tight">{item.title}</h4>
           {item.isAIGenerated && (
-            <span className="ml-2 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-accent-50 text-accent-600 rounded-md">
+            <span className="ml-2 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-accent-50 text-accent-700 rounded-md">
               AI
             </span>
           )}
         </div>
         
         {item.description && (
-          <p className="text-sm text-warm-600 mt-1 mb-2 leading-relaxed">
+          <p className="text-sm text-warm-600 mb-3 leading-relaxed">
             {item.description}
           </p>
         )}
 
         {item.location && (
-          <div className="flex items-center gap-1 mt-2 text-xs text-warm-500">
-            <span role="img" aria-label="pin" className="text-[10px]">📍</span>
+          <div className="flex items-center gap-1.5 mt-2 text-xs font-medium text-warm-500">
+            <span role="img" aria-label="pin" className="text-[12px]">📍</span>
             <span>{item.location}</span>
           </div>
         )}
 
         {item.notes && (
-          <div className="mt-2 text-xs text-warm-400 bg-warm-50/50 p-2 rounded-lg border border-warm-100">
+          <div className="mt-3 text-xs text-warm-500 bg-warm-50 p-2.5 rounded-lg border border-warm-100">
             {item.notes}
           </div>
         )}
@@ -87,7 +87,7 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({
 
       {/* Actions */}
       {isEditable && (
-        <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+        <div className="opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center gap-1 pt-1">
           <button 
             onClick={onToggleMustDo}
             className="p-2 text-warm-400 hover:text-accent-500 rounded-lg hover:bg-warm-100 transition-colors"

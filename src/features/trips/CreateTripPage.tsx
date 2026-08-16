@@ -127,10 +127,10 @@ export function CreateTripPage() {
       <div className="flex-1 w-full max-w-lg mx-auto">
         <AnimatePresence mode="wait">
         {step === 1 && (
-          <motion.div key={1} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
-            <div className="text-center space-y-3">
-              <h1 className="text-3xl font-semibold text-warm-900 tracking-tight">Let's plan your new adventure</h1>
-              <p className="text-warm-600">You don't need to know where yet. We'll figure it out together.</p>
+          <motion.div key={1} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ type: "spring", bounce: 0, duration: 0.4 }} className="space-y-10">
+            <div className="text-center space-y-4">
+              <h1 className="text-4xl font-bold text-warm-950 tracking-tight">Let's plan something.</h1>
+              <p className="text-lg text-warm-600">Give this adventure a name to get started.</p>
             </div>
             <div className="space-y-6">
               <Input
@@ -140,11 +140,12 @@ export function CreateTripPage() {
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 autoFocus
               />
-              <div className="flex gap-4 mt-10">
+              <div className="flex justify-center mt-12">
                 <Button 
                   onClick={nextStep} 
                   disabled={!formData.name.trim()}
-                  className="w-full flex-1"
+                  size="lg"
+                  className="rounded-full px-10 text-base"
                 >
                   Continue
                 </Button>
@@ -154,13 +155,13 @@ export function CreateTripPage() {
         )}
 
         {step === 2 && (
-          <motion.div key={2} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
-            <div className="text-center space-y-3">
-              <h1 className="text-3xl font-semibold text-warm-900 tracking-tight">Who's joining the crew?</h1>
-              <p className="text-warm-600">
+          <motion.div key={2} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ type: "spring", bounce: 0, duration: 0.4 }} className="space-y-10">
+            <div className="text-center space-y-4">
+              <h1 className="text-4xl font-bold text-warm-950 tracking-tight">Who are you planning with?</h1>
+              <p className="text-lg text-warm-600">
                 {formData.invitedUsers.length === 0 
-                  ? 'Only you' 
-                  : `You and ${formData.invitedUsers.length} other${formData.invitedUsers.length !== 1 ? 's' : ''}`
+                  ? 'Just you for now.' 
+                  : `You and ${formData.invitedUsers.length} friend${formData.invitedUsers.length !== 1 ? 's' : ''}.`
                 }
               </p>
             </div>
@@ -230,17 +231,17 @@ export function CreateTripPage() {
                 )}
               </div>
             </div>
-            <div className="flex gap-4 pt-4">
-              <Button variant="secondary" onClick={prevStep} className="flex-1">Back</Button>
-              <Button onClick={nextStep} className="flex-1">Continue</Button>
+            <div className="flex justify-center gap-4 pt-8">
+              <Button variant="secondary" onClick={prevStep} size="lg" className="rounded-full px-8 text-base">Back</Button>
+              <Button onClick={nextStep} size="lg" className="rounded-full px-10 text-base">Continue</Button>
             </div>
           </motion.div>
         )}
 
         {step === 3 && (
-          <motion.div key={3} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
-            <div className="text-center space-y-3">
-              <h1 className="text-3xl font-semibold text-warm-900 tracking-tight">When is this happening?</h1>
+          <motion.div key={3} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ type: "spring", bounce: 0, duration: 0.4 }} className="space-y-10">
+            <div className="text-center space-y-4">
+              <h1 className="text-4xl font-bold text-warm-950 tracking-tight">How much time do you have?</h1>
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -314,17 +315,18 @@ export function CreateTripPage() {
               )}
             </div>
 
-            <div className="flex gap-4 pt-4">
-              <Button variant="secondary" onClick={prevStep} className="flex-1">Back</Button>
-              <Button onClick={nextStep} className="flex-1">Continue</Button>
+            <div className="flex justify-center gap-4 pt-8">
+              <Button variant="secondary" onClick={prevStep} size="lg" className="rounded-full px-8 text-base">Back</Button>
+              <Button onClick={nextStep} size="lg" className="rounded-full px-10 text-base">Continue</Button>
             </div>
           </motion.div>
         )}
 
         {step === 4 && (
-          <motion.div key={4} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
-            <div className="text-center space-y-3">
-              <h1 className="text-3xl font-semibold text-warm-900 tracking-tight">What's the budget?</h1>
+          <motion.div key={4} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ type: "spring", bounce: 0, duration: 0.4 }} className="space-y-10">
+            <div className="text-center space-y-4">
+              <h1 className="text-4xl font-bold text-warm-950 tracking-tight">What's your vibe?</h1>
+              <p className="text-lg text-warm-600">Don't know the exact budget? That's fine. We'll work with a rough number.</p>
             </div>
             
             <div className="flex bg-warm-100 p-1 rounded-full">
@@ -388,17 +390,17 @@ export function CreateTripPage() {
               </div>
             </div>
 
-            <div className="flex gap-4 pt-4">
-              <Button variant="secondary" onClick={prevStep} className="flex-1">Back</Button>
-              <Button onClick={nextStep} className="flex-1">Continue</Button>
+            <div className="flex justify-center gap-4 pt-8">
+              <Button variant="secondary" onClick={prevStep} size="lg" className="rounded-full px-8 text-base">Back</Button>
+              <Button onClick={nextStep} size="lg" className="rounded-full px-10 text-base">Continue</Button>
             </div>
           </motion.div>
         )}
 
         {step === 5 && (
-          <motion.div key={5} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
-            <div className="text-center space-y-3">
-              <h1 className="text-3xl font-semibold text-warm-900 tracking-tight">A few more details</h1>
+          <motion.div key={5} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ type: "spring", bounce: 0, duration: 0.4 }} className="space-y-10">
+            <div className="text-center space-y-4">
+              <h1 className="text-4xl font-bold text-warm-950 tracking-tight">Just a few more details.</h1>
             </div>
             
             <div className="space-y-8">
@@ -454,9 +456,9 @@ export function CreateTripPage() {
               </div>
             </div>
 
-            <div className="flex gap-4 pt-8">
-              <Button variant="secondary" onClick={prevStep} className="flex-1">Back</Button>
-              <Button onClick={handleCreate} className="flex-1">Create Trip</Button>
+            <div className="flex justify-center gap-4 pt-12">
+              <Button variant="secondary" onClick={prevStep} size="lg" className="rounded-full px-8 text-base">Back</Button>
+              <Button onClick={handleCreate} size="lg" className="rounded-full px-10 text-base">Create Trip</Button>
             </div>
           </motion.div>
         )}

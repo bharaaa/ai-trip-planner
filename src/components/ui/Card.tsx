@@ -7,13 +7,13 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export const Card = React.forwardRef<HTMLDivElement, CardProps>(
   ({ className, variant = 'default', children, ...props }, ref) => {
-    const baseStyles = 'rounded-2xl p-5';
+    const baseStyles = 'rounded-[var(--radius-lg)] p-5';
     
     const variants = {
-      default: 'bg-white border border-warm-200/40 shadow-xs',
-      elevated: 'bg-white shadow-md',
-      interactive: 'bg-white cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all duration-200',
-      highlighted: 'bg-accent-50/30 border border-accent-200/40',
+      default: 'bg-white border border-warm-200/60 shadow-xs',
+      elevated: 'bg-white border border-warm-200/40 shadow-sm',
+      interactive: 'bg-white border border-warm-200/60 cursor-pointer hover:shadow-sm hover:-translate-y-0.5 hover:border-warm-300/80 transition-all duration-300 ease-out',
+      highlighted: 'bg-accent-50/50 border border-accent-200/50',
       flat: 'bg-transparent',
     };
 

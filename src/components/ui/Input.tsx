@@ -19,8 +19,8 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         <input
           ref={ref}
           className={cn(
-            'w-full bg-white border border-warm-200 rounded-xl px-4 py-2.5 text-warm-900 text-sm placeholder:text-warm-400',
-            'focus:outline-none focus:border-accent-400 focus:ring-2 focus:ring-accent-400/10 transition-all',
+            'w-full bg-white border border-warm-200/80 rounded-[var(--radius-md)] px-4 py-2.5 text-warm-900 text-sm placeholder:text-warm-400 shadow-xs',
+            'focus:outline-none focus:border-accent-400 focus:ring-2 focus:ring-accent-400/20 transition-all duration-200',
             'disabled:opacity-50 disabled:bg-warm-50',
             error && 'border-error-500 focus:border-error-500 focus:ring-error-500/20',
             className
@@ -56,8 +56,8 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         <textarea
           ref={ref}
           className={cn(
-            'w-full bg-white border border-warm-200 rounded-xl px-4 py-2.5 text-warm-900 text-sm placeholder:text-warm-400',
-            'focus:outline-none focus:border-accent-400 focus:ring-2 focus:ring-accent-400/10 transition-all min-h-[100px] resize-y',
+            'w-full bg-white border border-warm-200/80 rounded-[var(--radius-md)] px-4 py-2.5 text-warm-900 text-sm placeholder:text-warm-400 shadow-xs',
+            'focus:outline-none focus:border-accent-400 focus:ring-2 focus:ring-accent-400/20 transition-all duration-200 min-h-[100px] resize-y',
             'disabled:opacity-50 disabled:bg-warm-50',
             error && 'border-error-500 focus:border-error-500 focus:ring-error-500/20',
             className

@@ -25,12 +25,25 @@ export function Avatar({ name, src, size = 'md', className, ...props }: AvatarPr
       .toUpperCase();
   };
 
+  // Generate a consistent pseudo-random hue based on name for colorful avatars
+  const getAvatarColorClass = (name: string) => {
+    const charCode = name.charCodeAt(0) || 0;
+    const colors = [
+      'bg-accent-100 text-accent-700',
+      'bg-yellow-100 text-yellow-700',
+      'bg-sky-100 text-sky-700',
+      'bg-lavender-100 text-lavender-700',
+      'bg-success-100 text-success-700'
+    ];
+    return colors[charCode % colors.length];
+  };
+
   return (
     <div
       className={cn(
-        'relative flex items-center justify-center rounded-full overflow-hidden shrink-0',
+        'relative flex items-center justify-center rounded-full overflow-hidden shrink-0 transition-transform duration-200 hover:scale-105',
         sizes[size],
-        !src && 'bg-warm-200 text-warm-600 font-medium',
+        !src && getAvatarColorClass(name),
         className
       )}
       {...props}
@@ -38,7 +51,7 @@ export function Avatar({ name, src, size = 'md', className, ...props }: AvatarPr
       {src ? (
         <img src={src} alt={name} className="w-full h-full object-cover" />
       ) : (
-        <span>{getInitials(name)}</span>
+        <span className="font-semibold tracking-wide">{getInitials(name)}</span>
       )}
     </div>
   );
@@ -64,13 +77,13 @@ export function AvatarGroup({ children, max = 4, size = 'md', className, ...prop
   return (
     <div className={cn('flex items-center', className)} {...props}>
       {visibleAvatars.map((child, index) => (
-        <div key={index} className={cn('ring-2 ring-white rounded-full', index > 0 && '-ml-2')}>
+        <div key={index} className={cn('ring-2 ring-white rounded-full transition-all duration-200 hover:z-20 hover:-translate-y-1', index > 0 && '-ml-3')}>
           {child}
         </div>
       ))}
       {extraCount > 0 && (
         <div className={cn(
-          'ring-2 ring-white rounded-full bg-warm-100 text-warm-600 flex items-center justify-center font-medium z-10 -ml-2',
+          'ring-2 ring-white rounded-full bg-warm-100 text-warm-600 flex items-center justify-center font-medium z-10 -ml-3 transition-all duration-200 hover:z-20 hover:-translate-y-1',
           sizes[size]
         )}>
           +{extraCount}

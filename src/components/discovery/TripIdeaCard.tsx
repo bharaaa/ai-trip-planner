@@ -42,7 +42,7 @@ export const TripIdeaCard: React.FC<TripIdeaCardProps> = ({
     <motion.div 
       layoutId={`destination-${idea.id}`}
       className={cn(
-        "flex flex-col group cursor-pointer animate-slide-up h-full",
+        "flex flex-col group cursor-pointer animate-slide-up h-full bg-white rounded-[var(--radius-xl)] shadow-xs hover:shadow-md transition-all duration-300 border border-warm-200/60 overflow-hidden",
         className
       )}
       style={style}
@@ -50,7 +50,7 @@ export const TripIdeaCard: React.FC<TripIdeaCardProps> = ({
     >
       {/* Header Image */}
       <div className={cn(
-        "w-full relative rounded-2xl overflow-hidden mb-5",
+        "w-full relative overflow-hidden",
         featured ? "aspect-[16/9] md:aspect-[21/9]" : "aspect-[4/3]"
       )}>
         {idea.imageUrl ? (
@@ -58,10 +58,10 @@ export const TripIdeaCard: React.FC<TripIdeaCardProps> = ({
         ) : (
           <div className={cn("w-full h-full bg-gradient-to-br transition-transform duration-700 group-hover:scale-105", getGradient(idea.destination))} />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/0 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/0 to-transparent" />
       </div>
 
-      <div className="flex flex-col flex-grow px-1">
+      <div className="flex flex-col flex-grow p-5 md:p-6">
         {/* Destination */}
         <div className="flex items-center gap-3 mb-2">
           <h3 className={cn("font-semibold text-warm-900 tracking-tight", featured ? "text-3xl" : "text-2xl")}>

@@ -22,20 +22,20 @@ export const DaySection: React.FC<DaySectionProps> = ({
   isEditable = true,
 }) => {
   return (
-    <div className="flex flex-col mb-4">
-      <div className="mb-4 pb-3 border-b border-warm-200/40 flex items-center gap-3">
-        <div className="w-7 h-7 bg-accent-400 text-white rounded-full flex items-center justify-center text-xs font-bold">
+    <div className="flex flex-col mb-10 relative">
+      <div className="sticky top-0 z-20 bg-warm-50/90 backdrop-blur-md pb-4 pt-2 mb-4 border-b border-warm-200/60 flex items-center gap-4">
+        <div className="w-8 h-8 bg-warm-900 text-white rounded-full flex items-center justify-center text-sm font-bold shadow-sm">
           {dayIndex + 1}
         </div>
         <div>
           {day.title && (
-            <h3 className="text-lg font-semibold text-warm-900 leading-tight">
+            <h3 className="text-xl font-bold text-warm-950 tracking-tight leading-tight">
               {day.title}
             </h3>
           )}
           {day.date && (
-            <span className="text-xs uppercase tracking-wider text-warm-500 font-medium">
-              {day.date.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }) || day.date.toString()}
+            <span className="text-xs uppercase tracking-widest text-warm-500 font-semibold mt-0.5 block">
+              {day.date.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' }) || day.date.toString()}
             </span>
           )}
         </div>

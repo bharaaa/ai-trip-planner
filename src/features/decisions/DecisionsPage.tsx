@@ -62,10 +62,10 @@ export const DecisionsPage: React.FC = () => {
     <PageTransition>
       <div className="min-h-screen bg-warm-50 flex flex-col">
         <div className="flex-1 max-w-5xl w-full mx-auto p-4 md:p-6 lg:p-8">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-10 gap-4">
             <div>
-              <h1 className="text-2xl font-semibold text-warm-900 tracking-tight">Decisions</h1>
-              <p className="text-warm-500 mt-1">Vote and finalize details with your group.</p>
+              <h1 className="text-3xl font-bold text-warm-950 tracking-tight">Decisions</h1>
+              <p className="text-lg text-warm-600 mt-2">Time to make some calls.</p>
             </div>
             
             <Button 

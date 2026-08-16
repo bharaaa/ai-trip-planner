@@ -52,34 +52,46 @@ export const DecisionCard: React.FC<DecisionCardProps> = ({ decision, onVote }) 
       
       <div className="pb-4 px-6">
         {isDecided ? (
-          <div className="bg-success-50 rounded-xl p-3 flex items-center gap-2">
-             <span className="text-success-600 font-medium text-sm">✓ Selected:</span>
-             <span className="text-warm-800 font-medium text-sm">{decision.options.find(o => o.id === decision.decidedOption)?.title || 'Unknown'}</span>
+          <div className="bg-success-50 rounded-xl p-4 flex items-center gap-3 border border-success-100">
+             <div className="w-8 h-8 rounded-full bg-success-200 text-success-700 flex items-center justify-center font-bold">
+               ✓
+             </div>
+             <div>
+               <span className="block text-success-600 font-medium text-xs uppercase tracking-wider mb-0.5">Selected</span>
+               <span className="block text-success-900 font-semibold text-sm">{decision.options.find(o => o.id === decision.decidedOption)?.title || 'Unknown'}</span>
+             </div>
           </div>
         ) : (
-          <div className="space-y-2">
-            {decision.options.map(option => (
-              <div 
-                key={option.id} 
-                className="flex items-center justify-between p-3 rounded-xl border border-warm-200/40 bg-warm-50 hover:bg-warm-100 transition-colors cursor-pointer"
-                onClick={() => onVote?.(option.id)}
-              >
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium text-warm-800">{option.title}</span>
-                  {option.description && <span className="text-xs text-warm-500 mt-0.5">{option.description}</span>}
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="flex -space-x-1.5">
-                    {option.votes?.map((vote, i) => (
-                      <div key={i} className="w-6 h-6 rounded-full bg-warm-200 text-[10px] flex items-center justify-center border-2 border-white">{vote.userId.charAt(0)}</div>
-                    ))}
+          <div className="space-y-2.5">
+            {decision.options.map(option => {
+              // Assume if there's any vote, we highlight it playfully (you could check currentUser.id if available)
+              const hasVotes = option.votes && option.votes.length > 0;
+              return (
+                <div 
+                  key={option.id} 
+                  className={cn(
+                    "flex items-center justify-between p-3 rounded-xl border transition-all duration-200 cursor-pointer group",
+                    hasVotes ? "border-accent-200 bg-accent-50/50 hover:bg-accent-50" : "border-warm-200/60 bg-white hover:border-accent-300 hover:shadow-xs"
+                  )}
+                  onClick={() => onVote?.(option.id)}
+                >
+                  <div className="flex flex-col pr-4">
+                    <span className={cn("text-sm font-semibold", hasVotes ? "text-accent-900" : "text-warm-800")}>{option.title}</span>
+                    {option.description && <span className={cn("text-xs mt-0.5", hasVotes ? "text-accent-600" : "text-warm-500")}>{option.description}</span>}
                   </div>
-                  <span className="text-xs font-semibold text-warm-400 w-4 text-right">
-                    {option.votes?.length || 0}
-                  </span>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <div className="flex -space-x-1.5">
+                      {option.votes?.map((vote, i) => (
+                        <div key={i} className="w-6 h-6 rounded-full bg-accent-200 text-accent-800 text-[10px] font-bold flex items-center justify-center border-2 border-white z-10">{vote.userId.charAt(0)}</div>
+                      ))}
+                    </div>
+                    <span className={cn("text-xs font-semibold w-4 text-right", hasVotes ? "text-accent-600" : "text-warm-400 group-hover:text-accent-400")}>
+                      {option.votes?.length || 0}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

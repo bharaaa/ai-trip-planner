@@ -37,19 +37,19 @@ export function Select({ value, onChange, options, placeholder = 'Select an opti
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "flex items-center justify-between w-full px-4 py-3 bg-white border rounded-xl text-left transition-all duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-accent-400/50 focus:border-accent-400",
-          isOpen ? "border-accent-400 ring-2 ring-accent-400/20" : "border-warm-200 hover:border-warm-300",
+          "flex items-center justify-between w-full px-4 py-2.5 bg-white border rounded-[var(--radius-md)] text-left transition-all duration-200 shadow-xs focus:outline-none focus:ring-2 focus:ring-accent-400/20 focus:border-accent-400",
+          isOpen ? "border-accent-400 ring-2 ring-accent-400/20" : "border-warm-200/80 hover:border-warm-300",
           !selectedOption && "text-warm-500"
         )}
       >
-        <span className={cn("block truncate font-medium", selectedOption ? "text-warm-900" : "text-warm-400")}>
+        <span className={cn("block truncate font-medium text-sm", selectedOption ? "text-warm-900" : "text-warm-400")}>
           {selectedOption ? selectedOption.label : placeholder}
         </span>
-        <ChevronDown className={cn("w-5 h-5 text-warm-400 transition-transform duration-200", isOpen && "transform rotate-180")} />
+        <ChevronDown className={cn("w-4 h-4 text-warm-400 transition-transform duration-200", isOpen && "transform rotate-180")} />
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 w-full mt-2 bg-white border border-warm-200 rounded-xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="absolute z-50 w-full mt-2 bg-white border border-warm-200/80 rounded-[var(--radius-md)] shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
           <ul className="max-h-60 overflow-auto py-1">
             {options.map((option) => (
               <li
@@ -59,7 +59,7 @@ export function Select({ value, onChange, options, placeholder = 'Select an opti
                   setIsOpen(false);
                 }}
                 className={cn(
-                  "relative cursor-default select-none py-3 pl-10 pr-4 text-sm font-medium transition-colors hover:bg-warm-50",
+                  "relative cursor-default select-none py-2.5 pl-9 pr-4 text-sm font-medium transition-colors hover:bg-warm-50",
                   option.value === value ? "text-accent-600 bg-accent-50/50" : "text-warm-700"
                 )}
               >

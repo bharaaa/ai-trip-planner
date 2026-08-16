@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils/cn';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Avatar } from '@/components/ui/Avatar';
+import { useTripStore } from '@/stores/tripStore';
 import type { Decision } from '@/types';
 
 interface DecisionCardProps {
@@ -22,7 +23,13 @@ const getIconForType = (type: string) => {
 };
 
 export const DecisionCard: React.FC<DecisionCardProps> = ({ decision, onVote }) => {
+  const { activeTrip } = useTripStore();
   const isDecided = decision.status === 'decided';
+
+  const getUserInitial = (userId: string) => {
+    const member = activeTrip?.members.find(m => m.userId === userId);
+    return member?.name ? member.name.charAt(0).toUpperCase() : userId.charAt(0).toUpperCase();
+  };
   
   return (
     <Card className={cn(
@@ -82,7 +89,9 @@ export const DecisionCard: React.FC<DecisionCardProps> = ({ decision, onVote }) 
                   <div className="flex items-center gap-3 shrink-0">
                     <div className="flex -space-x-1.5">
                       {option.votes?.map((vote, i) => (
-                        <div key={i} className="w-6 h-6 rounded-full bg-accent-200 text-accent-800 text-[10px] font-bold flex items-center justify-center border-2 border-white z-10">{vote.userId.charAt(0)}</div>
+                        <div key={i} className="w-6 h-6 rounded-full bg-accent-200 text-accent-800 text-[10px] font-bold flex items-center justify-center border-2 border-white z-10" title={activeTrip?.members.find(m => m.userId === vote.userId)?.name || 'Unknown'}>
+                          {getUserInitial(vote.userId)}
+                        </div>
                       ))}
                     </div>
                     <span className={cn("text-xs font-semibold w-4 text-right", hasVotes ? "text-accent-600" : "text-warm-400 group-hover:text-accent-400")}>

@@ -1,8 +1,10 @@
 import { create } from 'zustand';
-import type { User, Trip, TripMember, Preference, TripIdea, TripReaction, Destination, Itinerary, ItineraryItem, Decision, DecisionStatus, TripPhase } from '@/types';
+import type { User, Trip, TripMember, Preference, TripIdea, TripReaction, Destination, Itinerary, ItineraryItem, Decision, DecisionStatus, TripPhase, TripActivityType } from '@/types';
 import { tripService } from '@/services/trip/tripService';
 import { activityService } from '@/services/trip/activityService';
 import { notificationService } from '@/services/notification/notificationService';
+import { notifyTripMembers } from '@/features/notifications/utils/notifyMembers';
+import { notificationFactory } from '@/features/notifications/utils/notificationFactory';
 import { useNotificationStore } from '@/stores/notificationStore';
 import { useAuthStore } from './authStore';
 
@@ -57,16 +59,20 @@ const syncActiveTrip = (trips: Trip[], activeTripId?: string): Trip | null => {
   return trips.find(t => t.id === activeTripId) || null;
 };
 
-// Helper to log and sync activity to the local state
-const logAndSyncActivity = (tripId: string, actionType: any, details: any = {}) => {
+const logAndSyncActivity = (tripId: string, actionType: TripActivityType, details: any = {}) => {
   const user = useAuthStore.getState().user;
-  activityService.logActivity(tripId, user?.id, actionType, details).then(activity => {
+  activityService.logActivity(tripId, actionType, user?.id, details).then(activity => {
     if (activity) {
       useTripStore.setState(state => {
-        const trips = updateTrip(state.trips, tripId, trip => ({
-          ...trip,
-          activities: [activity, ...(trip.activities || [])]
-        }));
+        const trips = updateTrip(state.trips, tripId, trip => {
+          if (trip.activities?.some(a => a.id === activity.id)) {
+            return trip;
+          }
+          return {
+            ...trip,
+            activities: [activity, ...(trip.activities || [])]
+          };
+        });
         return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
       });
     }
@@ -89,8 +95,26 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
         return;
       }
       
-      const trips = await tripService.fetchUserTrips(currentUser.id);
-      set({ trips, isLoadingTrips: false });
+      const fetchedTrips = await tripService.fetchUserTrips(currentUser.id);
+      
+      set(state => {
+        const mergedTrips = fetchedTrips.map(fetchedTrip => {
+          const existingTrip = state.trips.find(t => t.id === fetchedTrip.id);
+          if (existingTrip) {
+            return {
+              ...fetchedTrip,
+              activities: existingTrip.activities
+            };
+          }
+          return fetchedTrip;
+        });
+
+        return { 
+          trips: mergedTrips, 
+          isLoadingTrips: false,
+          activeTrip: syncActiveTrip(mergedTrips, state.activeTrip?.id)
+        };
+      });
     } catch (err) {
       console.error('Error fetching trips:', err);
       set({ isLoadingTrips: false });
@@ -198,7 +222,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
     // Clean up any pending invites just in case
     notificationService.deleteTripInviteNotification(memberId, tripId).catch(console.error);
 
-    logAndSyncActivity(tripId, 'MEMBER_REMOVED', { name: memberName });
+    logAndSyncActivity(tripId, 'member_removed', { name: memberName });
 
     return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
   }),
@@ -227,7 +251,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
     const user = useAuthStore.getState().user;
     if (!user) return;
     
-    await activityService.logActivity(tripId, user.id, 'MEMBER_LEFT', { name: user.name || 'Someone' });
+    await activityService.logActivity(tripId, 'member_left', user.id, { name: user.name || 'Someone' });
     await tripService.removeMember(tripId, user.id);
     
     useTripStore.setState(state => {
@@ -241,16 +265,30 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
     if (!user) return;
 
     await tripService.updateMemberStatus(tripId, user.id, 'joined');
-    await activityService.logActivity(tripId, user.id, 'MEMBER_JOINED', { name: user.name || 'Someone' });
+    const activity = await activityService.logActivity(tripId, 'member_joined', user.id, { name: user.name || 'Someone' });
     useNotificationStore.getState().removeTripInviteNotification(tripId);
-
+    
     useTripStore.setState(state => {
-      const trips = updateTrip(state.trips, tripId, trip => ({
-        ...trip,
-        members: trip.members.map(m => m.userId === user.id ? { ...m, status: 'joined' } : m)
-      }));
+      const trips = updateTrip(state.trips, tripId, trip => {
+        const updatedActivities = activity && (!trip.activities?.some(a => a.id === activity.id))
+          ? [activity, ...(trip.activities || [])]
+          : trip.activities;
+
+        return {
+          ...trip,
+          members: trip.members.map(m => m.userId === user.id ? { ...m, status: 'joined' } : m),
+          activities: updatedActivities
+        };
+      });
       return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
     });
+
+    const activeTripData = get().trips.find(t => t.id === tripId);
+    if (activeTripData) {
+      notifyTripMembers(tripId, user.id, (memberId) => 
+        notificationFactory.createMemberJoined(memberId, user.id, user.name || 'Someone', tripId, activeTripData.name)
+      );
+    }
   },
 
   rejectInvitation: async (tripId) => {
@@ -258,7 +296,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
     if (!user) return;
 
     await tripService.removeMember(tripId, user.id);
-    await activityService.logActivity(tripId, user.id, 'MEMBER_REJECTED', { name: user.name || 'Someone' });
+    await activityService.logActivity(tripId, 'MEMBER_REJECTED', user.id, { name: user.name || 'Someone' });
     useNotificationStore.getState().removeTripInviteNotification(tripId);
 
     useTripStore.setState(state => {
@@ -408,6 +446,14 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
       newDays[dayIndex] = { ...newDays[dayIndex], items: [...newDays[dayIndex].items, item] };
       return { ...trip, itinerary: { ...trip.itinerary, days: newDays } };
     });
+
+    const user = useAuthStore.getState().user;
+    if (user && !item.isAIGenerated) {
+      notifyTripMembers(tripId, user.id, (memberId) => 
+        notificationFactory.createActivityAdded(memberId, user.id, user.name || 'Someone', tripId, item.title, dayIndex + 1)
+      );
+    }
+
     return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
   }),
 
@@ -475,6 +521,13 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
       if (status === 'decided') {
         const option = decision.options.find(o => o.id === decidedOptionId);
         logAndSyncActivity(tripId, 'POLL_DECIDED', { title: decision.title, winner: option?.title });
+        
+        if (option) {
+          const user = useAuthStore.getState().user;
+          notifyTripMembers(tripId, user?.id || '', (memberId) => 
+            notificationFactory.createDecisionReached(memberId, tripId, trip?.name || '', decision.title, option.title)
+          );
+        }
       } else if (status === 'deferred') {
         logAndSyncActivity(tripId, 'POLL_CLOSED', { title: decision.title });
       }
@@ -504,6 +557,17 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
     tripService.addDecisionVote(optionId, userId, vote).catch(err => {
       console.error('Failed to sync vote:', err);
     });
+
+    const trip = state.trips.find(t => t.id === tripId);
+    const decision = trip?.decisions.find(d => d.id === decisionId);
+    const option = decision?.options.find(o => o.id === optionId);
+    const user = useAuthStore.getState().user;
+    
+    if (trip && option && user && user.id === userId) {
+      notifyTripMembers(tripId, user.id, (memberId) => 
+        notificationFactory.createVoteCast(memberId, user.id, user.name || 'Someone', tripId, option.title)
+      );
+    }
 
     return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
   }),
@@ -574,6 +638,14 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
         dateMonth: data.dateMonth,
         duration: data.duration !== undefined ? data.duration : trip.duration
       }));
+      
+      const user = useAuthStore.getState().user;
+      if (user) {
+        notifyTripMembers(tripId, user.id, (memberId) => 
+          notificationFactory.createTripUpdated(memberId, user.id, user.name || 'Someone', tripId, 'updated the trip dates')
+        );
+      }
+      
       return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
     });
   },

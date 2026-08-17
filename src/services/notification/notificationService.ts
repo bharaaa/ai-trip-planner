@@ -35,6 +35,23 @@ export const notificationService = {
         message: notification.message,
         metadata: notification.metadata
       });
+    if (error) throw error;
+  },
+
+  createMultipleNotifications: async (notifications: Omit<AppNotification, 'id' | 'isRead' | 'createdAt'>[]): Promise<void> => {
+    if (notifications.length === 0) return;
+    const { error } = await supabase
+      .from('notifications')
+      .insert(
+        notifications.map(n => ({
+          user_id: n.userId,
+          actor_id: n.actorId,
+          type: n.type,
+          title: n.title,
+          message: n.message,
+          metadata: n.metadata
+        }))
+      );
 
     if (error) throw error;
   },

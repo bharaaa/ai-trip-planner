@@ -1,0 +1,10 @@
+ALTER TYPE notification_type ADD VALUE IF NOT EXISTS 'trip_member_joined';
+ALTER TYPE notification_type ADD VALUE IF NOT EXISTS 'trip_updated';
+ALTER TYPE notification_type ADD VALUE IF NOT EXISTS 'vote_cast';
+ALTER TYPE notification_type ADD VALUE IF NOT EXISTS 'vote_changed';
+ALTER TYPE notification_type ADD VALUE IF NOT EXISTS 'decision_reached';
+ALTER TYPE notification_type ADD VALUE IF NOT EXISTS 'activity_added';
+ALTER TYPE notification_type ADD VALUE IF NOT EXISTS 'activity_updated';
+ALTER TYPE notification_type ADD VALUE IF NOT EXISTS 'activity_suggested';
+ALTER TYPE notification_type ADD VALUE IF NOT EXISTS 'ai_recommendation_ready';
+ALTER TYPE notification_type ADD VALUE IF NOT EXISTS 'system';

@@ -115,7 +115,7 @@ export function InviteMemberModal({ open, onClose, tripId, existingMembers }: In
                       {isInvited ? (
                         <div className="flex items-center gap-2">
                           <span className="text-xs font-medium text-warm-500 px-2 py-1 bg-warm-200 rounded-md">Invited</span>
-                          <Button size="sm" variant="outline" onClick={() => handleCancel(user)}>
+                          <Button size="sm" variant="secondary" onClick={() => handleCancel(user)}>
                             Cancel
                           </Button>
                         </div>

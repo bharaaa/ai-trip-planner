@@ -4,15 +4,15 @@ import { cn } from '@/lib/utils/cn';
 import { useTripStore } from '@/stores/tripStore';
 import { useAuthStore } from '@/stores/authStore';
 import { useNavigate, useParams } from 'react-router';
-import { GroupPreferenceSummary } from '@/components/discovery/GroupPreferenceSummary';
-import { RecommendationGrid } from '@/components/discovery/RecommendationGrid';
-import { AILoadingState } from '@/components/ai/AILoadingState';
+import { GroupPreferenceSummary } from '@/features/discovery/components/GroupPreferenceSummary';
+import { RecommendationGrid } from '@/features/discovery/components/RecommendationGrid';
+import { AILoadingState } from '@/features/ai/components/AILoadingState';
 import { GroupConsensus } from '@/features/discovery/components/GroupConsensus';
 import { RefinementSummary } from '@/features/discovery/components/RefinementSummary';
 import { DestinationSelection } from '@/features/discovery/components/DestinationSelection';
 import { ReactionBar } from '@/features/discovery/components/ReactionBar';
 import { Dialog } from '@/components/ui/Dialog';
-import { EditTripDialog } from '@/components/trip/EditTripDialog';
+import { EditTripDialog } from '@/features/trips/components/EditTripDialog';
 import { Button } from '@/components/ui/Button';
 import { aiService } from '@/services/ai';
 import { formatCurrency, formatBudgetRange } from '@/lib/utils/formatting';
@@ -143,7 +143,9 @@ export const DiscoveryPage = () => {
       options: [
         { id: crypto.randomUUID(), title: 'Yes, let\'s go!', votes: [] },
         { id: crypto.randomUUID(), title: 'No, keep looking', votes: [] }
-      ]
+      ],
+      participants: [],
+      createdAt: new Date()
     };
     
     addDecision(activeTrip.id, decision);
@@ -232,7 +234,7 @@ export const DiscoveryPage = () => {
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-bold text-warm-950 tracking-tight">Where to?</h2>
             {!isLoading && !isRefining && (
-              <Button variant="outline" size="sm" onClick={handleRefresh}>
+              <Button variant="secondary" size="sm" onClick={handleRefresh}>
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Refresh Suggestions
               </Button>

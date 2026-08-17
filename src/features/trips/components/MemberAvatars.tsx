@@ -1,5 +1,5 @@
 import React from 'react';
-import { Avatar, AvatarGroup } from '../ui/Avatar';
+import { Avatar, AvatarGroup } from '@/components/ui/Avatar';
 
 export interface Member {
   name: string;

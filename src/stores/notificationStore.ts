@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { notificationService } from '@/services/notification/notificationService';
 import { useAuthStore } from './authStore';
+import { supabase } from '@/lib/supabase';
 import type { AppNotification } from '@/types';
 
 interface NotificationState {
@@ -10,6 +11,9 @@ interface NotificationState {
   markAsRead: (id: string) => Promise<void>;
   markAllAsRead: () => Promise<void>;
   removeTripInviteNotification: (tripId: string) => Promise<void>;
+  subscribeToNotifications: (onNewNotification?: (n: AppNotification) => void) => void;
+  unsubscribeFromNotifications: () => void;
+  addRealtimeNotification: (notification: AppNotification) => void;
 }
 
 export const useNotificationStore = create<NotificationState>((set, get) => ({
@@ -72,5 +76,45 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     } catch (err) {
       console.error('Failed to remove trip invite notification:', err);
     }
+  },
+
+  addRealtimeNotification: (n: AppNotification) => {
+    set(state => {
+      if (state.notifications.some(existing => existing.id === n.id)) return state;
+      return { notifications: [n, ...state.notifications] };
+    });
+  },
+
+  subscribeToNotifications: (onNewNotification?: (n: AppNotification) => void) => {
+    const user = useAuthStore.getState().user;
+    if (!user) return;
+
+    supabase
+      .channel('public:notifications')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` },
+        (payload) => {
+          const newRecord = payload.new;
+          const notification: AppNotification = {
+            id: newRecord.id,
+            userId: newRecord.user_id,
+            actorId: newRecord.actor_id,
+            type: newRecord.type,
+            title: newRecord.title,
+            message: newRecord.message,
+            metadata: newRecord.metadata || {},
+            isRead: newRecord.is_read,
+            createdAt: new Date(newRecord.created_at)
+          };
+          get().addRealtimeNotification(notification);
+          if (onNewNotification) onNewNotification(notification);
+        }
+      )
+      .subscribe();
+  },
+
+  unsubscribeFromNotifications: () => {
+    supabase.channel('public:notifications').unsubscribe();
   }
 }));

@@ -2,11 +2,12 @@ import React, { useEffect, useState, useRef } from 'react'
 import { Outlet, useLocation, Link, useNavigate } from 'react-router'
 import { cn } from '@/lib/utils/cn'
 import { useUIStore } from '@/stores/uiStore'
-import { useNotificationStore } from '@/stores/notificationStore'
-import { AnimatePresence, motion } from 'motion/react'
 import { useTripStore } from '@/stores/tripStore'
 import { useAuthStore } from '@/stores/authStore'
-import { Bell } from 'lucide-react'
+import { useNotificationStore } from '@/stores/notificationStore'
+import { NotificationBell } from '@/features/notifications/components/NotificationBell'
+import { showNotificationToast } from '@/features/notifications/components/NotificationToast'
+import { AnimatePresence, motion } from 'motion/react'
 
 const mobileNavItems = [
   { id: 'discover' as const, label: 'Discover', icon: '✨', path: 'discover' },
@@ -20,18 +21,13 @@ export function AppLayout() {
   const { mobileNavTab, setMobileNavTab } = useUIStore()
   const { user, signOut } = useAuthStore()
   const [isProfileOpen, setIsProfileOpen] = useState(false)
-  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false)
   const profileRef = useRef<HTMLDivElement>(null)
-  const notificationsRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
         setIsProfileOpen(false)
-      }
-      if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
-        setIsNotificationsOpen(false)
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
@@ -44,18 +40,21 @@ export function AppLayout() {
 
   // Extract tripId from path for mobile nav links
   const tripIdMatch = location.pathname.match(/\/trips\/([^/]+)/)
-  const tripId = tripIdMatch ? tripIdMatch[1] : null
+  const tripId = tripIdMatch && tripIdMatch[1] !== 'new' ? tripIdMatch[1] : null
 
   const setActiveTrip = useTripStore((state) => state.setActiveTrip)
   const fetchTrips = useTripStore((state) => state.fetchTrips)
   
-  const { notifications, fetchNotifications, markAsRead, markAllAsRead } = useNotificationStore()
-  const unreadCount = notifications.filter(n => !n.isRead).length
+  const { fetchNotifications, subscribeToNotifications, unsubscribeFromNotifications } = useNotificationStore()
 
   useEffect(() => {
     fetchTrips()
     fetchNotifications()
-  }, [fetchTrips, fetchNotifications])
+    subscribeToNotifications((n) => {
+      showNotificationToast(n, navigate)
+    })
+    return () => unsubscribeFromNotifications()
+  }, [fetchTrips, fetchNotifications, subscribeToNotifications, unsubscribeFromNotifications, navigate])
 
   useEffect(() => {
     if (tripId) {
@@ -110,76 +109,7 @@ export function AppLayout() {
             )}
 
             <div className="flex items-center gap-4">
-              <div className="relative" ref={notificationsRef}>
-                <button
-                  onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                  className="relative p-2 rounded-full hover:bg-warm-100 text-warm-600 transition-colors focus:outline-none"
-                >
-                  <Bell className="w-5 h-5" />
-                  {unreadCount > 0 && (
-                    <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-error-500 rounded-full border-2 border-white"></span>
-                  )}
-                </button>
-
-                <AnimatePresence>
-                  {isNotificationsOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                      transition={{ duration: 0.2 }}
-                      className="absolute right-0 mt-2 w-80 rounded-xl bg-white shadow-lg border border-warm-200/50 overflow-hidden z-50"
-                    >
-                      <div className="px-4 py-3 border-b border-warm-100 bg-warm-50 flex items-center justify-between">
-                        <p className="text-sm font-semibold text-warm-900">Notifications</p>
-                        {unreadCount > 0 && (
-                          <button 
-                            onClick={() => markAllAsRead()}
-                            className="text-xs text-accent-600 hover:text-accent-700 font-medium"
-                          >
-                            Mark all as read
-                          </button>
-                        )}
-                      </div>
-                      <div className="max-h-80 overflow-y-auto">
-                        {notifications.length > 0 ? (
-                          notifications.map(notification => (
-                            <div 
-                              key={notification.id}
-                              onClick={() => {
-                                if (!notification.isRead) markAsRead(notification.id)
-                                setIsNotificationsOpen(false)
-                                if (notification.type === 'trip_invite' && notification.metadata?.tripId) {
-                                  navigate(`/trips/${notification.metadata.tripId}`)
-                                }
-                              }}
-                              className={cn(
-                                "px-4 py-3 cursor-pointer transition-colors border-b border-warm-100 last:border-0",
-                                notification.isRead ? "bg-white hover:bg-warm-50" : "bg-accent-50/30 hover:bg-accent-50/50"
-                              )}
-                            >
-                              <div className="flex items-start gap-3">
-                                <div className={cn(
-                                  "mt-1 w-2 h-2 rounded-full shrink-0",
-                                  notification.isRead ? "bg-transparent" : "bg-accent-500"
-                                )} />
-                                <div>
-                                  <p className="text-sm font-medium text-warm-900">{notification.title}</p>
-                                  <p className="text-sm text-warm-600 mt-0.5 line-clamp-2">{notification.message}</p>
-                                </div>
-                              </div>
-                            </div>
-                          ))
-                        ) : (
-                          <div className="p-4 text-center text-sm text-warm-500">
-                            No notifications
-                          </div>
-                        )}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+              <NotificationBell />
 
               <div className="relative" ref={profileRef}>
               <button 

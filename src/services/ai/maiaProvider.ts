@@ -1,5 +1,7 @@
 import OpenAI from 'openai';
+import { z } from 'zod';
 import type { AIProvider } from './types';
+import { TripIdeaSchema } from '@/lib/validation/schemas';
 import type { TripContext, TripIdea, TripReaction, Destination, Itinerary, ItineraryInsight } from '@/types';
 
 // Read configuration from Vite environment variables
@@ -11,6 +13,10 @@ const openai = new OpenAI({
   apiKey: apiKey || 'dummy-key',
   baseURL: baseURL || 'https://api.maiarouter.com/v1',
   dangerouslyAllowBrowser: true, // We are calling from client-side for this prototype
+});
+
+const AIResponseSchema = z.object({
+  ideas: z.array(TripIdeaSchema)
 });
 
 export class MaiaProvider implements AIProvider {
@@ -81,7 +87,8 @@ CRITICAL INSTRUCTION 2: Instead of returning broad or generic cities (e.g. "Bogo
       if (!content) throw new Error('No content returned from AI');
 
       const data = JSON.parse(content);
-      return data.ideas as TripIdea[];
+      const validated = AIResponseSchema.parse(data);
+      return validated.ideas;
     } catch (error) {
       console.error('Failed to generate trip ideas:', error);
       throw error;
@@ -106,7 +113,8 @@ CRITICAL INSTRUCTION 2: Instead of returning broad or generic cities (e.g. "Bogo
       if (!content) throw new Error('No content returned from AI');
 
       const data = JSON.parse(content);
-      return data.ideas as TripIdea[];
+      const validated = AIResponseSchema.parse(data);
+      return validated.ideas;
     } catch (error) {
       console.error('Failed to refine trip ideas:', error);
       throw error;

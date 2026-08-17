@@ -6,7 +6,7 @@ import { getGreeting } from '@/lib/utils/formatting';
 import { useTripStore } from '@/stores/tripStore';
 import { useAuthStore } from '@/stores/authStore';
 import { Button } from '@/components/ui/Button';
-import { TripCard } from '@/components/trip/TripCard';
+import { TripCard } from '@/features/trips/components/TripCard';
 import { Card } from '@/components/ui/Card';
 import type { Trip } from '@/types';
 import { PageTransition } from '@/components/motion/PageTransition';

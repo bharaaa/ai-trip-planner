@@ -1,6 +1,6 @@
 import React from 'react';
-import { Card } from '../ui/Card';
-import { Badge } from '../ui/Badge';
+import { Card } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
 import { MemberAvatars } from './MemberAvatars';
 import { cn } from '@/lib/utils/cn';
 import { useAuthStore } from '@/stores/authStore';

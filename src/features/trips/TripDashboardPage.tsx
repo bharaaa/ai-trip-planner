@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils/cn';
 import { useNavigate, useParams, Link } from 'react-router';
-import { TripProgress } from '@/components/trip/TripProgress';
-import { NextDecision } from '@/components/trip/NextDecision';
+import { TripProgress } from '@/features/trips/components/TripProgress';
+import { NextDecision } from '@/features/trips/components/NextDecision';
 import { InviteMemberModal } from './components/InviteMemberModal';
-import { TripActivityFeed } from '@/components/trip/TripActivityFeed';
+import { TripActivityFeed } from '@/features/trips/components/TripActivityFeed';
 import { EditTripDateModal } from './components/EditTripDateModal';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Avatar, AvatarGroup } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 import { Dialog } from '@/components/ui/Dialog';
-import { useTripStore } from '@/stores/tripStore';
 import { useAuthStore } from '@/stores/authStore';
+import { useTripStore } from '@/stores/tripStore';
+import { useTrip } from './hooks/useTrip';
+import { useTripMembers } from './hooks/useTripMembers';
 import { Users, Settings2, CalendarDays, LogOut, X, UserMinus, Check, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -24,8 +26,13 @@ export const TripDashboardPage: React.FC = () => {
   const [memberToRemove, setMemberToRemove] = useState<{ id: string; name: string } | null>(null);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const navigate = useNavigate();
-  const { activeTrip, setActiveTrip, trips, fetchTrips } = useTripStore();
+  
   const { user: currentUser } = useAuthStore();
+  const { trip: activeTrip } = useTrip(id);
+  const { members, removeMember } = useTripMembers(id || '');
+  
+  // Note: We still use the store directly for some top-level fetches until we fully abstract the query layer
+  const { setActiveTrip, trips, fetchTrips } = useTripStore();
 
   useEffect(() => {
     if (trips.length === 0) {
@@ -46,9 +53,10 @@ export const TripDashboardPage: React.FC = () => {
   };
 
   const confirmRemoveMember = () => {
-    if (memberToRemove) {
-      useTripStore.getState().removeMember(activeTrip!.id, memberToRemove.id, memberToRemove.name);
+    if (memberToRemove && activeTrip) {
+      removeMember(activeTrip.id, memberToRemove.id, memberToRemove.name);
       setMemberToRemove(null);
+      toast.success('Member removed successfully');
     }
   };
 
@@ -95,8 +103,8 @@ export const TripDashboardPage: React.FC = () => {
             </div>
             <div className="flex items-center gap-2 w-full sm:w-auto">
               <Button 
-                variant="outline" 
-                className="flex-1 sm:flex-none border-white/20 text-white hover:bg-white/10"
+                variant="secondary"
+                className="flex-1 sm:flex-none bg-transparent border-white/20 text-white hover:bg-white/10"
                 onClick={() => {
                   useTripStore.getState().rejectInvitation(activeTrip.id).then(() => {
                     toast.success('Invitation declined');
@@ -111,9 +119,14 @@ export const TripDashboardPage: React.FC = () => {
                 variant="primary" 
                 className="flex-1 sm:flex-none bg-accent-500 hover:bg-accent-600 text-white border-none shadow-md"
                 onClick={() => {
-                  useTripStore.getState().joinTrip(activeTrip.id).then(() => {
-                    toast.success('Invitation accepted! Welcome to the crew.');
-                  });
+                  useTripStore.getState().joinTrip(activeTrip.id)
+                    .then(() => {
+                      toast.success('Invitation accepted! Welcome to the crew.');
+                    })
+                    .catch((err) => {
+                      console.error(err);
+                      toast.error('Failed to accept invitation');
+                    });
                 }}
               >
                 <Check className="w-4 h-4 mr-2" />

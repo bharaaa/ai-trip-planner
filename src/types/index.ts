@@ -41,7 +41,21 @@ export interface Trip {
   memberCount?: number;
 }
 
-export type NotificationType = 'trip_invite' | 'trip_removed' | 'poll_created' | 'itinerary_updated';
+export type NotificationType = 
+  | 'trip_invite'
+  | 'trip_member_joined'
+  | 'trip_removed'
+  | 'trip_updated'
+  | 'poll_created'
+  | 'vote_cast'
+  | 'vote_changed'
+  | 'decision_reached'
+  | 'activity_added'
+  | 'activity_updated'
+  | 'activity_suggested'
+  | 'itinerary_updated'
+  | 'ai_recommendation_ready'
+  | 'system';
 
 export interface AppNotification {
   id: string;
@@ -55,28 +69,25 @@ export interface AppNotification {
   createdAt: Date;
 }
 
-export type ActionType = 
-  | 'MEMBER_JOINED'
-  | 'DATES_CHANGED'
-  | 'DESTINATION_SELECTED'
-  | 'POLL_CREATED'
-  | 'POLL_DECIDED'
-  | 'POLL_CLOSED'
-  | 'ITINERARY_UPDATED'
-  | 'PREFERENCES_SUBMITTED'
-  | 'MEMBER_REMOVED'
-  | 'MEMBER_LEFT'
-  | 'MEMBER_INVITED'
-  | 'MEMBER_REJECTED'
-  | 'INVITATION_CANCELLED';
+export type TripActivityType = 
+  | 'trip_created' | 'trip_updated' | 'trip_dates_changed' | 'trip_destination_changed'
+  | 'member_joined' | 'member_left' | 'member_removed' | 'member_role_changed' | 'member_invited' | 'invitation_cancelled' | 'member_rejected'
+  | 'destination_added' | 'destination_removed' | 'ai_recommendations_generated' | 'destination_shortlisted'
+  | 'vote_started' | 'vote_cast' | 'vote_changed' | 'voting_completed' | 'destination_selected'
+  | 'itinerary_created' | 'activity_added' | 'activity_updated' | 'activity_removed' | 'activity_moved' | 'day_added' | 'day_removed'
+  | 'preference_updated' | 'budget_updated' | 'trip_settings_updated'
+  | 'trip_archived' | 'trip_restored'
+  // Legacy support
+  | 'MEMBER_JOINED' | 'DATES_CHANGED' | 'DESTINATION_SELECTED' | 'POLL_CREATED' | 'POLL_DECIDED' | 'POLL_CLOSED' | 'ITINERARY_UPDATED' | 'PREFERENCES_SUBMITTED' | 'MEMBER_REMOVED' | 'MEMBER_LEFT' | 'MEMBER_INVITED' | 'MEMBER_REJECTED' | 'INVITATION_CANCELLED';
 
 export interface TripActivity {
   id: string;
   tripId: string;
-  userId?: string; // null if AI or system
-  actionType: ActionType;
-  details: Record<string, any>;
-  createdAt: Date;
+  type: TripActivityType;
+  actorId?: string;
+  entityId?: string;
+  metadata?: Record<string, any>;
+  createdAt: string;
 }
 
 export interface TripMember {

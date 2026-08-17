@@ -105,7 +105,7 @@ export function EditTripDialog({ open, onClose, tripId }: EditTripDialogProps) {
         </div>
 
         <div className="flex gap-3 pt-4">
-          <Button variant="outline" className="flex-1" onClick={onClose}>
+          <Button variant="secondary" className="flex-1" onClick={onClose}>
             Cancel
           </Button>
           <Button className="flex-1" onClick={handleSave} disabled={isSaving}>

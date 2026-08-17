@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import type { TripActivity, ActionType } from '@/types';
+import type { TripActivity, TripActivityType } from '@/types';
 
 export const activityService = {
   getActivities: async (tripId: string): Promise<TripActivity[]> => {
@@ -21,19 +21,27 @@ export const activityService = {
     return data.map(item => ({
       id: item.id,
       tripId: item.trip_id,
-      userId: item.user_id,
-      actionType: item.action_type as ActionType,
-      details: item.details,
-      createdAt: new Date(item.created_at)
+      type: (item.type || item.action_type) as TripActivityType, // Handle legacy action_type during migration
+      actorId: item.actor_id || item.user_id, // Handle legacy user_id
+      entityId: item.entity_id,
+      metadata: item.metadata || item.details, // Handle legacy details
+      createdAt: item.created_at
     }));
   },
 
-  logActivity: async (tripId: string, userId: string | undefined, actionType: ActionType, details: Record<string, any> = {}): Promise<TripActivity | null> => {
+  logActivity: async (
+    tripId: string, 
+    type: TripActivityType, 
+    actorId?: string, 
+    metadata: Record<string, any> = {},
+    entityId?: string
+  ): Promise<TripActivity | null> => {
     const payload = {
       trip_id: tripId,
-      user_id: userId || null,
-      action_type: actionType,
-      details
+      actor_id: actorId || null,
+      type: type,
+      metadata: metadata,
+      entity_id: entityId || null
     };
 
     const { data, error } = await supabase
@@ -54,10 +62,37 @@ export const activityService = {
     return {
       id: data.id,
       tripId: data.trip_id,
-      userId: data.user_id,
-      actionType: data.action_type as ActionType,
-      details: data.details,
-      createdAt: new Date(data.created_at)
+      type: data.type as TripActivityType,
+      actorId: data.actor_id,
+      entityId: data.entity_id,
+      metadata: data.metadata,
+      createdAt: data.created_at
+    };
+  },
+
+  subscribeToActivities: (tripId: string, onActivityReceived: (activity: TripActivity) => void) => {
+    const channel = supabase
+      .channel(`trip_activities:${tripId}`)
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'trip_activities', filter: `trip_id=eq.${tripId}` },
+        (payload) => {
+          const item = payload.new;
+          onActivityReceived({
+            id: item.id,
+            tripId: item.trip_id,
+            type: (item.type || item.action_type) as TripActivityType,
+            actorId: item.actor_id || item.user_id,
+            entityId: item.entity_id,
+            metadata: item.metadata || item.details,
+            createdAt: item.created_at
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
     };
   }
 };

@@ -194,6 +194,9 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
         metadata: { tripId: activeTripData.id, tripName: activeTripData.name }
       }).catch(err => console.error('Failed to create notification:', err));
     }
+    
+    // Clean up any pending invites just in case
+    notificationService.deleteTripInviteNotification(memberId, tripId).catch(console.error);
 
     logAndSyncActivity(tripId, 'MEMBER_REMOVED', { name: memberName });
 
@@ -208,6 +211,11 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
 
     tripService.removeMember(tripId, memberId).catch(err => {
       console.error('Failed to sync invitation cancellation:', err);
+    });
+    
+    // Also remove the notification for the invited user
+    notificationService.deleteTripInviteNotification(memberId, tripId).catch(err => {
+      console.error('Failed to remove invite notification:', err);
     });
 
     logAndSyncActivity(tripId, 'INVITATION_CANCELLED', { name: memberName });

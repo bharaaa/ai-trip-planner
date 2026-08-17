@@ -15,6 +15,7 @@ import { useTripStore } from '@/stores/tripStore';
 import { useAuthStore } from '@/stores/authStore';
 import { Users, Settings2, CalendarDays, LogOut, X, UserMinus, Check, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
+import toast from 'react-hot-toast';
 
 export const TripDashboardPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -40,6 +41,7 @@ export const TripDashboardPage: React.FC = () => {
 
   const confirmLeaveTrip = async () => {
     await useTripStore.getState().leaveTrip(activeTrip!.id);
+    toast.success('You have left the trip');
     navigate('/');
   };
 

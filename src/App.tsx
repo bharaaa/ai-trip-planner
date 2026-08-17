@@ -47,7 +47,35 @@ export function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Toaster position="top-center" />
+      <Toaster 
+        position="top-center" 
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#ffffff',
+            color: '#1f1a17',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+            borderRadius: '1rem',
+            border: '1px solid rgba(231, 222, 216, 0.6)',
+            padding: '14px 20px',
+            fontSize: '15px',
+            fontWeight: 500,
+            letterSpacing: '-0.01em',
+          },
+          success: {
+            iconTheme: {
+              primary: '#16a34a',
+              secondary: '#ffffff',
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: '#dc2626',
+              secondary: '#ffffff',
+            },
+          },
+        }}
+      />
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />

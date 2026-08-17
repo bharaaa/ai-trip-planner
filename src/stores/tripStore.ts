@@ -234,7 +234,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
 
     await tripService.updateMemberStatus(tripId, user.id, 'joined');
     await activityService.logActivity(tripId, user.id, 'MEMBER_JOINED', { name: user.name || 'Someone' });
-    useNotificationStore.getState().fetchNotifications();
+    useNotificationStore.getState().removeTripInviteNotification(tripId);
 
     useTripStore.setState(state => {
       const trips = updateTrip(state.trips, tripId, trip => ({
@@ -251,7 +251,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
 
     await tripService.removeMember(tripId, user.id);
     await activityService.logActivity(tripId, user.id, 'MEMBER_REJECTED', { name: user.name || 'Someone' });
-    useNotificationStore.getState().fetchNotifications();
+    useNotificationStore.getState().removeTripInviteNotification(tripId);
 
     useTripStore.setState(state => {
       const trips = state.trips.filter(t => t.id !== tripId);

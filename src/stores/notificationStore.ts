@@ -9,6 +9,7 @@ interface NotificationState {
   fetchNotifications: () => Promise<void>;
   markAsRead: (id: string) => Promise<void>;
   markAllAsRead: () => Promise<void>;
+  removeTripInviteNotification: (tripId: string) => Promise<void>;
 }
 
 export const useNotificationStore = create<NotificationState>((set, get) => ({
@@ -54,6 +55,22 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
       }));
     } catch (err) {
       console.error('Failed to mark all notifications as read:', err);
+    }
+  },
+
+  removeTripInviteNotification: async (tripId: string) => {
+    const user = useAuthStore.getState().user;
+    if (!user) return;
+
+    try {
+      await notificationService.deleteTripInviteNotification(user.id, tripId);
+      set(state => ({
+        notifications: state.notifications.filter(
+          n => !(n.type === 'trip_invite' && n.metadata?.tripId === tripId)
+        )
+      }));
+    } catch (err) {
+      console.error('Failed to remove trip invite notification:', err);
     }
   }
 }));

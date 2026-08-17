@@ -56,5 +56,16 @@ export const notificationService = {
       .eq('is_read', false);
 
     if (error) throw error;
+  },
+
+  deleteTripInviteNotification: async (userId: string, tripId: string): Promise<void> => {
+    const { error } = await supabase
+      .from('notifications')
+      .delete()
+      .eq('user_id', userId)
+      .eq('type', 'trip_invite')
+      .contains('metadata', { tripId });
+
+    if (error) throw error;
   }
 };

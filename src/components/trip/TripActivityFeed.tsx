@@ -1,5 +1,5 @@
-import React from 'react';
 import { useTripStore } from '@/stores/tripStore';
+import { useAuthStore } from '@/stores/authStore';
 import { formatDistanceToNow, format } from 'date-fns';
 import type { TripActivity } from '@/types';
 import { MapPin, Calendar, CheckSquare, Settings2, Users, FileText, UserMinus, LogOut, X } from 'lucide-react';
@@ -78,11 +78,28 @@ const getActivityMessage = (activity: TripActivity, memberName: string) => {
 };
 
 export const TripActivityFeed: React.FC = () => {
+  const currentUser = useAuthStore((state) => state.user);
   const { activeTrip } = useTripStore();
 
   if (!activeTrip) return null;
 
-  const activities = activeTrip.activities || [];
+  const currentMember = activeTrip.members?.find(m => m.userId === currentUser?.id);
+  const memberJoinedActivity = activeTrip.activities?.find(
+    a => a.actionType === 'MEMBER_JOINED' && a.userId === currentUser?.id
+  );
+
+  const activities = (activeTrip.activities || []).filter(activity => {
+    // Admins see everything
+    if (currentMember?.role === 'admin') return true;
+    
+    // If we have a join date for this user, filter out older activities
+    // We also include the MEMBER_JOINED activity itself
+    if (memberJoinedActivity) {
+      return new Date(activity.createdAt) >= new Date(memberJoinedActivity.createdAt);
+    }
+
+    return true;
+  });
 
   if (activities.length === 0) {
     return (

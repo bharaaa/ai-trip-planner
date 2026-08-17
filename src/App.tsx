@@ -36,6 +36,8 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>
 }
 
+import { Toaster } from 'react-hot-toast'
+
 export function App() {
   const initializeAuth = useAuthStore((state) => state.initialize)
 
@@ -45,6 +47,7 @@ export function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <Toaster position="top-center" />
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />

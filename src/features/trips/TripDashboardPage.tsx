@@ -95,7 +95,12 @@ export const TripDashboardPage: React.FC = () => {
               <Button 
                 variant="outline" 
                 className="flex-1 sm:flex-none border-white/20 text-white hover:bg-white/10"
-                onClick={() => useTripStore.getState().rejectInvitation(activeTrip.id).then(() => navigate('/'))}
+                onClick={() => {
+                  useTripStore.getState().rejectInvitation(activeTrip.id).then(() => {
+                    toast.success('Invitation declined');
+                    navigate('/');
+                  });
+                }}
               >
                 <X className="w-4 h-4 mr-2" />
                 Decline
@@ -103,7 +108,11 @@ export const TripDashboardPage: React.FC = () => {
               <Button 
                 variant="primary" 
                 className="flex-1 sm:flex-none bg-accent-500 hover:bg-accent-600 text-white border-none shadow-md"
-                onClick={() => useTripStore.getState().joinTrip(activeTrip.id)}
+                onClick={() => {
+                  useTripStore.getState().joinTrip(activeTrip.id).then(() => {
+                    toast.success('Invitation accepted! Welcome to the crew.');
+                  });
+                }}
               >
                 <Check className="w-4 h-4 mr-2" />
                 Join Trip

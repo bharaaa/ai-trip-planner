@@ -119,7 +119,7 @@ export function TripCard({ trip, onClick, className }: TripCardProps) {
           </div>
           
           <div className="flex items-center shrink-0">
-            <MemberAvatars members={trip.members} size="sm" className="-space-x-2 shadow-sm" />
+            <MemberAvatars members={trip.members.filter(m => m.status !== 'invited')} size="sm" className="-space-x-2 shadow-sm" />
           </div>
         </div>
       </div>

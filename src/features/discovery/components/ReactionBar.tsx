@@ -19,7 +19,7 @@ export const ReactionBar: React.FC<ReactionBarProps> = ({
 }) => {
   return (
     <div className={cn("flex items-center gap-2", className)}>
-      <div className="flex bg-warm-50 rounded-full p-1 border border-warm-200">
+      <div className="flex bg-white/10 rounded-full p-1 border border-white/5">
         <button
           onClick={() => onReact('love')}
           title="Love"
@@ -27,8 +27,8 @@ export const ReactionBar: React.FC<ReactionBarProps> = ({
             "flex items-center justify-center rounded-full transition-all duration-200 hover:scale-105 active:scale-95",
             compact ? "w-8 h-8" : "w-10 h-10",
             currentReaction === 'love' 
-              ? "bg-rose-100 text-rose-600 shadow-sm" 
-              : "text-warm-500 hover:text-rose-500 hover:bg-rose-50"
+              ? "bg-rose-500/20 text-rose-400 shadow-[0_0_10px_rgba(244,63,94,0.3)]" 
+              : "text-warm-400 hover:text-rose-400 hover:bg-rose-500/10"
           )}
         >
           <span className={cn(compact ? "text-sm" : "text-base")}>❤️</span>
@@ -40,8 +40,8 @@ export const ReactionBar: React.FC<ReactionBarProps> = ({
             "flex items-center justify-center rounded-full transition-all duration-200 hover:scale-105 active:scale-95",
             compact ? "w-8 h-8" : "w-10 h-10",
             currentReaction === 'maybe' 
-              ? "bg-amber-100 text-amber-600 shadow-sm" 
-              : "text-warm-500 hover:text-amber-500 hover:bg-amber-50"
+              ? "bg-amber-500/20 text-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.3)]" 
+              : "text-warm-400 hover:text-amber-400 hover:bg-amber-500/10"
           )}
         >
           <span className={cn(compact ? "text-sm" : "text-base")}>👍</span>
@@ -53,8 +53,8 @@ export const ReactionBar: React.FC<ReactionBarProps> = ({
             "flex items-center justify-center rounded-full transition-all duration-200 hover:scale-105 active:scale-95",
             compact ? "w-8 h-8" : "w-10 h-10",
             currentReaction === 'nope' 
-              ? "bg-warm-200 text-warm-700 shadow-sm" 
-              : "text-warm-500 hover:text-warm-700 hover:bg-warm-200/50"
+              ? "bg-white/20 text-white shadow-sm" 
+              : "text-warm-400 hover:text-white hover:bg-white/10"
           )}
         >
           <span className={cn(compact ? "text-sm" : "text-base")}>👎</span>
@@ -65,7 +65,7 @@ export const ReactionBar: React.FC<ReactionBarProps> = ({
         <button 
           title="Save"
           className={cn(
-            "flex items-center justify-center rounded-full border border-warm-200 bg-white text-warm-500 hover:bg-warm-50 transition-colors",
+            "flex items-center justify-center rounded-full border border-white/10 bg-white/5 text-warm-400 hover:bg-white/10 hover:text-white transition-colors",
             compact ? "w-8 h-8" : "w-10 h-10"
           )}
         >
@@ -74,7 +74,7 @@ export const ReactionBar: React.FC<ReactionBarProps> = ({
         <button 
           title="Hide"
           className={cn(
-            "flex items-center justify-center rounded-full border border-warm-200 bg-white text-warm-500 hover:bg-warm-50 transition-colors",
+            "flex items-center justify-center rounded-full border border-white/10 bg-white/5 text-warm-400 hover:bg-white/10 hover:text-white transition-colors",
             compact ? "w-8 h-8" : "w-10 h-10"
           )}
         >

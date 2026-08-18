@@ -28,8 +28,8 @@ export const GroupPreferenceSummary: React.FC<GroupPreferenceSummaryProps> = ({
   const sortedPreferences = [...preferences].sort((a, b) => b.score - a.score);
 
   return (
-    <div className={cn("bg-white border border-warm-200 rounded-2xl p-6 shadow-sm", className)}>
-      <h3 className="text-lg font-semibold text-warm-900 mb-6">
+    <div className={cn("bg-white/5 border border-white/10 rounded-2xl p-6 shadow-sm", className)}>
+      <h3 className="text-lg font-bold text-white tracking-tight mb-6">
         Your group seems to like
       </h3>
       <div className="space-y-4">
@@ -37,15 +37,15 @@ export const GroupPreferenceSummary: React.FC<GroupPreferenceSummaryProps> = ({
           <div key={pref.category} className="flex items-center gap-4">
             <div className="flex items-center gap-2 w-32 shrink-0">
               <span className="text-xl">{pref.emoji}</span>
-              <span className="text-sm font-medium text-warm-700">{pref.label}</span>
+              <span className="text-sm font-medium text-warm-300">{pref.label}</span>
             </div>
-            <div className="flex-grow h-2 bg-warm-100 rounded-full overflow-hidden">
+            <div className="flex-grow h-2 bg-white/10 rounded-full overflow-hidden">
               <div
-                className="h-full bg-accent-400 rounded-full transition-all duration-1000 ease-out"
+                className="h-full bg-accent-500 rounded-full transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(var(--accent-500),0.5)]"
                 style={{ width: mounted ? `${pref.score}%` : '0%' }}
               />
             </div>
-            <div className="w-8 text-right text-sm font-semibold text-warm-500 shrink-0">
+            <div className="w-8 text-right text-sm font-bold text-white shrink-0">
               {pref.score}
             </div>
           </div>

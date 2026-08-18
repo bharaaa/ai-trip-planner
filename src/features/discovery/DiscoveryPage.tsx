@@ -238,7 +238,7 @@ export const DiscoveryPage = () => {
                   className="flex items-center gap-2 text-accent-400 hover:text-accent-300 font-bold transition-colors pt-4"
                 >
                   <Settings2 className="w-4 h-4" />
-                  <span>Edit Parameters</span>
+                  <span>Edit Trip Details</span>
                 </button>
               )}
 
@@ -247,7 +247,7 @@ export const DiscoveryPage = () => {
                 className="flex items-center gap-2 text-warm-400 hover:text-white font-medium transition-colors pt-2"
               >
                 <SlidersHorizontal className="w-4 h-4" />
-                <span>Re-adjust Preferences</span>
+                <span>Update Preferences</span>
               </button>
             </div>
 

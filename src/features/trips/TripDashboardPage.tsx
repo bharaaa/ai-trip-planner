@@ -305,7 +305,7 @@ export const TripDashboardPage: React.FC = () => {
                 <button onClick={() => setIsEditDateOpen(true)} className="w-full flex items-center justify-between p-4 rounded-xl hover:bg-white/5 text-white transition-colors group">
                   <div className="flex items-center gap-3 font-medium">
                     <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-warm-300 group-hover:bg-white/20 transition-colors"><Calendar className="w-4 h-4" /></div>
-                    Edit Details
+                    Edit Travel Dates
                   </div>
                   <ArrowRight className="w-4 h-4 text-warm-500 opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
                 </button>

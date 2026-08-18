@@ -11,7 +11,8 @@ import { GroupConsensus } from '@/features/discovery/components/GroupConsensus';
 import { RefinementSummary } from '@/features/discovery/components/RefinementSummary';
 import { DestinationSelection } from '@/features/discovery/components/DestinationSelection';
 import { ReactionBar } from '@/features/discovery/components/ReactionBar';
-import { Dialog } from '@/components/ui/Dialog';
+import { createPortal } from 'react-dom';
+import { AnimatePresence, motion } from 'motion/react';
 import { EditTripDialog } from '@/features/trips/components/EditTripDialog';
 import { Button } from '@/components/ui/Button';
 import { aiService } from '@/services/ai';
@@ -92,6 +93,23 @@ export const DiscoveryPage = () => {
       fetchIdeas();
     }
   }, [activeTrip?.id, activeTrip?.tripIdeas.length, isLoading, setTripIdeas]);
+
+  useEffect(() => {
+    if (!!selectedIdeaId) {
+      const scrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+      return () => {
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.left = '';
+        document.body.style.right = '';
+        window.scrollTo(0, scrollY);
+      };
+    }
+  }, [!!selectedIdeaId]);
 
   if (!activeTrip) {
     return (
@@ -338,155 +356,183 @@ export const DiscoveryPage = () => {
       </div>
       </div>
       
-      {/* Modal for Exploring Idea */}
-      <Dialog 
-        open={!!selectedIdeaId} 
-        onClose={() => setSelectedIdeaId(null)}
-        className="sm:max-w-xl md:max-w-2xl lg:max-w-4xl bg-warm-950 border border-white/10 text-white"
-      >
-        {selectedIdea && (
-          <div className="flex flex-col gap-6 text-white">
-            {/* Header Image & Core Info */}
-            <div className="relative -mt-2 -mx-5 sm:-mt-5 sm:-mx-5 mb-2">
-              {selectedIdea.imageUrl && (
-                <div className="w-full aspect-[4/3] sm:aspect-[16/9] overflow-hidden relative sm:rounded-t-2xl">
-                  <img 
-                    src={selectedIdea.imageUrl} 
-                    alt={selectedIdea.destination}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                    }}
-                  />
-                  {/* Overlay gradient */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-warm-950 via-warm-950/40 to-transparent" />
-                  
-                  {/* Floating Top Right Area */}
-                  <div className="absolute top-4 right-4 flex gap-2">
-                    {selectedIdea.fitScore !== undefined && (
-                      <div className="bg-black/40 backdrop-blur-md border border-white/20 text-white px-3 py-1.5 rounded-full text-sm font-semibold flex items-center gap-1.5 shadow-lg">
-                        ✨ {selectedIdea.fitScore}% Match
+      {/* Slide-over Panel for Exploring Idea */}
+      {createPortal(
+        <AnimatePresence>
+          {!!selectedIdeaId && selectedIdea && (
+            <>
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                onClick={() => setSelectedIdeaId(null)}
+                className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-md"
+              />
+
+              {/* Panel */}
+              <motion.div
+                initial={{ x: '100%' }}
+                animate={{ x: 0 }}
+                exit={{ x: '100%' }}
+                transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+                className="fixed top-0 right-0 bottom-0 z-[100] w-full md:w-[600px] lg:w-[720px] bg-warm-950 border-l border-white/5 flex flex-col shadow-2xl overflow-y-auto overflow-x-hidden"
+              >
+                <div className="flex flex-col text-white pb-12">
+                  {/* Header Image & Core Info */}
+                  <div className="relative w-full h-[400px] sm:h-[500px] shrink-0">
+                    <button
+                      onClick={() => setSelectedIdeaId(null)}
+                      className="absolute top-6 left-6 z-10 w-10 h-10 rounded-full bg-black/40 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-white/30 transition-all"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                    </button>
+                    
+                    {selectedIdea.imageUrl ? (
+                      <img 
+                        src={selectedIdea.imageUrl} 
+                        alt={selectedIdea.destination}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-warm-900" />
+                    )}
+                    
+                    {/* Overlay gradient */}
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-warm-950" />
+                    
+                    {/* Floating Top Right Area */}
+                    <div className="absolute top-6 right-6 flex gap-2 z-10">
+                      {selectedIdea.fitScore !== undefined && (
+                        <div className="bg-black/40 backdrop-blur-md border border-white/20 text-white px-3 py-1.5 rounded-full text-sm font-bold flex items-center gap-1.5 shadow-lg">
+                          ✨ {selectedIdea.fitScore}% Match
+                        </div>
+                      )}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleIdeaSaved(activeTrip.id, selectedIdea.id, !selectedIdea.isSaved);
+                        }}
+                        className="p-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/20 text-white hover:bg-white/30 transition-all shadow-lg"
+                        aria-label={selectedIdea.isSaved ? "Unsave idea" : "Save idea"}
+                      >
+                        <Bookmark 
+                          size={18} 
+                          className={selectedIdea.isSaved ? "fill-white" : ""} 
+                          strokeWidth={selectedIdea.isSaved ? 2 : 1.5}
+                        />
+                      </button>
+                    </div>
+
+                    {/* Destination Name floating on image */}
+                    <div className="absolute bottom-0 left-0 p-8 w-full">
+                      <h2 className="text-5xl sm:text-7xl font-black text-white tracking-tighter mb-2 drop-shadow-md leading-[0.9]">
+                        {selectedIdea.destination}
+                      </h2>
+                      {selectedIdea.country && (
+                        <p className="text-white/80 text-xl font-medium drop-shadow-sm flex items-center gap-2">
+                          <MapPin size={20} className="text-accent-400" />
+                          {selectedIdea.country}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="px-8 mt-8 space-y-12">
+                    {/* Quick Stats Grid */}
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="bg-white/5 rounded-3xl p-6 flex flex-col items-center justify-center text-center border border-white/10 shadow-sm transition-transform hover:-translate-y-1">
+                        <span className="text-3xl mb-2">💳</span>
+                        <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">Budget</span>
+                        <span className="text-lg font-bold text-white">{formatBudgetRange(selectedIdea.estimatedBudget.min, selectedIdea.estimatedBudget.max)}</span>
+                      </div>
+                      <div className="bg-white/5 rounded-3xl p-6 flex flex-col items-center justify-center text-center border border-white/10 shadow-sm transition-transform hover:-translate-y-1">
+                        <span className="text-3xl mb-2">⏰</span>
+                        <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">Duration</span>
+                        <span className="text-lg font-bold text-white">{selectedIdea.suggestedDuration} days</span>
+                      </div>
+                      <div className="bg-white/5 rounded-3xl p-6 flex flex-col items-center justify-center text-center border border-white/10 shadow-sm transition-transform hover:-translate-y-1">
+                        <span className="text-3xl mb-2">🎯</span>
+                        <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">Style</span>
+                        <span className="text-lg font-bold text-white line-clamp-1">{selectedIdea.travelStyle || 'Varied'}</span>
+                      </div>
+                    </div>
+
+                    {/* Summary */}
+                    <div>
+                      <h4 className="text-sm font-bold text-accent-400 uppercase tracking-widest mb-4">Why it fits your group</h4>
+                      <p className="text-white/80 text-lg leading-relaxed font-medium">
+                        {selectedIdea.summary || selectedIdea.reasons?.[0]}
+                      </p>
+                    </div>
+
+                    {/* Activities */}
+                    {selectedIdea.keyActivities && selectedIdea.keyActivities.length > 0 && (
+                      <div>
+                        <h4 className="text-sm font-bold text-accent-400 uppercase tracking-widest mb-4">Key Highlights</h4>
+                        <div className="flex flex-wrap gap-3">
+                          {selectedIdea.keyActivities.map((activity, idx) => (
+                            <span key={idx} className="px-5 py-2.5 bg-white/5 text-white rounded-full text-sm font-semibold border border-white/10 shadow-sm">
+                              {activity}
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     )}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleIdeaSaved(activeTrip.id, selectedIdea.id, !selectedIdea.isSaved);
-                      }}
-                      className="p-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/20 text-white hover:bg-white/30 transition-all shadow-lg"
-                      aria-label={selectedIdea.isSaved ? "Unsave idea" : "Save idea"}
-                    >
-                      <Bookmark 
-                        size={18} 
-                        className={selectedIdea.isSaved ? "fill-white" : ""} 
-                        strokeWidth={selectedIdea.isSaved ? 2 : 1.5}
-                      />
-                    </button>
-                  </div>
-
-                  {/* Destination Name floating on image */}
-                  <div className="absolute bottom-0 left-0 p-6 w-full">
-                    <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tighter mb-1.5 drop-shadow-md">
-                      {selectedIdea.destination}
-                    </h2>
-                    {selectedIdea.country && (
-                      <p className="text-white/80 text-lg font-medium drop-shadow-sm flex items-center gap-1.5">
-                        <MapPin size={18} className="text-accent-400" />
-                        {selectedIdea.country}
-                      </p>
-                    )}
+                    
+                    {/* Reaction & Action */}
+                    <div className="bg-white/5 rounded-[2.5rem] p-8 border border-white/10 shadow-inner">
+                      <h4 className="text-lg font-bold text-white mb-6 text-center tracking-tight">How do you feel about this idea?</h4>
+                      <div className="flex justify-center mb-10">
+                        <ReactionBar 
+                          ideaId={selectedIdea.id}
+                          currentReaction={userReactions[selectedIdea.id]}
+                          onReact={(r) => handleReact(selectedIdea.id, r)}
+                        />
+                      </div>
+                      
+                      {isAdmin ? (
+                        activeTrip.members.length > 1 ? (
+                          <div className="grid grid-cols-2 gap-4">
+                            <button 
+                              className="w-full py-4 bg-white/10 text-white border border-white/20 rounded-2xl font-bold text-lg shadow-sm hover:bg-white/20 transition-all hover:-translate-y-1 flex items-center justify-center gap-2"
+                              onClick={() => handleProposeDestination(selectedIdea)}
+                            >
+                              🗣️ Propose
+                            </button>
+                            <button 
+                              className="w-full py-4 bg-white text-black rounded-2xl font-bold text-lg shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                              onClick={() => handleSelectDestination(selectedIdea)}
+                            >
+                              Select Direct
+                            </button>
+                          </div>
+                        ) : (
+                          <button 
+                            className="w-full py-4 bg-white text-black rounded-full font-bold text-lg shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                            onClick={() => handleSelectDestination(selectedIdea)}
+                          >
+                            Select {selectedIdea.destination}
+                          </button>
+                        )
+                      ) : (
+                        <div className="w-full py-4 bg-white/5 text-white/40 rounded-2xl font-medium text-center border border-white/10">
+                          Only the organizer can select the destination
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-              )}
-            </div>
-
-            {/* Quick Stats Grid */}
-            <div className="grid grid-cols-3 gap-3 px-1">
-               <div className="bg-white/5 rounded-2xl p-4 flex flex-col items-center justify-center text-center border border-white/10 shadow-sm">
-                 <span className="text-2xl mb-1.5">💳</span>
-                 <span className="text-[10px] font-bold text-warm-500 uppercase tracking-wider mb-0.5">Budget</span>
-                 <span className="text-sm font-bold text-white">{formatBudgetRange(selectedIdea.estimatedBudget.min, selectedIdea.estimatedBudget.max)}</span>
-               </div>
-               <div className="bg-white/5 rounded-2xl p-4 flex flex-col items-center justify-center text-center border border-white/10 shadow-sm">
-                 <span className="text-2xl mb-1.5">⏰</span>
-                 <span className="text-[10px] font-bold text-warm-500 uppercase tracking-wider mb-0.5">Duration</span>
-                 <span className="text-sm font-bold text-white">{selectedIdea.suggestedDuration} days</span>
-               </div>
-               <div className="bg-white/5 rounded-2xl p-4 flex flex-col items-center justify-center text-center border border-white/10 shadow-sm">
-                 <span className="text-2xl mb-1.5">🎯</span>
-                 <span className="text-[10px] font-bold text-warm-500 uppercase tracking-wider mb-0.5">Style</span>
-                 <span className="text-sm font-bold text-white line-clamp-1">{selectedIdea.travelStyle || 'Varied'}</span>
-               </div>
-            </div>
-
-            {/* Summary */}
-            <div className="px-2 mt-2">
-              <h4 className="text-xl font-bold text-white mb-3 tracking-tight">Why it fits your group</h4>
-              <p className="text-warm-300 leading-relaxed text-[15px]">
-                {selectedIdea.summary || selectedIdea.reasons?.[0]}
-              </p>
-            </div>
-
-            {/* Activities */}
-            {selectedIdea.keyActivities && selectedIdea.keyActivities.length > 0 && (
-              <div className="px-2 mt-4">
-                <h4 className="text-xl font-bold text-white mb-4 tracking-tight">Key Highlights</h4>
-                <div className="flex flex-wrap gap-2.5">
-                  {selectedIdea.keyActivities.map((activity, idx) => (
-                    <span key={idx} className="px-4 py-2 bg-white/5 text-white rounded-xl text-sm font-medium border border-white/10 shadow-sm flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-accent-400"></span>
-                      {activity}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-            
-            {/* Reaction & Action */}
-            <div className="bg-white/5 rounded-[2rem] p-6 mt-6 border border-white/10 shadow-inner">
-              <h4 className="font-semibold text-white mb-5 text-center">How do you feel about this idea?</h4>
-              <div className="flex justify-center mb-8">
-                <ReactionBar 
-                  ideaId={selectedIdea.id}
-                  currentReaction={userReactions[selectedIdea.id]}
-                  onReact={(r) => handleReact(selectedIdea.id, r)}
-                />
-              </div>
-              
-              {isAdmin ? (
-                activeTrip.members.length > 1 ? (
-                  <div className="grid grid-cols-2 gap-3">
-                    <button 
-                      className="w-full py-3.5 bg-white/10 text-white border border-white/20 rounded-xl font-bold shadow-sm hover:bg-white/20 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2"
-                      onClick={() => handleProposeDestination(selectedIdea)}
-                    >
-                      🗣️ Propose to Group
-                    </button>
-                    <button 
-                      className="w-full py-3.5 bg-white text-warm-950 rounded-xl font-bold shadow-md hover:bg-warm-100 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2"
-                      onClick={() => handleSelectDestination(selectedIdea)}
-                    >
-                      Select Direct ➡️
-                    </button>
-                  </div>
-                ) : (
-                  <button 
-                    className="w-full py-4 bg-white text-warm-950 rounded-xl font-bold shadow-md hover:bg-warm-100 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2"
-                    onClick={() => handleSelectDestination(selectedIdea)}
-                  >
-                    Select {selectedIdea.destination}
-                    <span>➡️</span>
-                  </button>
-                )
-              ) : (
-                <div className="w-full py-4 bg-white/5 text-warm-500 rounded-xl font-medium text-center border border-white/10">
-                  Only the organizer can select the destination
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-      </Dialog>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
 
       <EditTripDialog 
         open={isEditDialogOpen} 

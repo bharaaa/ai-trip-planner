@@ -145,8 +145,8 @@ export const EditTripDateModal: React.FC<EditTripDateModalProps> = ({
               {/* Type Selectors */}
               <div className="grid grid-cols-3 gap-3">
                 {[
-                  { type: 'exact' as const, label: 'Locked In', icon: CalendarRange },
-                  { type: 'month' as const, label: 'Sometime in', icon: Calendar },
+                  { type: 'exact' as const, label: 'Exact Dates', icon: CalendarRange },
+                  { type: 'month' as const, label: 'Sometime In...', icon: Calendar },
                   { type: 'flexible' as const, label: 'Flexible', icon: Shuffle }
                 ].map(opt => {
                   const Icon = opt.icon;

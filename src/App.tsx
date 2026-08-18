@@ -11,6 +11,7 @@ import { DecisionsPage } from './features/decisions/DecisionsPage'
 import { TripDashboardPage } from './features/trips/TripDashboardPage'
 import { LoginPage } from './features/auth/LoginPage'
 import { RegisterPage } from './features/auth/RegisterPage'
+import { AuthLayout } from './features/auth/AuthLayout'
 import { useAuthStore } from './stores/authStore'
 
 const queryClient = new QueryClient({
@@ -78,8 +79,10 @@ export function App() {
       />
       <BrowserRouter>
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
+          <Route element={<AuthLayout />}>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+          </Route>
           <Route element={
             <ProtectedRoute>
               <AppLayout />

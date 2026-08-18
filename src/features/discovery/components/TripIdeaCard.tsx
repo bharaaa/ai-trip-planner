@@ -35,7 +35,7 @@ export const TripIdeaCard: React.FC<TripIdeaCardProps> = ({
     <motion.div 
       layoutId={`destination-${idea.id}`}
       className={cn(
-        "group cursor-pointer animate-slide-up relative rounded-3xl overflow-hidden bg-warm-900",
+        "group cursor-pointer relative rounded-3xl overflow-hidden bg-warm-900",
         featured ? "h-[500px]" : "h-[400px]",
         className
       )}

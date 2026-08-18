@@ -5,8 +5,8 @@ import { staggerContainerVariants } from '@/lib/motion';
 export const StaggerContainer: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className }) => {
   return (
     <motion.div
-      initial="initial"
-      animate="animate"
+      initial="hidden"
+      animate="show"
       variants={staggerContainerVariants}
       className={className}
     >

@@ -30,8 +30,8 @@ export const fadeVariants = {
 };
 
 export const staggerContainerVariants = {
-  initial: { opacity: 0 },
-  animate: {
+  hidden: { opacity: 0 },
+  show: {
     opacity: 1,
     transition: {
       staggerChildren: 0.08,
@@ -40,8 +40,8 @@ export const staggerContainerVariants = {
 };
 
 export const staggerItemVariants = {
-  initial: { opacity: 0, y: 16, scale: 0.98 },
-  animate: { 
+  hidden: { opacity: 0, y: 16, scale: 0.98 },
+  show: { 
     opacity: 1, 
     y: 0, 
     scale: 1,

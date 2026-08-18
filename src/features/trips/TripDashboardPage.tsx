@@ -323,6 +323,7 @@ export const TripDashboardPage: React.FC = () => {
         </div>
         
         <InviteMemberModal
+          open={isInviteModalOpen}
           onClose={() => setIsInviteModalOpen(false)}
           tripId={activeTrip.id}
           existingMembers={activeTrip.members}

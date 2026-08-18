@@ -28,24 +28,24 @@ export const GroupPreferenceSummary: React.FC<GroupPreferenceSummaryProps> = ({
   const sortedPreferences = [...preferences].sort((a, b) => b.score - a.score);
 
   return (
-    <div className={cn("bg-white/5 border border-white/10 rounded-2xl p-6 shadow-sm", className)}>
-      <h3 className="text-lg font-bold text-white tracking-tight mb-6">
-        Your group seems to like
+    <div className={cn("space-y-6", className)}>
+      <h3 className="text-[10px] font-bold tracking-widest text-warm-500 uppercase">
+        The Group Vibe
       </h3>
-      <div className="space-y-4">
+      <div className="space-y-5">
         {sortedPreferences.map((pref) => (
           <div key={pref.category} className="flex items-center gap-4">
-            <div className="flex items-center gap-2 w-32 shrink-0">
-              <span className="text-xl">{pref.emoji}</span>
-              <span className="text-sm font-medium text-warm-300">{pref.label}</span>
+            <div className="flex items-center gap-3 w-28 shrink-0">
+              <span className="text-lg opacity-80">{pref.emoji}</span>
+              <span className="text-xs font-bold tracking-wide text-white">{pref.label}</span>
             </div>
-            <div className="flex-grow h-2 bg-white/10 rounded-full overflow-hidden">
+            <div className="flex-grow h-1 bg-white/10 rounded-full overflow-hidden">
               <div
-                className="h-full bg-accent-500 rounded-full transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(var(--accent-500),0.5)]"
+                className="h-full bg-accent-400 rounded-full transition-all duration-1000 ease-out shadow-[0_0_12px_rgba(var(--accent-400),0.8)]"
                 style={{ width: mounted ? `${pref.score}%` : '0%' }}
               />
             </div>
-            <div className="w-8 text-right text-sm font-bold text-white shrink-0">
+            <div className="w-8 text-right text-[10px] font-bold text-warm-500 shrink-0">
               {pref.score}
             </div>
           </div>

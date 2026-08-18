@@ -193,62 +193,71 @@ export const DiscoveryPage = () => {
 
   return (
     <PageTransition className="min-h-screen bg-warm-950 pb-32">
-      <div className="max-w-6xl mx-auto px-6 pt-12 space-y-10">
+      <div className="max-w-7xl mx-auto px-6 pt-32 md:pt-40">
         
-        {/* Context Bar */}
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl px-5 py-4 flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm font-medium text-warm-300 shadow-sm">
-          <div className="flex items-center gap-2">
-            <Users className="w-4 h-4" />
-            <span className="text-white">{activeTrip.travelers} traveler{activeTrip.travelers !== 1 && 's'}</span>
-          </div>
-          <div className="hidden sm:block text-white/20">•</div>
-          <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4" />
-            <span className="text-white">{travelDateLabel}</span>
-          </div>
-          <div className="hidden sm:block text-white/20">•</div>
-          <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4" />
-            <span className="text-white">{activeTrip.duration} days</span>
-          </div>
-          <div className="hidden sm:block text-white/20">•</div>
-          <div className="flex items-center gap-2">
-            <Wallet className="w-4 h-4" />
-            <span className="text-white">{formatCurrency(activeTrip.budgetPerPerson || 0)}/person</span>
-          </div>
-          <div className="hidden sm:block text-white/20">•</div>
-          <div className="flex items-center gap-2">
-            <MapPin className="w-4 h-4" />
-            <span className="text-white">{activeTrip.origin}</span>
-          </div>
-          {isAdmin && (
-            <>
-              <div className="hidden sm:block text-white/20">•</div>
-              <button 
-                onClick={() => setIsEditDialogOpen(true)}
-                className="flex items-center gap-1.5 text-accent-400 hover:text-accent-300 font-bold transition-colors"
-              >
-                <Settings2 className="w-4 h-4" />
-                <span>Edit</span>
-              </button>
-            </>
-          )}
-        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-start">
+          
+          {/* LEFT SIDEBAR: Typography & Vibe */}
+          <div className="lg:col-span-4 mb-12 lg:mb-0">
+            <div className="lg:sticky lg:top-32 space-y-12">
+              <div>
+                <h1 className="text-5xl md:text-7xl font-black text-white tracking-tighter mb-6 leading-[0.9]">
+                Discover
+              </h1>
+              <p className="text-warm-300 text-lg leading-relaxed">
+                Explore destinations tailored to your group's unique vibe and constraints.
+              </p>
+            </div>
+            
+            {/* Elegant Context List */}
+            <div className="space-y-4 text-warm-300">
+              <div className="flex items-center gap-4">
+                <Users className="w-5 h-5 text-warm-500 opacity-80" />
+                <span className="text-white font-medium tracking-wide">{activeTrip.travelers} traveler{activeTrip.travelers !== 1 && 's'}</span>
+              </div>
+              <div className="flex items-center gap-4">
+                <Calendar className="w-5 h-5 text-warm-500 opacity-80" />
+                <span className="text-white font-medium tracking-wide">{travelDateLabel}</span>
+              </div>
+              <div className="flex items-center gap-4">
+                <Clock className="w-5 h-5 text-warm-500 opacity-80" />
+                <span className="text-white font-medium tracking-wide">{activeTrip.duration} days</span>
+              </div>
+              <div className="flex items-center gap-4">
+                <Wallet className="w-5 h-5 text-warm-500 opacity-80" />
+                <span className="text-white font-medium tracking-wide">{formatCurrency(activeTrip.budgetPerPerson || 0)}/person</span>
+              </div>
+              <div className="flex items-center gap-4">
+                <MapPin className="w-5 h-5 text-warm-500 opacity-80" />
+                <span className="text-white font-medium tracking-wide">From {activeTrip.origin}</span>
+              </div>
+              
+              {isAdmin && (
+                <button 
+                  onClick={() => setIsEditDialogOpen(true)}
+                  className="flex items-center gap-2 text-accent-400 hover:text-accent-300 font-bold transition-colors pt-4"
+                >
+                  <Settings2 className="w-4 h-4" />
+                  <span>Edit Parameters</span>
+                </button>
+              )}
+            </div>
 
-        <GroupPreferenceSummary preferences={aggregatePreferences} />
-        
-        <hr className="border-white/10" />
-
-        <div>
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold text-white tracking-tight">Where to?</h2>
-            {!isLoading && !isRefining && (
-              <Button variant="secondary" size="sm" className="bg-white/10 hover:bg-white/20 border-0 text-white" onClick={handleRefresh}>
-                <RefreshCw className="w-4 h-4 mr-2" />
-                Refresh Suggestions
-              </Button>
-            )}
+            <GroupPreferenceSummary preferences={aggregatePreferences} />
+            </div>
           </div>
+
+          {/* RIGHT COLUMN: The Feed */}
+          <div className="lg:col-span-8">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-sm font-bold tracking-[0.2em] text-warm-500 uppercase">Top Matches</h2>
+              {!isLoading && !isRefining && (
+                <Button variant="secondary" size="sm" className="bg-white/5 hover:bg-white/10 border-0 text-white rounded-full px-4" onClick={handleRefresh}>
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Refresh
+                </Button>
+              )}
+            </div>
           
           {isLoading ? (
             <div className="py-20 text-center space-y-6">
@@ -319,7 +328,8 @@ export const DiscoveryPage = () => {
           )}
         </div>
       </div>
-
+      </div>
+      
       {/* Modal for Exploring Idea */}
       <Dialog 
         open={!!selectedIdeaId} 

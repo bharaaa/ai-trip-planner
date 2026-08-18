@@ -336,34 +336,54 @@ export const TripDashboardPage: React.FC = () => {
           onUpdate={(data) => useTripStore.getState().updateTripDates(activeTrip.id, data)}
         />
         {/* Modals for removing/leaving */}
-        <Dialog open={!!memberToRemove} onClose={() => setMemberToRemove(null)}>
-          <div className="flex flex-col items-center text-center p-2">
-            <div className="w-16 h-16 bg-error-50 rounded-full flex items-center justify-center mb-5">
-              <UserMinus className="w-8 h-8 text-error-600" />
+        <Dialog open={!!memberToRemove} onClose={() => setMemberToRemove(null)} theme="dark" className="max-w-sm">
+          <div className="flex flex-col items-center text-center p-4">
+            <div className="w-20 h-20 bg-error-500/10 rounded-full flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(239,68,68,0.15)]">
+              <UserMinus className="w-8 h-8 text-error-400" />
             </div>
-            <h3 className="text-2xl font-bold text-warm-900 mb-3 tracking-tight">Remove Member</h3>
-            <p className="text-warm-600 text-base mb-8 px-4">
-              Remove <strong className="text-warm-900">{memberToRemove?.name}</strong> from this trip?
+            <h3 className="text-3xl font-black text-white mb-2 tracking-tight">Remove Crew.</h3>
+            <p className="text-white/40 text-sm font-medium mb-10 px-2">
+              Are you sure you want to remove <strong className="text-white font-bold">{memberToRemove?.name}</strong> from this trip?
             </p>
-            <div className="flex gap-3 w-full">
-              <Button variant="secondary" className="flex-1" size="lg" onClick={() => setMemberToRemove(null)}>Cancel</Button>
-              <Button variant="primary" className="flex-1 bg-error-600 hover:bg-error-700 text-white border-error-600" size="lg" onClick={confirmRemoveMember}>Remove</Button>
+            <div className="flex flex-col gap-3 w-full">
+              <button 
+                className="w-full bg-error-500 hover:bg-error-400 text-white font-bold text-lg px-5 py-4 rounded-full transition-all shadow-[0_0_20px_rgba(239,68,68,0.3)] hover:scale-[1.02] active:scale-[0.98]" 
+                onClick={confirmRemoveMember}
+              >
+                Remove {memberToRemove?.name?.split(' ')[0]}
+              </button>
+              <button 
+                className="w-full bg-white/5 hover:bg-white/10 text-white font-bold text-lg px-5 py-4 rounded-full transition-all" 
+                onClick={() => setMemberToRemove(null)}
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </Dialog>
 
-        <Dialog open={showLeaveConfirm} onClose={() => setShowLeaveConfirm(false)}>
-          <div className="flex flex-col items-center text-center p-2">
-            <div className="w-16 h-16 bg-error-50 rounded-full flex items-center justify-center mb-5">
-              <LogOut className="w-8 h-8 text-error-600 ml-1" />
+        <Dialog open={showLeaveConfirm} onClose={() => setShowLeaveConfirm(false)} theme="dark" className="max-w-sm">
+          <div className="flex flex-col items-center text-center p-4">
+            <div className="w-20 h-20 bg-error-500/10 rounded-full flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(239,68,68,0.15)]">
+              <LogOut className="w-8 h-8 text-error-400 ml-1" />
             </div>
-            <h3 className="text-2xl font-bold text-warm-900 mb-3 tracking-tight">Leave Trip</h3>
-            <p className="text-warm-600 text-base mb-8 px-4">
-              Are you sure you want to leave this trip?
+            <h3 className="text-3xl font-black text-white mb-2 tracking-tight">Leave Trip.</h3>
+            <p className="text-white/40 text-sm font-medium mb-10 px-2">
+              Are you sure you want to leave? You'll need a new invite to rejoin.
             </p>
-            <div className="flex gap-3 w-full">
-              <Button variant="secondary" className="flex-1" size="lg" onClick={() => setShowLeaveConfirm(false)}>Cancel</Button>
-              <Button variant="primary" className="flex-1 bg-error-600 hover:bg-error-700 text-white border-error-600" size="lg" onClick={confirmLeaveTrip}>Leave</Button>
+            <div className="flex flex-col gap-3 w-full">
+              <button 
+                className="w-full bg-error-500 hover:bg-error-400 text-white font-bold text-lg px-5 py-4 rounded-full transition-all shadow-[0_0_20px_rgba(239,68,68,0.3)] hover:scale-[1.02] active:scale-[0.98]" 
+                onClick={confirmLeaveTrip}
+              >
+                Leave Trip
+              </button>
+              <button 
+                className="w-full bg-white/5 hover:bg-white/10 text-white font-bold text-lg px-5 py-4 rounded-full transition-all" 
+                onClick={() => setShowLeaveConfirm(false)}
+              >
+                Stay
+              </button>
             </div>
           </div>
         </Dialog>

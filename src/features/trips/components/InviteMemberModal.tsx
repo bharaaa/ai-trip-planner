@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useTripStore } from '@/stores/tripStore';
 import { useAuthStore } from '@/stores/authStore';
 import { AnimatePresence, motion } from 'motion/react';
@@ -32,15 +33,22 @@ export function InviteMemberModal({ open, onClose, tripId, existingMembers }: In
     }
   }, [open]);
 
-  // Lock body scroll when open
   useEffect(() => {
     if (open) {
-      document.body.style.overflow = 'hidden';
+      const scrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.left = '0';
+      document.body.style.right = '0';
       setTimeout(() => inputRef.current?.focus(), 400);
-    } else {
-      document.body.style.overflow = '';
+      return () => {
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.left = '';
+        document.body.style.right = '';
+        window.scrollTo(0, scrollY);
+      };
     }
-    return () => { document.body.style.overflow = ''; };
   }, [open]);
 
   useEffect(() => {
@@ -92,7 +100,7 @@ export function InviteMemberModal({ open, onClose, tripId, existingMembers }: In
   // Count already-invited members
   const pendingInvites = existingMembers.filter(m => m.status === 'invited');
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {open && (
         <>
@@ -103,7 +111,7 @@ export function InviteMemberModal({ open, onClose, tripId, existingMembers }: In
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
             onClick={onClose}
-            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm"
+            className="fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm"
           />
 
           {/* Slide-over Panel */}
@@ -112,7 +120,7 @@ export function InviteMemberModal({ open, onClose, tripId, existingMembers }: In
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="fixed top-0 right-0 bottom-0 z-50 w-full sm:w-[440px] bg-warm-950 border-l border-white/5 flex flex-col shadow-2xl"
+            className="fixed top-0 right-0 bottom-0 z-[60] w-full sm:w-[440px] bg-warm-950 border-l border-white/5 flex flex-col shadow-2xl"
           >
             {/* Panel Header */}
             <div className="p-6 pb-0">
@@ -248,6 +256,7 @@ export function InviteMemberModal({ open, onClose, tripId, existingMembers }: In
           </motion.div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

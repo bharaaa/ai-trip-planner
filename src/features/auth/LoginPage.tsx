@@ -10,6 +10,7 @@ import { authService } from '@/services/auth/authService';
 export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const navigate = useNavigate();
@@ -100,14 +101,53 @@ export const LoginPage: React.FC = () => {
         </div>
 
         <div className="flex items-center justify-between pt-2">
-          <div className="flex items-center">
+          <div 
+            className="flex items-center cursor-pointer group"
+            onClick={() => setRememberMe(!rememberMe)}
+          >
+            <div 
+              className={`
+                w-5 h-5 rounded-md border flex items-center justify-center transition-colors duration-200
+                ${rememberMe 
+                  ? 'bg-accent-500 border-accent-500' 
+                  : 'bg-white/5 border-white/20 group-hover:border-white/40'
+                }
+              `}
+            >
+              <AnimatePresence>
+                {rememberMe && (
+                  <motion.svg 
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0, opacity: 0 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                    className="w-3.5 h-3.5 text-warm-950" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor" 
+                    strokeWidth={3}
+                  >
+                    <motion.path 
+                      initial={{ pathLength: 0 }}
+                      animate={{ pathLength: 1 }}
+                      transition={{ duration: 0.2, delay: 0.1, ease: "easeOut" }}
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      d="M5 13l4 4L19 7" 
+                    />
+                  </motion.svg>
+                )}
+              </AnimatePresence>
+            </div>
             <input
               id="remember-me"
               name="remember-me"
               type="checkbox"
-              className="h-4 w-4 rounded border-white/20 bg-white/5 text-accent-500 focus:ring-accent-500"
+              className="sr-only"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
             />
-            <label htmlFor="remember-me" className="ml-2 block text-sm font-medium text-warm-300">
+            <label htmlFor="remember-me" className="ml-2.5 block text-sm font-medium text-warm-300 cursor-pointer group-hover:text-warm-100 transition-colors">
               Keep me logged in
             </label>
           </div>

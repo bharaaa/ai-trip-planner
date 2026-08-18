@@ -355,3 +355,12 @@ dialog::backdrop {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Hide global scrollbars but keep functionality (for a premium app feel) */
+::-webkit-scrollbar {
+  display: none;
+}
+* {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

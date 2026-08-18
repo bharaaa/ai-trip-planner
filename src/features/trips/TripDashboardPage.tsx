@@ -60,7 +60,7 @@ export const TripDashboardPage: React.FC = () => {
 
   if (!activeTrip) {
     return (
-      <div className="min-h-screen bg-warm-50 flex items-center justify-center">
+      <div className="min-h-screen bg-warm-950 flex items-center justify-center text-white">
         <div className="flex flex-col items-center gap-4">
           <div className="dot-pulse flex gap-1"><span></span><span></span><span></span></div>
           <p className="text-warm-500 text-sm font-medium tracking-wide uppercase">Loading trip</p>

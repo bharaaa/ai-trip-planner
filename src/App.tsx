@@ -26,7 +26,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuthStore()
   
   if (isLoading) {
-    return <div className="min-h-screen bg-warm-50 flex items-center justify-center">Loading...</div>
+    return <div className="min-h-screen bg-warm-950 flex items-center justify-center text-white">Loading...</div>
   }
   
   if (!user) {

@@ -11,6 +11,7 @@ import { useAuthStore } from './authStore';
 interface TripStoreState {
   trips: Trip[];
   activeTrip: Trip | null;
+  activeTripId: string | null;
   isGeneratingIdeas: boolean;
   isGeneratingItinerary: boolean;
   isLoadingTrips: boolean;
@@ -54,7 +55,7 @@ const updateTrip = (trips: Trip[], tripId: string, updater: (trip: Trip) => Trip
 };
 
 // Helper to keep activeTrip in sync
-const syncActiveTrip = (trips: Trip[], activeTripId?: string): Trip | null => {
+const syncActiveTrip = (trips: Trip[], activeTripId?: string | null): Trip | null => {
   if (!activeTripId) return null;
   return trips.find(t => t.id === activeTripId) || null;
 };
@@ -73,7 +74,7 @@ const logAndSyncActivity = (tripId: string, actionType: TripActivityType, detail
             activities: [activity, ...(trip.activities || [])]
           };
         });
-        return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
+        return { trips, activeTrip: syncActiveTrip(trips, state.activeTripId) };
       });
     }
   }).catch(console.error);
@@ -82,6 +83,7 @@ const logAndSyncActivity = (tripId: string, actionType: TripActivityType, detail
 export const useTripStore = create<TripStoreState>((set, get) => ({
   trips: [],
   activeTrip: null,
+  activeTripId: null,
   isGeneratingIdeas: false,
   isGeneratingItinerary: false,
   isLoadingTrips: true,
@@ -112,7 +114,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
         return { 
           trips: mergedTrips, 
           isLoadingTrips: false,
-          activeTrip: syncActiveTrip(mergedTrips, state.activeTrip?.id)
+          activeTrip: syncActiveTrip(mergedTrips, state.activeTripId)
         };
       });
     } catch (err) {
@@ -122,7 +124,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
   },
 
   clearTrips: () => {
-    set({ trips: [], activeTrip: null });
+    set({ trips: [], activeTrip: null, activeTripId: null });
   },
 
   searchUsers: async (query: string) => {
@@ -152,7 +154,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
   },
 
   setActiveTrip: async (tripId) => {
-    set(state => ({ activeTrip: state.trips.find(t => t.id === tripId) || null }));
+    set(state => ({ activeTripId: tripId, activeTrip: state.trips.find(t => t.id === tripId) || null }));
     if (tripId) {
       await get().fetchTripActivities(tripId);
     }
@@ -163,7 +165,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
       const activities = await activityService.getActivities(tripId);
       set(state => {
         const trips = updateTrip(state.trips, tripId, trip => ({ ...trip, activities }));
-        return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
+        return { trips, activeTrip: syncActiveTrip(trips, state.activeTripId) };
       });
     } catch (err) {
       console.error('Failed to fetch activities:', err);
@@ -194,7 +196,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
 
     logAndSyncActivity(tripId, 'MEMBER_INVITED', { name: member.name });
 
-    return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
+    return { trips, activeTrip: syncActiveTrip(trips, state.activeTripId) };
   }),
 
   removeMember: (tripId, memberId, memberName) => set((state) => {
@@ -224,7 +226,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
 
     logAndSyncActivity(tripId, 'member_removed', { name: memberName });
 
-    return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
+    return { trips, activeTrip: syncActiveTrip(trips, state.activeTripId) };
   }),
 
   cancelInvitation: (tripId, memberId, memberName) => set((state) => {
@@ -244,7 +246,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
 
     logAndSyncActivity(tripId, 'INVITATION_CANCELLED', { name: memberName });
 
-    return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
+    return { trips, activeTrip: syncActiveTrip(trips, state.activeTripId) };
   }),
 
   leaveTrip: async (tripId) => {
@@ -256,7 +258,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
     
     useTripStore.setState(state => {
       const trips = state.trips.filter(t => t.id !== tripId);
-      return { trips, activeTrip: state.activeTrip?.id === tripId ? null : state.activeTrip };
+      return { trips, activeTrip: state.activeTripId === tripId ? null : state.activeTrip };
     });
   },
 
@@ -280,7 +282,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
           activities: updatedActivities
         };
       });
-      return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
+      return { trips, activeTrip: syncActiveTrip(trips, state.activeTripId) };
     });
 
     const activeTripData = get().trips.find(t => t.id === tripId);
@@ -301,7 +303,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
 
     useTripStore.setState(state => {
       const trips = state.trips.filter(t => t.id !== tripId);
-      return { trips, activeTrip: state.activeTrip?.id === tripId ? null : state.activeTrip };
+      return { trips, activeTrip: state.activeTripId === tripId ? null : state.activeTrip };
     });
   },
 
@@ -328,7 +330,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
 
     logAndSyncActivity(tripId, 'PREFERENCES_SUBMITTED');
 
-    return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
+    return { trips, activeTrip: syncActiveTrip(trips, state.activeTripId) };
   }),
 
   setTripIdeas: (tripId, ideas) => set((state) => {
@@ -353,7 +355,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
       console.error('Failed to sync ideas:', err);
     });
 
-    return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
+    return { trips, activeTrip: syncActiveTrip(trips, state.activeTripId) };
   }),
 
   toggleIdeaSaved: (tripId, ideaId, isSaved) => set((state) => {
@@ -373,7 +375,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
       console.error('Failed to sync idea save state:', err);
     });
 
-    return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
+    return { trips, activeTrip: syncActiveTrip(trips, state.activeTripId) };
   }),
 
   addReaction: (tripId, reaction) => set((state) => {
@@ -392,7 +394,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
       console.error('Failed to sync reaction:', err);
     });
 
-    return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
+    return { trips, activeTrip: syncActiveTrip(trips, state.activeTripId) };
   }),
 
   selectDestination: (tripId, destination) => set((state) => {
@@ -409,7 +411,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
 
     logAndSyncActivity(tripId, 'DESTINATION_SELECTED', { destination: destination.name });
 
-    return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
+    return { trips, activeTrip: syncActiveTrip(trips, state.activeTripId) };
   }),
 
   setItinerary: (tripId, itinerary) => set((state) => {
@@ -424,7 +426,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
 
     logAndSyncActivity(tripId, 'ITINERARY_UPDATED', { type: 'generated' });
 
-    return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
+    return { trips, activeTrip: syncActiveTrip(trips, state.activeTripId) };
   }),
 
   updateItineraryItem: (tripId, dayIndex, itemIndex, item) => set((state) => {
@@ -436,7 +438,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
       newDays[dayIndex] = { ...newDays[dayIndex], items: newItems };
       return { ...trip, itinerary: { ...trip.itinerary, days: newDays } };
     });
-    return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
+    return { trips, activeTrip: syncActiveTrip(trips, state.activeTripId) };
   }),
 
   addItineraryItem: (tripId, dayIndex, item) => set((state) => {
@@ -454,7 +456,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
       );
     }
 
-    return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
+    return { trips, activeTrip: syncActiveTrip(trips, state.activeTripId) };
   }),
 
   removeItineraryItem: (tripId, dayIndex, itemIndex) => set((state) => {
@@ -466,7 +468,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
       newDays[dayIndex] = { ...newDays[dayIndex], items: newItems };
       return { ...trip, itinerary: { ...trip.itinerary, days: newDays } };
     });
-    return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
+    return { trips, activeTrip: syncActiveTrip(trips, state.activeTripId) };
   }),
 
   moveItineraryItem: (tripId, fromDay, fromIndex, toDay, toIndex) => set((state) => {
@@ -485,7 +487,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
       
       return { ...trip, itinerary: { ...trip.itinerary, days: newDays } };
     });
-    return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
+    return { trips, activeTrip: syncActiveTrip(trips, state.activeTripId) };
   }),
 
   addDecision: (tripId, decision) => set((state) => {
@@ -500,7 +502,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
 
     logAndSyncActivity(tripId, 'POLL_CREATED', { title: decision.title });
 
-    return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
+    return { trips, activeTrip: syncActiveTrip(trips, state.activeTripId) };
   }),
 
   updateDecisionStatus: (tripId, decisionId, status, decidedOptionId) => set((state) => {
@@ -533,7 +535,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
       }
     }
 
-    return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
+    return { trips, activeTrip: syncActiveTrip(trips, state.activeTripId) };
   }),
 
   addDecisionVote: (tripId, decisionId, optionId, userId, vote) => set((state) => {
@@ -569,7 +571,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
       );
     }
 
-    return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
+    return { trips, activeTrip: syncActiveTrip(trips, state.activeTripId) };
   }),
 
   removeDecisionVote: (tripId, decisionId, optionId, userId) => set((state) => {
@@ -594,7 +596,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
       console.error('Failed to sync remove vote:', err);
     });
 
-    return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
+    return { trips, activeTrip: syncActiveTrip(trips, state.activeTripId) };
   }),
 
   setPhase: (tripId, phase) => set((state) => {
@@ -607,7 +609,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
       console.error('Failed to update phase:', err);
     });
 
-    return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
+    return { trips, activeTrip: syncActiveTrip(trips, state.activeTripId) };
   }),
 
   updateTripDates: async (tripId, data) => {
@@ -646,7 +648,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
         );
       }
       
-      return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
+      return { trips, activeTrip: syncActiveTrip(trips, state.activeTripId) };
     });
   },
 
@@ -660,7 +662,7 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
         duration: data.duration,
         budgetPerPerson: data.budgetPerPerson
       }));
-      return { trips, activeTrip: syncActiveTrip(trips, state.activeTrip?.id) };
+      return { trips, activeTrip: syncActiveTrip(trips, state.activeTripId) };
     });
   },
 

@@ -77,7 +77,7 @@ export const PreferencesPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-warm-50/50 pb-32">
+    <div className="min-h-screen bg-warm-950 pb-32">
       <div className="max-w-2xl mx-auto px-6 pt-12">
         <header className="mb-10 text-center space-y-3">
           <h1 className="text-3xl font-semibold text-warm-900 tracking-tight mb-2">What sounds good?</h1>

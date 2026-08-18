@@ -60,7 +60,7 @@ function AnimatedRoutes() {
           <Route path="trips/:id" element={<TripDashboardPage />} />
           <Route path="trips/:id/preferences" element={<PreferencesPage />} />
           <Route path="trips/:id/discover" element={<DiscoveryPage />} />
-          <Route path="trips/:id/plan" element={<PlannerPage />} />
+          <Route path="trips/:id/itinerary" element={<PlannerPage />} />
           <Route path="trips/:id/decisions" element={<DecisionsPage />} />
         </Route>
       </Routes>

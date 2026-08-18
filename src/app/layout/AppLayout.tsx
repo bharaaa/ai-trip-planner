@@ -12,7 +12,7 @@ import { AnimatePresence, motion } from 'motion/react'
 const mobileNavItems = [
   { id: 'discover' as const, label: 'Discover', icon: '✨', path: 'discover' },
   { id: 'decide' as const, label: 'Decide', icon: '🤝', path: 'decisions' },
-  { id: 'plan' as const, label: 'Plan', icon: '📋', path: 'plan' },
+  { id: 'itinerary' as const, label: 'Itinerary', icon: '📋', path: 'itinerary' },
   { id: 'more' as const, label: 'More', icon: '⋯', path: '' },
 ]
 
@@ -113,8 +113,8 @@ export function AppLayout() {
                 <NavLink to={`/trips/${tripId}/decisions`} active={location.pathname.includes('/decisions')}>
                   Decide
                 </NavLink>
-                <NavLink to={`/trips/${tripId}/plan`} active={location.pathname.includes('/plan')}>
-                  Plan
+                <NavLink to={`/trips/${tripId}/itinerary`} active={location.pathname.includes('/itinerary')}>
+                  Itinerary
                 </NavLink>
               </nav>
             )}

@@ -64,7 +64,13 @@ export function AppLayout() {
   }, [tripId, setActiveTrip])
 
   return (
-    <div className="min-h-dvh bg-warm-950 flex flex-col font-sans">
+    <motion.div 
+      initial={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }}
+      animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+      exit={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }}
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      className="min-h-dvh bg-warm-950 flex flex-col font-sans"
+    >
       {/* Floating Pill Navigation */}
       <header className="fixed top-4 left-0 right-0 z-50 flex justify-center pointer-events-none px-4">
         <div className="pointer-events-auto bg-warm-950/90 backdrop-blur-2xl border border-white/10 shadow-2xl rounded-full flex items-center h-14 px-4 sm:px-6 w-full max-w-5xl justify-between text-white transition-all duration-300">
@@ -203,7 +209,7 @@ export function AppLayout() {
           </div>
         </nav>
       )}
-    </div>
+    </motion.div>
   )
 }
 

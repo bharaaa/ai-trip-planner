@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { AppLayout } from './app/layout/AppLayout'
@@ -13,6 +13,7 @@ import { LoginPage } from './features/auth/LoginPage'
 import { RegisterPage } from './features/auth/RegisterPage'
 import { AuthLayout } from './features/auth/AuthLayout'
 import { useAuthStore } from './stores/authStore'
+import { AnimatePresence, motion } from 'motion/react'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -38,6 +39,34 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 
 import { Toaster } from 'react-hot-toast'
+
+function AnimatedRoutes() {
+  const location = useLocation();
+  
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname === '/login' || location.pathname === '/register' ? 'auth' : 'app'}>
+        <Route element={<AuthLayout />}>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+        </Route>
+        <Route element={
+          <ProtectedRoute>
+            <AppLayout />
+          </ProtectedRoute>
+        }>
+          <Route index element={<HomePage />} />
+          <Route path="trips/new" element={<CreateTripPage />} />
+          <Route path="trips/:id" element={<TripDashboardPage />} />
+          <Route path="trips/:id/preferences" element={<PreferencesPage />} />
+          <Route path="trips/:id/discover" element={<DiscoveryPage />} />
+          <Route path="trips/:id/plan" element={<PlannerPage />} />
+          <Route path="trips/:id/decisions" element={<DecisionsPage />} />
+        </Route>
+      </Routes>
+    </AnimatePresence>
+  );
+}
 
 export function App() {
   const initializeAuth = useAuthStore((state) => state.initialize)
@@ -78,25 +107,7 @@ export function App() {
         }}
       />
       <BrowserRouter>
-        <Routes>
-          <Route element={<AuthLayout />}>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-          </Route>
-          <Route element={
-            <ProtectedRoute>
-              <AppLayout />
-            </ProtectedRoute>
-          }>
-            <Route index element={<HomePage />} />
-            <Route path="trips/new" element={<CreateTripPage />} />
-            <Route path="trips/:id" element={<TripDashboardPage />} />
-            <Route path="trips/:id/preferences" element={<PreferencesPage />} />
-            <Route path="trips/:id/discover" element={<DiscoveryPage />} />
-            <Route path="trips/:id/plan" element={<PlannerPage />} />
-            <Route path="trips/:id/decisions" element={<DecisionsPage />} />
-          </Route>
-        </Routes>
+        <AnimatedRoutes />
       </BrowserRouter>
     </QueryClientProvider>
   )

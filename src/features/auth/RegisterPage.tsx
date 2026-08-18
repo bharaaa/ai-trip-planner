@@ -63,7 +63,7 @@ export const RegisterPage: React.FC = () => {
 
   return (
     <div className="w-full flex flex-col items-center">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
+      <motion.div layoutId="auth-header" className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
         <div className="flex justify-center text-4xl mb-8">
           <span className="text-accent-400 drop-shadow-lg scale-150">◆</span>
         </div>
@@ -73,11 +73,11 @@ export const RegisterPage: React.FC = () => {
         <p className="mt-4 text-center text-warm-300 font-medium tracking-wide">
           Start planning your next adventure today
         </p>
-      </div>
+      </motion.div>
 
-      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-md relative z-10">
-        <div className="mx-4 sm:mx-0 py-8 px-4 sm:px-10 bg-warm-950/40 backdrop-blur-xl border border-white/10 rounded-[2.5rem] shadow-2xl">
-          <form className="space-y-6" onSubmit={handleRegister} noValidate>
+      <motion.div layoutId="auth-container" className="mt-10 sm:mx-auto sm:w-full sm:max-w-md relative z-10">
+        <motion.div layoutId="auth-card" className="mx-4 sm:mx-0 py-8 px-4 sm:px-10 bg-warm-950/40 backdrop-blur-xl border border-white/10 rounded-[2.5rem] shadow-2xl">
+          <motion.form layoutId="auth-form-content" className="space-y-6" onSubmit={handleRegister} noValidate>
             <AnimatePresence mode="wait">
               {errorMsg && (
                 <motion.div
@@ -166,18 +166,18 @@ export const RegisterPage: React.FC = () => {
                 Sign up
               </Button>
             </div>
-          </form>
+          </motion.form>
 
-          <div className="mt-8">
+          <motion.div layoutId="auth-footer" className="mt-8">
             <div className="text-center text-sm font-medium">
               <span className="text-warm-400">Already have an account? </span>
               <Link to="/login" className="font-bold text-white hover:text-accent-400 transition-colors">
                 Log in instead
               </Link>
             </div>
-          </div>
-        </div>
-      </div>
+          </motion.div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 };

@@ -16,7 +16,7 @@ import { EditTripDialog } from '@/features/trips/components/EditTripDialog';
 import { Button } from '@/components/ui/Button';
 import { aiService } from '@/services/ai';
 import { formatCurrency, formatBudgetRange } from '@/lib/utils/formatting';
-import { Users, Calendar, Clock, Wallet, MapPin, RefreshCw, Bookmark, Settings2 } from 'lucide-react';
+import { Users, Calendar, Clock, Wallet, MapPin, RefreshCw, Bookmark, Settings2, SlidersHorizontal } from 'lucide-react';
 import { format } from 'date-fns';
 import type { TripContext, ReactionType, TripIdea, TripReaction, Decision } from '@/types';
 
@@ -241,6 +241,14 @@ export const DiscoveryPage = () => {
                   <span>Edit Parameters</span>
                 </button>
               )}
+
+              <button 
+                onClick={() => navigate(`/trips/${activeTrip.id}/preferences`)}
+                className="flex items-center gap-2 text-warm-400 hover:text-white font-medium transition-colors pt-2"
+              >
+                <SlidersHorizontal className="w-4 h-4" />
+                <span>Re-adjust Preferences</span>
+              </button>
             </div>
 
             <GroupPreferenceSummary preferences={aggregatePreferences} />

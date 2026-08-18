@@ -57,7 +57,7 @@ export const LoginPage: React.FC = () => {
       </motion.div>
 
       <motion.div className="mt-10 sm:mx-auto sm:w-full sm:max-w-md relative z-10">
-        <motion.div className="mx-4 sm:mx-0 py-8 px-4 sm:px-10 bg-warm-950/40 backdrop-blur-xl border border-white/10 rounded-[2.5rem] shadow-2xl">
+        <motion.div className="mx-4 sm:mx-0 py-8 px-4 sm:px-10 bg-warm-950/60 backdrop-blur-lg border border-white/10 rounded-[2.5rem] shadow-2xl">
           <motion.form className="space-y-6" onSubmit={handleLogin} noValidate>
             <AnimatePresence mode="wait">
               {errorMsg && (

@@ -162,18 +162,9 @@ export function AppLayout() {
 
       {/* Main content */}
       <main className="flex-1 relative flex flex-col">
-        <AnimatePresence mode="wait">
-          <motion.div 
-            key={location.pathname} 
-            className="flex-1 flex flex-col"
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.2 }}
-          >
-            <Outlet />
-          </motion.div>
-        </AnimatePresence>
+        <div className="flex-1 flex flex-col">
+          <Outlet />
+        </div>
       </main>
 
       {/* Mobile bottom navigation - only on trip pages */}

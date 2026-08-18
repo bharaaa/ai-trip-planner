@@ -149,8 +149,8 @@ html {
 
 body {
   font-family: var(--font-sans);
-  background-color: var(--color-warm-50);
-  color: var(--color-warm-950);
+  background-color: var(--color-warm-950);
+  color: var(--color-warm-50);
   line-height: 1.65;
   letter-spacing: -0.011em;
 }

@@ -93,7 +93,16 @@ export const DiscoveryPage = () => {
     }
   }, [activeTrip?.id, activeTrip?.tripIdeas.length, isLoading, setTripIdeas]);
 
-  if (!activeTrip) return null;
+  if (!activeTrip) {
+    return (
+      <div className="min-h-screen bg-warm-950 flex items-center justify-center text-white">
+        <div className="flex flex-col items-center gap-4">
+          <div className="dot-pulse flex gap-1"><span></span><span></span><span></span></div>
+          <p className="text-warm-500 text-sm font-medium tracking-wide uppercase">Loading trip details...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleRefresh = async () => {
     if (!activeTrip) return;

@@ -25,11 +25,17 @@ export const RecommendationGrid: React.FC<RecommendationGridProps> = ({
   className,
 }) => {
   return (
-    <StaggerContainer className={cn("grid grid-cols-1 md:grid-cols-12 gap-8", className)}>
+    <StaggerContainer className={cn(
+      "flex overflow-x-auto pb-8 -mx-6 px-6 snap-x snap-mandatory md:grid md:grid-cols-12 md:gap-8 md:overflow-visible md:pb-0 md:px-0 md:mx-0 md:snap-none hide-scrollbar", 
+      className
+    )}>
       {ideas.map((idea, index) => (
         <StaggerItem 
           key={idea.id}
-          className={cn(index === 0 ? "col-span-12" : "col-span-12 md:col-span-6")}
+          className={cn(
+            "w-[85vw] shrink-0 snap-center mr-4 md:mr-0 md:w-auto md:shrink md:snap-align-none",
+            index === 0 ? "md:col-span-12" : "md:col-span-6"
+          )}
         >
           <TripIdeaCard
             idea={idea}

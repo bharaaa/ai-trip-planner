@@ -12,18 +12,18 @@
   /* ─── Typography ─── */
   --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
 
-  /* ─── Accent: Vivid Coral (Primary) ─── */
-  --color-accent-50: #fff5f2;
-  --color-accent-100: #ffe6de;
-  --color-accent-200: #ffd0c2;
-  --color-accent-300: #ffb19a;
-  --color-accent-400: #ff8666;
-  --color-accent-500: #ff6b4a;
-  --color-accent-600: #e65230;
-  --color-accent-700: #bf3f21;
-  --color-accent-800: #99351f;
-  --color-accent-900: #7d2f1f;
-  --color-accent-950: #42140a;
+  /* ─── Accent: Ocean / Sky (Primary) ─── */
+  --color-accent-50: #f0f9ff;
+  --color-accent-100: #e0f2fe;
+  --color-accent-200: #bae6fd;
+  --color-accent-300: #7dd3fc;
+  --color-accent-400: #38bdf8;
+  --color-accent-500: #0ea5e9;
+  --color-accent-600: #0284c7;
+  --color-accent-700: #0369a1;
+  --color-accent-800: #075985;
+  --color-accent-900: #0c4a6e;
+  --color-accent-950: #082f49;
 
   /* ─── Semantic Editorial Accents ─── */
   --color-yellow-50: #fffbeb;
@@ -31,34 +31,37 @@
   --color-yellow-400: #fbbf24;
   --color-yellow-500: #f59e0b;
   
-  --color-sky-50: #f0f9ff;
-  --color-sky-100: #e0f2fe;
-  --color-sky-400: #38bdf8;
-  --color-sky-500: #0ea5e9;
+  --color-energy-50: #fff5f2;
+  --color-energy-100: #ffe6de;
+  --color-energy-200: #ffd0c2;
+  --color-energy-300: #ffb19a;
+  --color-energy-400: #ff8666;
+  --color-energy-500: #ff6b4a;
+  --color-energy-600: #e65230;
 
   --color-lavender-50: #f5f3ff;
   --color-lavender-100: #ede9fe;
   --color-lavender-400: #a78bfa;
   --color-lavender-500: #8b5cf6;
 
-  /* ─── Warm Neutrals (Crisp Cream & Charcoal) ─── */
-  --color-warm-50: #fdfbf9;
-  --color-warm-100: #f7f4ee;
-  --color-warm-200: #ede7de;
-  --color-warm-300: #e0d8ca;
-  --color-warm-400: #c9bcab;
-  --color-warm-500: #aa9c88;
-  --color-warm-600: #8f816f;
-  --color-warm-700: #756858;
-  --color-warm-800: #5e5449;
-  --color-warm-900: #4a433a;
-  --color-warm-950: #292520;
+  /* ─── Warm Neutrals (Canvas & Charcoal) ─── */
+  --color-warm-50: #f4f2ee; /* Lighter warm canvas */
+  --color-warm-100: #eae5df;
+  --color-warm-200: #dbd3ca;
+  --color-warm-300: #c9bcab;
+  --color-warm-400: #b5a48e;
+  --color-warm-500: #9e8c75;
+  --color-warm-600: #85745e;
+  --color-warm-700: #6b5c4b;
+  --color-warm-800: #54483a;
+  --color-warm-900: #29241f; /* Deep Charcoal */
+  --color-warm-950: #14120f; /* Near Black */
 
-  /* ─── Status Colors ─── */
-  --color-success-50: #ecfdf5;
-  --color-success-100: #d1fae5;
-  --color-success-500: #10b981;
-  --color-success-600: #059669;
+  /* ─── Status Colors (Natural Green) ─── */
+  --color-success-50: #f0fdf4;
+  --color-success-100: #dcfce7;
+  --color-success-500: #22c55e;
+  --color-success-600: #16a34a;
   --color-error-50: #fef2f2;
   --color-error-100: #fee2e2;
   --color-error-500: #ef4444;
@@ -345,3 +348,10 @@ dialog::backdrop {
   border: 1px solid var(--color-warm-200);
 }
 
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

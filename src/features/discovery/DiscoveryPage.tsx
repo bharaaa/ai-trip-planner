@@ -183,41 +183,41 @@ export const DiscoveryPage = () => {
   }
 
   return (
-    <PageTransition className="min-h-screen bg-warm-50 pb-32">
+    <PageTransition className="min-h-screen bg-warm-950 pb-32">
       <div className="max-w-6xl mx-auto px-6 pt-12 space-y-10">
         
         {/* Context Bar */}
-        <div className="bg-warm-100 rounded-xl px-5 py-4 flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm font-medium text-warm-700 shadow-sm">
+        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl px-5 py-4 flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm font-medium text-warm-300 shadow-sm">
           <div className="flex items-center gap-2">
             <Users className="w-4 h-4" />
-            <span>{activeTrip.travelers} traveler{activeTrip.travelers !== 1 && 's'}</span>
+            <span className="text-white">{activeTrip.travelers} traveler{activeTrip.travelers !== 1 && 's'}</span>
           </div>
-          <div className="hidden sm:block text-warm-300">•</div>
+          <div className="hidden sm:block text-white/20">•</div>
           <div className="flex items-center gap-2">
             <Calendar className="w-4 h-4" />
-            <span>{travelDateLabel}</span>
+            <span className="text-white">{travelDateLabel}</span>
           </div>
-          <div className="hidden sm:block text-warm-300">•</div>
+          <div className="hidden sm:block text-white/20">•</div>
           <div className="flex items-center gap-2">
             <Clock className="w-4 h-4" />
-            <span>{activeTrip.duration} days</span>
+            <span className="text-white">{activeTrip.duration} days</span>
           </div>
-          <div className="hidden sm:block text-warm-300">•</div>
+          <div className="hidden sm:block text-white/20">•</div>
           <div className="flex items-center gap-2">
             <Wallet className="w-4 h-4" />
-            <span>{formatCurrency(activeTrip.budgetPerPerson || 0)}/person</span>
+            <span className="text-white">{formatCurrency(activeTrip.budgetPerPerson || 0)}/person</span>
           </div>
-          <div className="hidden sm:block text-warm-300">•</div>
+          <div className="hidden sm:block text-white/20">•</div>
           <div className="flex items-center gap-2">
             <MapPin className="w-4 h-4" />
-            <span>{activeTrip.origin}</span>
+            <span className="text-white">{activeTrip.origin}</span>
           </div>
           {isAdmin && (
             <>
-              <div className="hidden sm:block text-warm-300">•</div>
+              <div className="hidden sm:block text-white/20">•</div>
               <button 
                 onClick={() => setIsEditDialogOpen(true)}
-                className="flex items-center gap-1.5 text-accent-600 hover:text-accent-700 font-semibold transition-colors"
+                className="flex items-center gap-1.5 text-accent-400 hover:text-accent-300 font-bold transition-colors"
               >
                 <Settings2 className="w-4 h-4" />
                 <span>Edit</span>
@@ -228,13 +228,13 @@ export const DiscoveryPage = () => {
 
         <GroupPreferenceSummary preferences={aggregatePreferences} />
         
-        <hr className="border-warm-200/60" />
+        <hr className="border-white/10" />
 
         <div>
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold text-warm-950 tracking-tight">Where to?</h2>
+            <h2 className="text-3xl font-bold text-white tracking-tight">Where to?</h2>
             {!isLoading && !isRefining && (
-              <Button variant="secondary" size="sm" onClick={handleRefresh}>
+              <Button variant="secondary" size="sm" className="bg-white/10 hover:bg-white/20 border-0 text-white" onClick={handleRefresh}>
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Refresh Suggestions
               </Button>
@@ -243,22 +243,22 @@ export const DiscoveryPage = () => {
           
           {isLoading ? (
             <div className="py-20 text-center space-y-6">
-              <div className="w-16 h-16 rounded-full bg-accent-100 flex items-center justify-center mx-auto text-accent-600 animate-pulse">
+              <div className="w-16 h-16 rounded-full bg-accent-500/20 border border-accent-500/30 flex items-center justify-center mx-auto text-accent-400 animate-pulse text-2xl">
                 ✨
               </div>
               <div>
-                <p className="text-xl font-semibold text-warm-900 mb-2">Finding the perfect spots...</p>
-                <p className="text-warm-500">Checking group preferences and constraints.</p>
+                <p className="text-xl font-semibold text-white mb-2">Finding the perfect spots...</p>
+                <p className="text-warm-400">Checking group preferences and constraints.</p>
               </div>
             </div>
           ) : isRefining ? (
             <div className="py-20 text-center space-y-6">
-              <div className="w-16 h-16 rounded-full bg-accent-100 flex items-center justify-center mx-auto text-accent-600 animate-pulse">
+              <div className="w-16 h-16 rounded-full bg-accent-500/20 border border-accent-500/30 flex items-center justify-center mx-auto text-accent-400 animate-pulse text-2xl">
                 🤔
               </div>
               <div>
-                <p className="text-xl font-semibold text-warm-900 mb-2">Taking notes...</p>
-                <p className="text-warm-500">Refining ideas based on what you liked and didn't like.</p>
+                <p className="text-xl font-semibold text-white mb-2">Taking notes...</p>
+                <p className="text-warm-400">Refining ideas based on what you liked and didn't like.</p>
               </div>
             </div>
           ) : (
@@ -273,8 +273,8 @@ export const DiscoveryPage = () => {
               />
 
               {allReacted && (
-                <div className="space-y-8 animate-slide-up pt-8 border-t border-warm-200/60">
-                  <h3 className="text-xl font-semibold text-warm-900 text-center tracking-tight">Group Consensus</h3>
+                <div className="space-y-8 animate-slide-up pt-8 border-t border-white/10">
+                  <h3 className="text-xl font-bold text-white text-center tracking-tight">Group Consensus</h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {activeTrip.tripIdeas.map(idea => (
                       <GroupConsensus 
@@ -315,10 +315,10 @@ export const DiscoveryPage = () => {
       <Dialog 
         open={!!selectedIdeaId} 
         onClose={() => setSelectedIdeaId(null)}
-        className="sm:max-w-xl md:max-w-2xl lg:max-w-4xl"
+        className="sm:max-w-xl md:max-w-2xl lg:max-w-4xl bg-warm-950 border border-white/10 text-white"
       >
         {selectedIdea && (
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-6 text-white">
             {/* Header Image & Core Info */}
             <div className="relative -mt-2 -mx-5 sm:-mt-5 sm:-mx-5 mb-2">
               {selectedIdea.imageUrl && (
@@ -332,7 +332,7 @@ export const DiscoveryPage = () => {
                     }}
                   />
                   {/* Overlay gradient */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-warm-950 via-warm-950/40 to-transparent" />
                   
                   {/* Floating Top Right Area */}
                   <div className="absolute top-4 right-4 flex gap-2">
@@ -359,12 +359,12 @@ export const DiscoveryPage = () => {
 
                   {/* Destination Name floating on image */}
                   <div className="absolute bottom-0 left-0 p-6 w-full">
-                    <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-1.5 drop-shadow-md">
+                    <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tighter mb-1.5 drop-shadow-md">
                       {selectedIdea.destination}
                     </h2>
                     {selectedIdea.country && (
-                      <p className="text-white/90 text-lg font-medium drop-shadow-sm flex items-center gap-1.5">
-                        <MapPin size={18} className="text-accent-300" />
+                      <p className="text-white/80 text-lg font-medium drop-shadow-sm flex items-center gap-1.5">
+                        <MapPin size={18} className="text-accent-400" />
                         {selectedIdea.country}
                       </p>
                     )}
@@ -375,27 +375,27 @@ export const DiscoveryPage = () => {
 
             {/* Quick Stats Grid */}
             <div className="grid grid-cols-3 gap-3 px-1">
-               <div className="bg-warm-50 rounded-2xl p-4 flex flex-col items-center justify-center text-center border border-warm-100/60 shadow-sm">
+               <div className="bg-white/5 rounded-2xl p-4 flex flex-col items-center justify-center text-center border border-white/10 shadow-sm">
                  <span className="text-2xl mb-1.5">💳</span>
                  <span className="text-[10px] font-bold text-warm-500 uppercase tracking-wider mb-0.5">Budget</span>
-                 <span className="text-sm font-bold text-warm-900">{formatBudgetRange(selectedIdea.estimatedBudget.min, selectedIdea.estimatedBudget.max)}</span>
+                 <span className="text-sm font-bold text-white">{formatBudgetRange(selectedIdea.estimatedBudget.min, selectedIdea.estimatedBudget.max)}</span>
                </div>
-               <div className="bg-warm-50 rounded-2xl p-4 flex flex-col items-center justify-center text-center border border-warm-100/60 shadow-sm">
+               <div className="bg-white/5 rounded-2xl p-4 flex flex-col items-center justify-center text-center border border-white/10 shadow-sm">
                  <span className="text-2xl mb-1.5">⏰</span>
                  <span className="text-[10px] font-bold text-warm-500 uppercase tracking-wider mb-0.5">Duration</span>
-                 <span className="text-sm font-bold text-warm-900">{selectedIdea.suggestedDuration} days</span>
+                 <span className="text-sm font-bold text-white">{selectedIdea.suggestedDuration} days</span>
                </div>
-               <div className="bg-warm-50 rounded-2xl p-4 flex flex-col items-center justify-center text-center border border-warm-100/60 shadow-sm">
+               <div className="bg-white/5 rounded-2xl p-4 flex flex-col items-center justify-center text-center border border-white/10 shadow-sm">
                  <span className="text-2xl mb-1.5">🎯</span>
                  <span className="text-[10px] font-bold text-warm-500 uppercase tracking-wider mb-0.5">Style</span>
-                 <span className="text-sm font-bold text-warm-900 line-clamp-1">{selectedIdea.travelStyle || 'Varied'}</span>
+                 <span className="text-sm font-bold text-white line-clamp-1">{selectedIdea.travelStyle || 'Varied'}</span>
                </div>
             </div>
 
             {/* Summary */}
             <div className="px-2 mt-2">
-              <h4 className="text-xl font-bold text-warm-950 mb-3 tracking-tight">Why it fits your group</h4>
-              <p className="text-warm-700 leading-relaxed text-[15px]">
+              <h4 className="text-xl font-bold text-white mb-3 tracking-tight">Why it fits your group</h4>
+              <p className="text-warm-300 leading-relaxed text-[15px]">
                 {selectedIdea.summary || selectedIdea.reasons?.[0]}
               </p>
             </div>
@@ -403,10 +403,10 @@ export const DiscoveryPage = () => {
             {/* Activities */}
             {selectedIdea.keyActivities && selectedIdea.keyActivities.length > 0 && (
               <div className="px-2 mt-4">
-                <h4 className="text-xl font-bold text-warm-950 mb-4 tracking-tight">Key Highlights</h4>
+                <h4 className="text-xl font-bold text-white mb-4 tracking-tight">Key Highlights</h4>
                 <div className="flex flex-wrap gap-2.5">
                   {selectedIdea.keyActivities.map((activity, idx) => (
-                    <span key={idx} className="px-4 py-2 bg-white text-warm-800 rounded-xl text-sm font-medium border border-warm-200 shadow-sm flex items-center gap-2">
+                    <span key={idx} className="px-4 py-2 bg-white/5 text-white rounded-xl text-sm font-medium border border-white/10 shadow-sm flex items-center gap-2">
                       <span className="w-1.5 h-1.5 rounded-full bg-accent-400"></span>
                       {activity}
                     </span>
@@ -416,8 +416,8 @@ export const DiscoveryPage = () => {
             )}
             
             {/* Reaction & Action */}
-            <div className="bg-warm-50 rounded-2xl p-6 mt-6 border border-warm-100 shadow-inner">
-              <h4 className="font-semibold text-warm-950 mb-5 text-center">How do you feel about this idea?</h4>
+            <div className="bg-white/5 rounded-[2rem] p-6 mt-6 border border-white/10 shadow-inner">
+              <h4 className="font-semibold text-white mb-5 text-center">How do you feel about this idea?</h4>
               <div className="flex justify-center mb-8">
                 <ReactionBar 
                   ideaId={selectedIdea.id}
@@ -430,13 +430,13 @@ export const DiscoveryPage = () => {
                 activeTrip.members.length > 1 ? (
                   <div className="grid grid-cols-2 gap-3">
                     <button 
-                      className="w-full py-3.5 bg-white text-warm-800 border border-warm-200 rounded-xl font-bold shadow-sm hover:bg-warm-50 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                      className="w-full py-3.5 bg-white/10 text-white border border-white/20 rounded-xl font-bold shadow-sm hover:bg-white/20 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2"
                       onClick={() => handleProposeDestination(selectedIdea)}
                     >
                       🗣️ Propose to Group
                     </button>
                     <button 
-                      className="w-full py-3.5 bg-warm-900 text-white rounded-xl font-bold shadow-md hover:bg-black transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                      className="w-full py-3.5 bg-white text-warm-950 rounded-xl font-bold shadow-md hover:bg-warm-100 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2"
                       onClick={() => handleSelectDestination(selectedIdea)}
                     >
                       Select Direct ➡️
@@ -444,7 +444,7 @@ export const DiscoveryPage = () => {
                   </div>
                 ) : (
                   <button 
-                    className="w-full py-4 bg-warm-900 text-white rounded-xl font-bold shadow-md hover:bg-black transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                    className="w-full py-4 bg-white text-warm-950 rounded-xl font-bold shadow-md hover:bg-warm-100 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2"
                     onClick={() => handleSelectDestination(selectedIdea)}
                   >
                     Select {selectedIdea.destination}
@@ -452,7 +452,7 @@ export const DiscoveryPage = () => {
                   </button>
                 )
               ) : (
-                <div className="w-full py-4 bg-warm-200/50 text-warm-600 rounded-xl font-medium text-center border border-warm-200/50">
+                <div className="w-full py-4 bg-white/5 text-warm-500 rounded-xl font-medium text-center border border-white/10">
                   Only the organizer can select the destination
                 </div>
               )}

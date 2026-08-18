@@ -1,5 +1,4 @@
 import React from 'react';
-import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { MemberAvatars } from './MemberAvatars';
 import { cn } from '@/lib/utils/cn';
@@ -30,99 +29,77 @@ export function TripCard({ trip, onClick, className }: TripCardProps) {
   };
 
   return (
-    <Card 
-      variant="interactive" 
+    <div 
       onClick={onClick}
       className={cn(
-        "relative overflow-hidden group hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col p-0 border-0 bg-white ring-1 ring-warm-200/50",
+        "group relative overflow-hidden rounded-[2rem] h-[360px] cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-white/10 flex flex-col",
         className
       )}
     >
-      {/* Image Header */}
+      {/* Background Image */}
       <div className={cn(
-        "relative h-40 w-full shrink-0 overflow-hidden bg-warm-100",
-        isAdmin ? "bg-gradient-to-br from-accent-400 to-warm-600" : "bg-gradient-to-br from-blue-400 to-indigo-600"
+        "absolute inset-0 w-full h-full bg-warm-900",
+        isAdmin ? "bg-gradient-to-br from-accent-600 to-warm-800" : "bg-gradient-to-br from-blue-600 to-indigo-900"
       )}>
         {bgImage && (
           <img 
             src={bgImage} 
             alt={trip.name} 
-            className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+            className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-700 ease-out"
             onError={(e) => {
               e.currentTarget.style.display = 'none';
             }}
           />
         )}
-        
-        {/* Overlay gradient so text/badges pop */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent" />
-        
-        <div className="absolute top-4 right-4">
-          <Badge variant={trip.status === 'ready' ? 'success' : (trip.status === 'discovering' || trip.status === 'planning' ? 'accent' : 'default')} className="shadow-md backdrop-blur-md bg-white/95 border-0 font-bold">
-            {statusLabels[trip.status] || trip.status}
-          </Badge>
-        </div>
+      </div>
+      
+      {/* Overlay gradient so text pops */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/10 to-black/90 pointer-events-none" />
 
-        <div className="absolute top-4 left-4">
-           {isAdmin ? (
-             <Badge variant="accent" className="text-[10px] uppercase py-1 px-2.5 bg-accent-500/95 text-white border-0 shadow-md backdrop-blur-md font-bold tracking-wider flex items-center gap-1.5">
-               <Crown className="w-3 h-3" /> Organizer
-             </Badge>
-           ) : (
-             <Badge variant="default" className="text-[10px] uppercase py-1 px-2.5 bg-blue-500/95 text-white border-0 shadow-md backdrop-blur-md font-bold tracking-wider flex items-center gap-1.5">
-               <Users className="w-3 h-3" /> Invited
-             </Badge>
-           )}
-        </div>
+      {/* Top Badges */}
+      <div className="relative z-10 flex justify-between p-5">
+        <Badge variant={trip.status === 'ready' ? 'success' : 'accent'} className="shadow-md backdrop-blur-md bg-white/10 text-white border border-white/20 font-bold tracking-wide">
+          {statusLabels[trip.status] || trip.status}
+        </Badge>
+
+        {isAdmin ? (
+          <div className="w-8 h-8 rounded-full bg-accent-500/80 backdrop-blur-md flex items-center justify-center shadow-lg border border-white/20" title="Organizer">
+            <Crown className="w-4 h-4 text-white" />
+          </div>
+        ) : (
+          <div className="w-8 h-8 rounded-full bg-blue-500/80 backdrop-blur-md flex items-center justify-center shadow-lg border border-white/20" title="Invited">
+            <Users className="w-4 h-4 text-white" />
+          </div>
+        )}
       </div>
 
-      {/* Content Section */}
-      <div className="flex-1 p-5 flex flex-col">
-        <div className="mb-4">
-          <h3 className="text-xl font-bold text-warm-900 leading-tight mb-1.5 group-hover:text-accent-600 transition-colors line-clamp-1">
+      {/* Spacer to push content to bottom */}
+      <div className="flex-1" />
+
+      {/* Bottom Content */}
+      <div className="relative z-10 p-6 flex flex-col mt-auto transform transition-transform duration-500">
+        <div className="mb-2">
+          <h3 className="text-3xl font-bold text-white leading-tight mb-2 group-hover:text-accent-300 transition-colors line-clamp-2 tracking-tight shadow-sm">
             {trip.name}
           </h3>
-          <p className="text-sm font-medium text-warm-600 flex items-center gap-1.5">
-            <MapPin className="w-4 h-4 text-warm-500" />
-            <span className="truncate">{trip.selectedDestination?.name || 'Still dreaming up where to go...'}</span>
+          <p className="text-sm font-medium text-warm-200 flex items-center gap-1.5 opacity-90">
+            <MapPin className="w-4 h-4" />
+            <span className="truncate">{trip.selectedDestination?.name || 'Destination TBD'}</span>
           </p>
         </div>
         
-        <div className="flex justify-between items-center mt-auto bg-warm-50/50 p-3 rounded-xl border border-warm-100/50">
+        {/* Footer Details */}
+        <div className="pt-4 mt-2 flex justify-between items-end border-t border-white/20">
           <div className="flex flex-col">
-            <span className="text-[10px] text-warm-400 font-bold uppercase tracking-wider mb-0.5">Dates</span>
-            <span className="font-semibold text-warm-800 text-sm">{trip.flexibleDates ? `Sometime in ${trip.dateMonth || 'the future'}` : 'Locked In'}</span>
-          </div>
-          <div className="w-px h-6 bg-warm-200"></div>
-          <div className="flex flex-col text-right">
-            <span className="text-[10px] text-warm-400 font-bold uppercase tracking-wider mb-0.5">Crew</span>
-            <span className="font-semibold text-warm-800 text-sm">{trip.travelers} people</span>
-          </div>
-        </div>
-
-        {/* Footer (Progress & Avatars) */}
-        <div className="pt-4 mt-4 border-t border-warm-100 flex justify-between items-center">
-          <div className="flex-1 mr-6">
-             <div className="flex justify-between items-end text-[10px] uppercase font-bold tracking-wider text-warm-400 mb-1.5">
-               <span>{trip.phase === 'discover' ? 'Brainstorming' : 'Planning Details'}</span>
-               <span className={isAdmin ? "text-accent-600" : "text-blue-600"}>{Math.round(trip.progress || 0)}%</span>
-             </div>
-             <div className="h-1.5 w-full bg-warm-100 rounded-full overflow-hidden shadow-inner">
-                <div 
-                  className={cn(
-                    "h-full rounded-full transition-all duration-1000 ease-out",
-                    isAdmin ? "bg-gradient-to-r from-accent-400 to-accent-500" : "bg-gradient-to-r from-blue-400 to-blue-500"
-                  )}
-                  style={{ width: `${trip.progress || 0}%` }}
-                />
-             </div>
+            <span className="text-[10px] text-warm-300 font-bold uppercase tracking-wider mb-1">Dates</span>
+            <span className="font-semibold text-white text-sm">{trip.flexibleDates ? `Sometime in ${trip.dateMonth || 'the future'}` : 'Locked In'}</span>
           </div>
           
           <div className="flex items-center shrink-0">
-            <MemberAvatars members={trip.members.filter(m => m.status !== 'invited')} size="sm" className="-space-x-2 shadow-sm" />
+            <MemberAvatars members={trip.members.filter(m => m.status !== 'invited')} size="sm" className="-space-x-2 shadow-sm border-white/20" />
           </div>
         </div>
       </div>
-    </Card>
+    </div>
   );
 }

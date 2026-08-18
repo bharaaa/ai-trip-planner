@@ -1,7 +1,7 @@
 import React from 'react';
 import { formatDistanceToNow, format } from 'date-fns';
 import type { TripActivity, TripMember } from '@/types';
-import { MapPin, Calendar, CheckSquare, Settings2, Users, FileText, UserMinus, LogOut, X, Sparkles } from 'lucide-react';
+import { MapPin, Calendar, CheckSquare, Settings2, Users, FileText, UserMinus, LogOut, X, Sparkles, Plus, Navigation } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 
 interface ActivityItemProps {
@@ -13,30 +13,30 @@ interface ActivityItemProps {
 const getActivityIcon = (type: string) => {
   switch (type) {
     case 'member_joined':
-    case 'MEMBER_JOINED': return { icon: <Users className="w-5 h-5 text-accent-700" />, bg: 'bg-accent-100' };
-    case 'MEMBER_INVITED': return { icon: <Users className="w-5 h-5 text-info-700" />, bg: 'bg-info-100' };
+    case 'MEMBER_JOINED': return { icon: <Users className="w-4 h-4 text-warm-300" />, bg: 'bg-white/10 border-white/20' };
+    case 'MEMBER_INVITED': return { icon: <Users className="w-4 h-4 text-warm-400" />, bg: 'bg-white/10 border-white/20' };
     case 'member_removed':
-    case 'MEMBER_REMOVED': return { icon: <UserMinus className="w-5 h-5 text-error-700" />, bg: 'bg-error-100' };
-    case 'MEMBER_REJECTED': return { icon: <X className="w-5 h-5 text-warm-600" />, bg: 'bg-warm-200' };
-    case 'INVITATION_CANCELLED': return { icon: <X className="w-5 h-5 text-warm-500" />, bg: 'bg-warm-100' };
+    case 'MEMBER_REMOVED': return { icon: <UserMinus className="w-4 h-4 text-error-400" />, bg: 'bg-error-500/20 border-error-500/30' };
+    case 'MEMBER_REJECTED': return { icon: <X className="w-4 h-4 text-warm-400" />, bg: 'bg-white/10 border-white/20' };
+    case 'INVITATION_CANCELLED': return { icon: <X className="w-4 h-4 text-warm-400" />, bg: 'bg-white/10 border-white/20' };
     case 'member_left':
-    case 'MEMBER_LEFT': return { icon: <LogOut className="w-5 h-5 text-warm-600 ml-1" />, bg: 'bg-warm-200' };
+    case 'MEMBER_LEFT': return { icon: <LogOut className="w-4 h-4 text-warm-400 ml-0.5" />, bg: 'bg-white/10 border-white/20' };
     case 'trip_dates_changed':
-    case 'DATES_CHANGED': return { icon: <Calendar className="w-5 h-5 text-info-700" />, bg: 'bg-info-100' };
+    case 'DATES_CHANGED': return { icon: <Calendar className="w-4 h-4 text-info-400" />, bg: 'bg-info-500/20 border-info-500/30' };
     case 'destination_selected':
-    case 'DESTINATION_SELECTED': return { icon: <MapPin className="w-5 h-5 text-success-700" />, bg: 'bg-success-100' };
+    case 'DESTINATION_SELECTED': return { icon: <MapPin className="w-5 h-5 text-success-400" />, bg: 'bg-success-500/20 border-success-500/30', milestone: true };
     case 'vote_started':
-    case 'POLL_CREATED': return { icon: <CheckSquare className="w-5 h-5 text-warning-700" />, bg: 'bg-warning-100' };
+    case 'POLL_CREATED': return { icon: <CheckSquare className="w-4 h-4 text-energy-400" />, bg: 'bg-energy-500/20 border-energy-500/30' };
     case 'voting_completed':
-    case 'POLL_DECIDED': return { icon: <CheckSquare className="w-5 h-5 text-success-700" />, bg: 'bg-success-100' };
-    case 'POLL_CLOSED': return { icon: <CheckSquare className="w-5 h-5 text-warm-600" />, bg: 'bg-warm-200' };
+    case 'POLL_DECIDED': return { icon: <CheckSquare className="w-5 h-5 text-success-400" />, bg: 'bg-success-500/20 border-success-500/30', milestone: true };
+    case 'POLL_CLOSED': return { icon: <CheckSquare className="w-4 h-4 text-warm-400" />, bg: 'bg-white/10 border-white/20' };
     case 'itinerary_created':
     case 'activity_added':
-    case 'ITINERARY_UPDATED': return { icon: <FileText className="w-5 h-5 text-info-700" />, bg: 'bg-info-100' };
+    case 'ITINERARY_UPDATED': return { icon: <Navigation className="w-4 h-4 text-accent-400" />, bg: 'bg-accent-500/20 border-accent-500/30' };
     case 'preference_updated':
-    case 'PREFERENCES_SUBMITTED': return { icon: <Settings2 className="w-5 h-5 text-accent-700" />, bg: 'bg-accent-100' };
-    case 'trip_created': return { icon: <Sparkles className="w-5 h-5 text-success-700" />, bg: 'bg-success-100' };
-    default: return { icon: <div className="w-3 h-3 rounded-full bg-warm-400" />, bg: 'bg-warm-100' };
+    case 'PREFERENCES_SUBMITTED': return { icon: <Settings2 className="w-4 h-4 text-accent-400" />, bg: 'bg-accent-500/20 border-accent-500/30' };
+    case 'trip_created': return { icon: <Sparkles className="w-5 h-5 text-accent-400" />, bg: 'bg-accent-500/20 border-accent-500/30', milestone: true };
+    default: return { icon: <div className="w-2 h-2 rounded-full bg-warm-500" />, bg: 'bg-white/10 border-white/20' };
   }
 };
 
@@ -55,7 +55,6 @@ const formatDateDetails = (dates: any) => {
 const getActivityMessage = (activity: TripActivity, isSelf: boolean, memberName: string) => {
   const { type, metadata = {} } = activity;
   const name = isSelf ? 'You' : memberName;
-  const verb = (isSelf && type !== 'trip_created') ? '' : 's'; // grammar heuristic, though we'll hardcode per case to be safe.
 
   switch (type) {
     case 'trip_created':
@@ -81,7 +80,7 @@ const getActivityMessage = (activity: TripActivity, isSelf: boolean, memberName:
       if (metadata.newDates) {
         const oldStr = formatDateDetails(metadata.oldDates);
         const newStr = formatDateDetails(metadata.newDates);
-        return <span><strong>{name}</strong> updated the trip dates from <strong>{oldStr}</strong> to <strong>{newStr}</strong></span>;
+        return <span><strong>{name}</strong> updated the trip dates from <em className="text-warm-400">{oldStr}</em> to <strong>{newStr}</strong></span>;
       }
       return <span><strong>{name}</strong> updated the trip dates to <strong>{formatDateDetails(metadata)}</strong></span>;
     }
@@ -89,20 +88,20 @@ const getActivityMessage = (activity: TripActivity, isSelf: boolean, memberName:
       return <span><strong>{name}</strong> added <strong>{metadata.destination || 'a destination'}</strong> to the shortlist</span>;
     case 'destination_selected':
     case 'DESTINATION_SELECTED':
-      return <span><strong>{name}</strong> selected <strong>{metadata.destination}</strong> as the destination</span>;
+      return <span><strong>{name}</strong> locked in <strong>{metadata.destination}</strong> as the destination!</span>;
     case 'vote_started':
     case 'POLL_CREATED':
-      return <span><strong>{name}</strong> started voting for destinations</span>;
+      return <span><strong>{name}</strong> wants the group to vote on a decision</span>;
     case 'vote_cast':
       return <span><strong>{name}</strong> voted for <strong>{metadata.destination || 'a destination'}</strong></span>;
     case 'voting_completed':
     case 'POLL_DECIDED':
-      return <span><strong>Everyone has voted!</strong> {metadata.destination ? `The group selected ${metadata.destination}.` : ''}</span>;
+      return <span><strong>Everyone has voted!</strong> {metadata.destination ? `The group chose ${metadata.destination}.` : ''}</span>;
     case 'activity_added':
       return <span><strong>{name}</strong> added <strong>{metadata.activityName || 'an activity'}</strong> to the itinerary</span>;
     case 'itinerary_created':
     case 'ITINERARY_UPDATED':
-      return <span><strong>{name}</strong> generated the itinerary</span>;
+      return <span><strong>{name}</strong> updated the itinerary</span>;
     case 'preference_updated':
     case 'PREFERENCES_SUBMITTED':
       return <span><strong>{name}</strong> submitted their travel preferences</span>;
@@ -116,35 +115,34 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({ activity, viewerId, 
   const member = members.find(m => m.userId === activity.actorId);
   const memberName = member?.name || 'Someone';
   
-  const { icon, bg } = getActivityIcon(activity.type);
-  const isMilestone = ['trip_created', 'destination_selected', 'DESTINATION_SELECTED', 'voting_completed'].includes(activity.type);
+  const { icon, bg, milestone } = getActivityIcon(activity.type);
 
   return (
-    <div className="relative flex items-start gap-5 group">
+    <div className="relative flex items-start gap-4 group">
       {/* Timeline Node */}
       <div className={cn(
-        `flex items-center justify-center rounded-full shadow-sm shrink-0 z-10 transition-transform`,
+        `flex items-center justify-center rounded-full shrink-0 z-10 border-[3px]`,
         bg,
-        isMilestone ? "w-14 h-14 border-4 border-white scale-105" : "w-12 h-12 border-4 border-white"
+        milestone ? "w-12 h-12 shadow-sm" : "w-10 h-10 shadow-xs mt-1"
       )}>
         {icon}
       </div>
       
       {/* Content */}
       <div className={cn(
-        "flex-1 p-5 rounded-2xl border shadow-sm transition-colors",
-        isMilestone ? "bg-accent-50/50 border-accent-200" : "bg-white border-warm-200/60 hover:border-warm-300"
+        "flex-1 rounded-2xl transition-colors",
+        milestone ? "p-5 bg-white/5 border border-white/10 shadow-sm mb-2 backdrop-blur-xl" : "p-2 py-3 bg-transparent"
       )}>
-        <div className="flex items-center justify-between mb-2">
+        <div className={cn(
+          "text-[15px] leading-relaxed",
+          milestone ? "text-white font-medium" : "text-warm-300"
+        )}>
+          {getActivityMessage(activity, isSelf, memberName)}
+        </div>
+        <div className="mt-1 flex items-center gap-2">
           <time className="text-[11px] font-bold text-warm-500 uppercase tracking-widest">
             {formatDistanceToNow(new Date(activity.createdAt), { addSuffix: true })}
           </time>
-        </div>
-        <div className={cn(
-          "text-base leading-relaxed font-medium",
-          isMilestone ? "text-accent-900" : "text-warm-900"
-        )}>
-          {getActivityMessage(activity, isSelf, memberName)}
         </div>
       </div>
     </div>

@@ -1,11 +1,11 @@
 import React from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '@/lib/utils/cn';
-import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
-import { Avatar } from '@/components/ui/Avatar';
 import { useTripStore } from '@/stores/tripStore';
 import { useAuthStore } from '@/stores/authStore';
 import type { Decision } from '@/types';
+import { Check, X, Hand } from 'lucide-react';
 
 interface DecisionCardProps {
   decision: Decision;
@@ -34,8 +34,14 @@ export const DecisionCard: React.FC<DecisionCardProps> = ({ decision, onVote }) 
     const member = activeTrip?.members.find(m => m.userId === userId);
     return member?.name ? member.name.charAt(0).toUpperCase() : userId.charAt(0).toUpperCase();
   };
+  
+  const getUserAvatar = (userId: string) => {
+    const member = activeTrip?.members.find(m => m.userId === userId);
+    return member?.avatarUrl;
+  };
 
   const totalVotes = decision.options.reduce((sum, opt) => sum + (opt.votes?.length || 0), 0);
+  const maxPossibleVotes = activeTrip?.members.length || 1;
 
   const handleClosePoll = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -57,74 +63,126 @@ export const DecisionCard: React.FC<DecisionCardProps> = ({ decision, onVote }) 
   };
   
   return (
-    <Card className={cn(
-      "overflow-hidden transition-all duration-200",
-      isDecided ? "bg-warm-50 border-warm-200" : "bg-white border-warm-200 hover:border-warm-300 shadow-sm hover:shadow"
+    <div className={cn(
+      "relative overflow-hidden rounded-[2rem] p-6 md:p-8 transition-all duration-500",
+      isDecided ? "bg-white/10" : "bg-white/5 shadow-sm border border-white/10"
     )}>
-      <div className="pb-3 flex flex-row items-start justify-between space-y-0 p-6">
-        <div className="flex gap-3 items-start">
-          <div className="w-10 h-10 rounded-full bg-warm-100 flex items-center justify-center text-xl shadow-sm">
+      {isDecided && (
+        <div className="absolute top-0 right-0 w-32 h-32 bg-success-500/20 rounded-bl-full -z-10 opacity-50" />
+      )}
+      
+      <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-8">
+        <div className="flex gap-4 items-start">
+          <div className={cn(
+            "w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-sm shrink-0",
+            isDecided ? "bg-success-500/20 text-success-400" : "bg-white/10"
+          )}>
             {getIconForType(decision.type)}
           </div>
           <div>
-            <h3 className="text-base font-semibold text-warm-900 leading-tight mb-1">
+            <h3 className={cn("text-xl font-bold tracking-tight mb-1", isDecided ? "text-warm-300" : "text-white")}>
               {decision.title}
             </h3>
-            <p className="text-xs text-warm-500 font-medium">{decision.description || 'Make a choice'}</p>
+            <p className="text-sm text-warm-400 font-medium">{decision.description || 'The group needs your vote'}</p>
           </div>
         </div>
-        <div className="shrink-0">
+        <div className="shrink-0 self-start">
           <Badge variant={isDecided ? 'success' : decision.status === 'voting' ? 'warning' : 'default'} className={cn(
-            isDecided && "bg-success-100 text-success-700",
-            isClosed && "bg-warm-100 text-warm-600",
-            decision.status === 'voting' && "bg-warning-100 text-warning-700",
-            decision.status === 'open' && "bg-warm-100 text-warm-700"
+            "px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full shadow-xs",
+            isDecided && "bg-success-500 text-white border-none",
+            isClosed && "bg-white/20 text-warm-300 border-none",
+            decision.status === 'voting' && "bg-energy-500 text-white border-none",
+            decision.status === 'open' && "bg-accent-500 text-white border-none"
           )}>
             {isDecided ? 'Decided' : isClosed ? 'Closed' : decision.status === 'voting' ? 'Voting' : 'Open'}
           </Badge>
         </div>
       </div>
       
-      <div className="pb-4 px-6">
+      <div className="space-y-4">
         {isDecided ? (
-          <div className="bg-success-50 rounded-xl p-4 flex items-center gap-3 border border-success-100">
-             <div className="w-8 h-8 rounded-full bg-success-200 text-success-700 flex items-center justify-center font-bold">
-               ✓
-             </div>
-             <div>
-               <span className="block text-success-600 font-medium text-xs uppercase tracking-wider mb-0.5">Selected</span>
-               <span className="block text-success-900 font-semibold text-sm">{decision.options.find(o => o.id === decision.decidedOption)?.title || 'Unknown'}</span>
-             </div>
-          </div>
+          <AnimatePresence>
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="bg-success-500/10 rounded-2xl p-6 flex flex-col items-center justify-center text-center border border-success-500/20 shadow-sm"
+            >
+               <div className="w-12 h-12 rounded-full bg-success-500 text-white flex items-center justify-center font-bold text-xl mb-4 shadow-md">
+                 <Check strokeWidth={3} />
+               </div>
+               <span className="block text-success-400 font-bold text-xs uppercase tracking-widest mb-1">We're going with</span>
+               <span className="block text-success-100 font-bold text-2xl tracking-tight">
+                 {decision.options.find(o => o.id === decision.decidedOption)?.title || 'Unknown'}
+               </span>
+            </motion.div>
+          </AnimatePresence>
         ) : (
-          <div className="space-y-2.5">
-            {decision.options.map(option => {
-              // Assume if there's any vote, we highlight it playfully (you could check currentUser.id if available)
-              const hasVotes = option.votes && option.votes.length > 0;
+          <div className="space-y-3">
+            {decision.options.map((option, index) => {
+              const voteCount = option.votes?.length || 0;
+              const hasVotes = voteCount > 0;
+              const isLeading = hasVotes && voteCount === Math.max(...decision.options.map(o => o.votes?.length || 0));
+              // Calculate fill percentage relative to total members, minimum 5% so it's visible, max 100%
+              const fillPercentage = hasVotes ? Math.max(10, (voteCount / maxPossibleVotes) * 100) : 0;
+              const userVotedForThis = option.votes?.some(v => v.userId === user?.id);
+
               return (
                 <div 
                   key={option.id} 
-                  className={cn(
-                    "flex items-center justify-between p-3 rounded-xl border transition-all duration-200 cursor-pointer group",
-                    hasVotes ? "border-accent-200 bg-accent-50/50 hover:bg-accent-50" : "border-warm-200/60 bg-white hover:border-accent-300 hover:shadow-xs"
-                  )}
+                  className="relative overflow-hidden rounded-2xl transition-all duration-300 cursor-pointer group bg-white/5 border border-white/10 hover:border-white/20"
                   onClick={() => onVote?.(option.id)}
                 >
-                  <div className="flex flex-col pr-4">
-                    <span className={cn("text-sm font-semibold", hasVotes ? "text-accent-900" : "text-warm-800")}>{option.title}</span>
-                    {option.description && <span className={cn("text-xs mt-0.5", hasVotes ? "text-accent-600" : "text-warm-500")}>{option.description}</span>}
-                  </div>
-                  <div className="flex items-center gap-3 shrink-0">
-                    <div className="flex -space-x-1.5">
-                      {option.votes?.map((vote, i) => (
-                        <div key={i} className="w-6 h-6 rounded-full bg-accent-200 text-accent-800 text-[10px] font-bold flex items-center justify-center border-2 border-white z-10" title={activeTrip?.members.find(m => m.userId === vote.userId)?.name || 'Unknown'}>
-                          {getUserInitial(vote.userId)}
-                        </div>
-                      ))}
+                  {/* The Horizontal Bar Graph Background */}
+                  <motion.div 
+                    className={cn(
+                      "absolute top-0 left-0 h-full opacity-20 transition-all duration-500",
+                      isLeading ? "bg-accent-500" : "bg-warm-400"
+                    )}
+                    initial={{ width: 0 }}
+                    animate={{ width: `${fillPercentage}%` }}
+                    transition={{ type: "spring", bounce: 0.2, duration: 1 }}
+                  />
+
+                  {/* Highlight border if user voted */}
+                  {userVotedForThis && (
+                    <div className="absolute inset-0 border-2 border-accent-500 rounded-2xl pointer-events-none" />
+                  )}
+
+                  <div className="relative z-10 p-4 flex items-center justify-between min-h-[4.5rem]">
+                    <div className="flex flex-col pr-4">
+                      <span className={cn("text-base font-bold tracking-tight", userVotedForThis ? "text-accent-300" : "text-white")}>
+                        {option.title}
+                      </span>
+                      {option.description && (
+                        <span className={cn("text-sm mt-0.5", userVotedForThis ? "text-accent-300 font-medium" : "text-warm-400")}>
+                          {option.description}
+                        </span>
+                      )}
                     </div>
-                    <span className={cn("text-xs font-semibold w-4 text-right", hasVotes ? "text-accent-600" : "text-warm-400 group-hover:text-accent-400")}>
-                      {option.votes?.length || 0}
-                    </span>
+                    
+                    <div className="flex items-center gap-3 shrink-0">
+                      <div className="flex -space-x-2 mr-2">
+                        {option.votes?.map((vote, i) => (
+                          <div 
+                            key={i} 
+                            className="w-8 h-8 rounded-full bg-warm-900 text-white text-xs font-bold flex items-center justify-center border-[2px] border-warm-800 shadow-sm z-10 overflow-hidden" 
+                            title={activeTrip?.members.find(m => m.userId === vote.userId)?.name || 'Unknown'}
+                          >
+                            {getUserAvatar(vote.userId) ? (
+                              <img src={getUserAvatar(vote.userId)} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                              getUserInitial(vote.userId)
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                      <div className={cn(
+                        "w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-colors",
+                        userVotedForThis ? "bg-accent-500 text-white shadow-md" : "bg-white/10 text-warm-300 group-hover:bg-white/20"
+                      )}>
+                        {userVotedForThis ? <Hand size={14} className="fill-current" /> : voteCount}
+                      </div>
+                    </div>
                   </div>
                 </div>
               );
@@ -133,24 +191,24 @@ export const DecisionCard: React.FC<DecisionCardProps> = ({ decision, onVote }) 
         )}
         
         {isAdmin && !isDecided && !isClosed && (
-          <div className="mt-4 pt-4 border-t border-warm-100/60 flex justify-end gap-3">
+          <div className="mt-8 pt-6 border-t border-white/10 flex flex-col sm:flex-row justify-end gap-3">
             <button 
               onClick={(e) => { e.stopPropagation(); updateDecisionStatus(activeTrip!.id, decision.id, 'deferred'); }}
-              className="text-xs font-semibold px-3 py-1.5 rounded-lg text-warm-600 hover:text-warm-800 bg-warm-100 hover:bg-warm-200 transition-colors shadow-sm"
+              className="text-sm font-bold px-5 py-2.5 rounded-xl text-warm-300 hover:text-white bg-white/5 border border-white/10 hover:border-white/20 transition-colors shadow-sm flex items-center justify-center gap-2"
             >
-              Close Without Winner
+              <X size={16} /> Cancel Poll
             </button>
             <button 
               onClick={handleClosePoll}
               disabled={totalVotes === 0}
               title={totalVotes === 0 ? "Cannot select a winner with zero votes" : ""}
-              className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-warm-900 text-white hover:bg-black disabled:bg-warm-300 disabled:text-warm-500 disabled:cursor-not-allowed transition-colors shadow-sm"
+              className="text-sm font-bold px-6 py-2.5 rounded-xl bg-white text-warm-950 hover:bg-warm-100 disabled:bg-white/10 disabled:text-warm-500 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
             >
-              Close Poll & Select Winner
+              <Check size={16} /> Finalize Decision
             </button>
           </div>
         )}
       </div>
-    </Card>
+    </div>
   );
 };

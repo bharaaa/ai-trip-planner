@@ -22,11 +22,11 @@ export const ItineraryEditor: React.FC<ItineraryEditorProps> = ({
   if (!itinerary || !itinerary.days || itinerary.days.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-24 px-4 text-center">
-        <div className="w-16 h-16 bg-warm-50 text-warm-400 rounded-full flex items-center justify-center mb-4">
+        <div className="w-16 h-16 bg-white/5 text-warm-500 rounded-full flex items-center justify-center mb-4 border border-white/10 shadow-inner">
           <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
         </div>
-        <h3 className="text-lg font-semibold text-warm-900 mb-2">No itinerary yet</h3>
-        <p className="text-warm-500 max-w-sm">
+        <h3 className="text-lg font-bold text-white mb-2">No itinerary yet</h3>
+        <p className="text-warm-400 max-w-sm">
           Generate an itinerary with AI or start adding days and activities manually.
         </p>
       </div>

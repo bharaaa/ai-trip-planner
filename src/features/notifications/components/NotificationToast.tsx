@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router';
 import { getNotificationDestination } from '../utils/routing';
 import { useNotificationStore } from '@/stores/notificationStore';
 import type { AppNotification } from '@/types';
+import { Bell, ChevronRight } from 'lucide-react';
 
 export const showNotificationToast = (notification: AppNotification, navigate: ReturnType<typeof useNavigate>) => {
   toast.custom((t: Toast) => (
@@ -17,22 +18,24 @@ export const showNotificationToast = (notification: AppNotification, navigate: R
       }}
       className={`${
         t.visible ? 'animate-enter' : 'animate-leave'
-      } max-w-md w-full bg-white shadow-xl rounded-[1.25rem] pointer-events-auto flex ring-1 ring-black/5 cursor-pointer hover:bg-warm-50 transition-colors border border-warm-100/50`}
+      } max-w-sm w-full bg-warm-950/95 backdrop-blur-xl text-white shadow-2xl rounded-2xl pointer-events-auto flex items-center p-4 cursor-pointer hover:bg-black transition-colors border border-warm-800/50`}
     >
-      <div className="flex-1 w-0 p-4">
-        <div className="flex items-start">
-          <div className="ml-3 flex-1">
-            <p className="text-sm font-semibold text-warm-900">
-              {notification.title}
-            </p>
-            {notification.message && (
-              <p className="mt-1 text-sm text-warm-500">
-                {notification.message}
-              </p>
-            )}
-          </div>
-        </div>
+      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-warm-800/50 flex items-center justify-center border border-warm-700/50">
+        <Bell size={18} className="text-warm-300" />
+      </div>
+      <div className="ml-4 flex-1">
+        <p className="text-sm font-bold text-white tracking-wide">
+          {notification.title}
+        </p>
+        {notification.message && (
+          <p className="mt-0.5 text-xs text-warm-300 line-clamp-1 font-medium">
+            {notification.message}
+          </p>
+        )}
+      </div>
+      <div className="ml-3 flex-shrink-0">
+        <ChevronRight size={16} className="text-warm-500 group-hover:text-warm-300 transition-colors" />
       </div>
     </div>
-  ), { duration: 4000 });
+  ), { duration: 5000, position: 'bottom-center' });
 };

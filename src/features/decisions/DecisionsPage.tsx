@@ -70,17 +70,17 @@ export const DecisionsPage: React.FC = () => {
 
   return (
     <PageTransition>
-      <div className="min-h-screen bg-warm-50 flex flex-col">
-        <div className="flex-1 max-w-5xl w-full mx-auto p-4 md:p-6 lg:p-8">
+      <div className="min-h-screen bg-warm-950 flex flex-col">
+        <div className="flex-1 max-w-5xl w-full mx-auto p-4 md:p-6 lg:p-8 pt-12">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-10 gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-warm-950 tracking-tight">Decisions</h1>
-              <p className="text-lg text-warm-600 mt-2">Time to make some calls.</p>
+              <h1 className="text-3xl font-bold text-white tracking-tight">Decisions</h1>
+              <p className="text-lg text-warm-300 mt-2">Time to make some calls.</p>
             </div>
             
             <Button 
               variant="secondary" 
-              className="shrink-0 bg-white shadow-sm border-warm-200 text-warm-700"
+              className="shrink-0 bg-white/10 text-white border-0 hover:bg-white/20 font-bold"
               onClick={() => setIsNewDecisionOpen(true)}
             >
               + New Decision
@@ -99,8 +99,8 @@ export const DecisionsPage: React.FC = () => {
           />
 
           {filteredDecisions.length === 0 ? (
-            <div className="text-center p-12 bg-warm-50 rounded-2xl border border-warm-300 border-dashed">
-              <p className="text-warm-500">No decisions found for this filter.</p>
+            <div className="text-center p-12 bg-white/5 rounded-[2rem] border border-white/10 border-dashed">
+              <p className="text-warm-400 font-medium">No decisions found for this filter.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -120,6 +120,7 @@ export const DecisionsPage: React.FC = () => {
         open={isNewDecisionOpen} 
         onClose={() => setIsNewDecisionOpen(false)}
         title="Create New Decision"
+        className="bg-warm-950 border border-white/10 text-white"
       >
         <div className="space-y-4">
           <Input 
@@ -136,7 +137,7 @@ export const DecisionsPage: React.FC = () => {
             onChange={(e) => setNewDescription(e.target.value)}
           />
           <Button 
-            className="w-full mt-4 bg-accent-400 hover:bg-accent-500 text-white" 
+            className="w-full mt-4 bg-accent-500 hover:bg-accent-600 border-none text-white font-bold" 
             onClick={handleCreateDecision}
             disabled={!newTitle.trim()}
           >

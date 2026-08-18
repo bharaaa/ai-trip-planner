@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils/cn';
 import type { TripIdea, TripReaction, ReactionType } from '@/types';
 import { getReactionCounts } from '@/lib/utils/reactions';
 import { formatBudgetRange } from '@/lib/utils/formatting';
-import { Bookmark } from 'lucide-react';
+import { Bookmark, MapPin } from 'lucide-react';
 
 interface TripIdeaCardProps {
   idea: TripIdea;
@@ -17,16 +17,6 @@ interface TripIdeaCardProps {
   className?: string;
   style?: React.CSSProperties;
 }
-
-const getGradient = (destinationName: string) => {
-  const normalized = (destinationName || '').toLowerCase();
-  if (normalized.includes('yogyakarta')) return 'from-amber-100 to-orange-200';
-  if (normalized.includes('bali')) return 'from-cyan-100 to-teal-200';
-  if (normalized.includes('malang')) return 'from-emerald-100 to-green-200';
-  if (normalized.includes('lombok')) return 'from-sky-100 to-blue-200';
-  if (normalized.includes('bandung')) return 'from-violet-100 to-purple-200';
-  return 'from-warm-100 to-warm-200';
-};
 
 export const TripIdeaCard: React.FC<TripIdeaCardProps> = ({
   idea,
@@ -45,91 +35,82 @@ export const TripIdeaCard: React.FC<TripIdeaCardProps> = ({
     <motion.div 
       layoutId={`destination-${idea.id}`}
       className={cn(
-        "flex flex-col group cursor-pointer animate-slide-up h-full bg-white rounded-[var(--radius-xl)] shadow-xs hover:shadow-md transition-all duration-300 border border-warm-200/60 overflow-hidden",
+        "group cursor-pointer animate-slide-up relative rounded-3xl overflow-hidden bg-warm-900",
+        featured ? "h-[500px]" : "h-[400px]",
         className
       )}
       style={style}
       onClick={onExplore}
     >
-      {/* Header Image */}
-      <div className={cn(
-        "w-full relative overflow-hidden transition-transform duration-700 group-hover:scale-105",
-        featured ? "aspect-[16/9] md:aspect-[21/9]" : "aspect-[4/3]",
-        getGradient(idea.destination)
-      )}>
-        {idea.imageUrl && (
-          <img 
-            src={idea.imageUrl} 
-            alt={idea.destination} 
-            className="w-full h-full object-cover" 
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
+      {/* Full Background Image */}
+      {idea.imageUrl ? (
+        <img 
+          src={idea.imageUrl} 
+          alt={idea.destination} 
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
+          onError={(e) => {
+            e.currentTarget.style.display = 'none';
+          }}
+        />
+      ) : (
+        <div className="absolute inset-0 bg-gradient-to-br from-warm-900 to-warm-800" />
+      )}
+      
+      {/* Rich Dark Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-500" />
+      
+      {/* Top Bar: Match Score & Bookmark */}
+      <div className="absolute top-0 left-0 w-full p-6 flex justify-between items-start">
+        {idea.fitScore !== undefined ? (
+          <div className="bg-black/30 backdrop-blur-md border border-white/20 text-white px-3 py-1.5 rounded-full text-sm font-semibold flex items-center shadow-lg">
+            {idea.fitScore}% Match
+          </div>
+        ) : <div/>}
+
+        {onToggleSave && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleSave(idea.id, !idea.isSaved);
             }}
-          />
+            className="p-2.5 rounded-full bg-black/30 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 transition-colors shadow-lg"
+            aria-label={idea.isSaved ? "Unsave idea" : "Save idea"}
+          >
+            <Bookmark 
+              size={20} 
+              className={idea.isSaved ? "fill-white" : ""} 
+              strokeWidth={idea.isSaved ? 2 : 1.5}
+            />
+          </button>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/0 to-transparent" />
       </div>
 
-      <div className="flex flex-col flex-grow p-5 md:p-6">
-        {/* Destination */}
-        <div className="flex items-center gap-3 mb-1">
-          <h3 className={cn("font-semibold text-warm-900 tracking-tight", featured ? "text-3xl" : "text-2xl")}>
-            {idea.destination}
-          </h3>
-          {idea.fitScore !== undefined && (
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-accent-50 text-accent-700 border border-accent-100">
-              {idea.fitScore}% match
-            </span>
-          )}
-          <div className="flex-grow" />
-          {/* Bookmark Button */}
-          {onToggleSave && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggleSave(idea.id, !idea.isSaved);
-              }}
-              className="p-2 -mr-2 rounded-full hover:bg-warm-100 text-warm-500 hover:text-accent-600 transition-colors"
-              aria-label={idea.isSaved ? "Unsave idea" : "Save idea"}
-            >
-              <Bookmark 
-                size={20} 
-                className={idea.isSaved ? "fill-accent-500 text-accent-500" : ""} 
-                strokeWidth={idea.isSaved ? 2 : 1.5}
-              />
-            </button>
-          )}
+      {/* Bottom Content Area */}
+      <div className="absolute bottom-0 left-0 w-full p-6 sm:p-8 flex flex-col justify-end">
+        <h3 className={cn("font-bold text-white tracking-tight mb-2 drop-shadow-md", featured ? "text-4xl sm:text-5xl" : "text-3xl")}>
+          {idea.destination}
+        </h3>
+        
+        {idea.country && (
+          <p className="text-white/80 font-medium flex items-center gap-1.5 mb-4 text-sm sm:text-base">
+            <MapPin size={16} className="text-accent-400" />
+            {idea.country}
+          </p>
+        )}
+
+        <div className="flex flex-wrap items-center gap-4 text-sm font-medium text-white/90 mb-6">
+          <span className="bg-white/20 backdrop-blur-sm px-2.5 py-1 rounded-md">{formatBudgetRange(idea.estimatedBudget.min, idea.estimatedBudget.max)}</span>
+          <span className="bg-white/20 backdrop-blur-sm px-2.5 py-1 rounded-md">{idea.suggestedDuration} days</span>
         </div>
 
-        {/* Key Info */}
-        <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-warm-500 mb-5 font-medium">
-          <div className="flex items-center gap-1.5">
-            <span>💳</span>
-            {formatBudgetRange(idea.estimatedBudget.min, idea.estimatedBudget.max)}
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span>⏰</span>
-            {idea.suggestedDuration} days
-          </div>
-          {idea.travelStyle && (
-            <div className="flex items-center gap-1.5">
-              <span>✨</span>
-              {idea.travelStyle}
-            </div>
-          )}
-        </div>
-
-        {/* Reactions Summary & Actions */}
-        <div className="flex items-center justify-between pt-4 mt-auto border-t border-warm-100">
+        {/* Reactions Summary */}
+        <div className="flex items-center justify-between pt-4 border-t border-white/20">
           <div className="flex gap-2">
-            <div className="flex items-center gap-1.5 bg-warm-50 px-2.5 py-1 rounded-full text-sm border border-warm-200/60" title="Love">
-              ❤️ <span className="font-semibold text-warm-700">{reactionCounts.love}</span>
+            <div className="flex items-center gap-1.5 bg-black/40 backdrop-blur-md px-3 py-1 rounded-full text-sm border border-white/10" title="Love">
+              ❤️ <span className="font-semibold text-white">{reactionCounts.love}</span>
             </div>
-            <div className="flex items-center gap-1.5 bg-warm-50 px-2.5 py-1 rounded-full text-sm border border-warm-200/60" title="Maybe">
-              👍 <span className="font-semibold text-warm-700">{reactionCounts.maybe}</span>
-            </div>
-            <div className="flex items-center gap-1.5 bg-warm-50 px-2.5 py-1 rounded-full text-sm border border-warm-200/60" title="No">
-              👎 <span className="font-semibold text-warm-700">{reactionCounts.nope}</span>
+            <div className="flex items-center gap-1.5 bg-black/40 backdrop-blur-md px-3 py-1 rounded-full text-sm border border-white/10" title="Maybe">
+              👍 <span className="font-semibold text-white">{reactionCounts.maybe}</span>
             </div>
           </div>
 
@@ -139,9 +120,9 @@ export const TripIdeaCard: React.FC<TripIdeaCardProps> = ({
                 e.stopPropagation();
                 onExplore();
               }}
-              className="text-accent-500 text-sm font-semibold hover:text-accent-600 transition-colors flex items-center gap-1"
+              className="text-white text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center gap-1"
             >
-              Explore details &rarr;
+              Explore &rarr;
             </button>
           )}
         </div>

@@ -59,28 +59,28 @@ export const PlannerPage: React.FC = () => {
 
   return (
     <PageTransition>
-      <div className="flex flex-col min-h-screen bg-warm-50">
+      <div className="flex flex-col min-h-screen bg-warm-950 pt-12">
         <div className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 lg:p-8 flex flex-col gap-6">
           
           {/* Top Section */}
           <div className="flex flex-col gap-4">
             <div className="flex justify-between items-start">
               <div>
-                <h1 className="text-3xl font-bold text-warm-950 tracking-tight">{activeTrip.selectedDestination?.name || 'Itinerary'}</h1>
-                <p className="text-lg text-warm-600 mt-1">
+                <h1 className="text-3xl font-bold text-white tracking-tight">{activeTrip.selectedDestination?.name || 'Itinerary'}</h1>
+                <p className="text-lg text-warm-300 mt-1">
                   {activeTrip.flexibleDates ? `${activeTrip.duration} Days` : 'Locked In Dates'}
                 </p>
               </div>
               {!itinerary && !isGenerating && (
-                <Button onClick={handleGenerate} size="lg" className="rounded-full bg-accent-400 hover:bg-accent-500 text-white shadow-sm hover:shadow-md transition-all">
+                <Button onClick={handleGenerate} size="lg" className="rounded-full bg-accent-500 hover:bg-accent-600 text-white shadow-sm hover:shadow-md transition-all font-bold">
                   ✨ Generate Draft Itinerary
                 </Button>
               )}
             </div>
             
             {itinerary && (
-              <div className="bg-white rounded-xl p-5 border border-warm-200/60 shadow-xs flex items-start gap-4">
-                <div className="flex-1">
+              <div className="bg-white/5 backdrop-blur-md rounded-2xl p-5 border border-white/10 shadow-xs flex items-start gap-4">
+                <div className="flex-1 text-white">
                   <NextDecision 
                     title="Choose accommodation"
                     description="This will help optimize your activities and routes."
@@ -100,14 +100,14 @@ export const PlannerPage: React.FC = () => {
             </div>
           ) : !itinerary ? (
             <div className="flex-1 flex flex-col items-center justify-center py-20 text-center px-4">
-              <div className="w-16 h-16 bg-warm-100 rounded-full flex items-center justify-center mb-6">
+              <div className="w-16 h-16 bg-white/5 border border-white/10 rounded-full flex items-center justify-center mb-6 shadow-inner">
                 <span className="text-3xl" role="img" aria-label="sparkles">✨</span>
               </div>
-              <h2 className="text-xl font-medium text-warm-900 mb-2">No itinerary yet</h2>
-              <p className="text-warm-500 max-w-md mx-auto mb-6">
+              <h2 className="text-xl font-bold text-white mb-2">No itinerary yet</h2>
+              <p className="text-warm-400 max-w-md mx-auto mb-6">
                 Your destination is set. Let our AI craft a personalized day-by-day plan based on your group's preferences.
               </p>
-              <Button size="lg" onClick={handleGenerate} className="bg-accent-400 text-white hover:bg-accent-500">
+              <Button size="lg" onClick={handleGenerate} className="bg-accent-500 text-white hover:bg-accent-600 font-bold rounded-full">
                 ✨ Generate Itinerary
               </Button>
             </div>

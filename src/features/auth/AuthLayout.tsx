@@ -11,7 +11,7 @@ export const AuthLayout: React.FC = () => {
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 1.1, filter: 'blur(10px)' }}
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-      className="min-h-screen bg-warm-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden"
+      className="min-h-screen w-full bg-warm-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden"
     >
       {/* Full Bleed Background Image with Subtle Pan */}
       <div className="absolute inset-0 z-0 overflow-hidden">

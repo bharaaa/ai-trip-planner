@@ -44,7 +44,7 @@ function AnimatedRoutes() {
   const location = useLocation();
   
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence mode="popLayout">
       <Routes location={location} key={location.pathname === '/login' || location.pathname === '/register' ? 'auth' : 'app'}>
         <Route element={<AuthLayout />}>
           <Route path="/login" element={<LoginPage />} />

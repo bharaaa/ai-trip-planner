@@ -69,7 +69,7 @@ export function AppLayout() {
       animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
       exit={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }}
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-      className="min-h-dvh bg-warm-950 flex flex-col font-sans"
+      className="min-h-dvh w-full bg-warm-950 flex flex-col font-sans"
     >
       {/* Floating Pill Navigation */}
       <header className="fixed top-4 left-0 right-0 z-50 flex justify-center pointer-events-none px-4">

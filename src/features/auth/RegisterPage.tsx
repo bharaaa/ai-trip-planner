@@ -68,31 +68,45 @@ export const RegisterPage: React.FC = () => {
           {errorMsg && (
             <motion.div
               key={errorMsg}
-              initial={{ opacity: 0, y: -10, height: 0 }}
-              animate={{ opacity: 1, y: 0, height: 'auto' }}
-              exit={{ opacity: 0, y: -10, height: 0 }}
-              transition={{ duration: 0.2 }}
-              className="flex items-center gap-3 p-4 bg-error-500/10 backdrop-blur-md text-error-400 text-sm rounded-2xl border border-error-500/20 shadow-sm overflow-hidden"
+              initial={{ opacity: 0, y: -20, height: 0, filter: 'blur(5px)' }}
+              animate={{ opacity: 1, y: 0, height: 'auto', filter: 'blur(0px)' }}
+              exit={{ opacity: 0, y: 20, height: 0, filter: 'blur(5px)' }}
+              transition={{ 
+                type: 'spring', 
+                stiffness: 400, 
+                damping: 15,
+                mass: 0.8
+              }}
+              className="flex items-center gap-3 bg-error-500/10 backdrop-blur-md text-error-400 text-sm rounded-2xl border border-error-500/20 shadow-sm overflow-hidden"
             >
-              <svg className="w-5 h-5 flex-shrink-0 text-error-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
-              <p className="font-semibold">{errorMsg}</p>
+              <div className="flex items-center gap-3 p-4 w-full">
+                <svg className="w-5 h-5 flex-shrink-0 text-error-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <p className="font-semibold">{errorMsg}</p>
+              </div>
             </motion.div>
           )}
           {successMsg && (
             <motion.div
               key={successMsg}
-              initial={{ opacity: 0, y: -10, height: 0 }}
-              animate={{ opacity: 1, y: 0, height: 'auto' }}
-              exit={{ opacity: 0, y: -10, height: 0 }}
-              transition={{ duration: 0.2 }}
-              className="flex items-center gap-3 p-4 bg-green-500/10 backdrop-blur-md text-green-400 text-sm rounded-2xl border border-green-500/20 shadow-sm overflow-hidden"
+              initial={{ opacity: 0, y: -20, height: 0, filter: 'blur(5px)' }}
+              animate={{ opacity: 1, y: 0, height: 'auto', filter: 'blur(0px)' }}
+              exit={{ opacity: 0, y: 20, height: 0, filter: 'blur(5px)' }}
+              transition={{ 
+                type: 'spring', 
+                stiffness: 400, 
+                damping: 15,
+                mass: 0.8
+              }}
+              className="flex items-center gap-3 bg-green-500/10 backdrop-blur-md text-green-400 text-sm rounded-2xl border border-green-500/20 shadow-sm overflow-hidden"
             >
-              <svg className="w-5 h-5 flex-shrink-0 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <p className="font-semibold">{successMsg}</p>
+              <div className="flex items-center gap-3 p-4 w-full">
+                <svg className="w-5 h-5 flex-shrink-0 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p className="font-semibold">{successMsg}</p>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

@@ -42,14 +42,15 @@ export const AuthLayout: React.FC = () => {
         />
       </div>
 
-      <div className="relative z-10 w-full flex-1 grid">
-        <AnimatePresence>
+      <div className="relative z-10 w-full flex-1 grid overflow-hidden">
+        <AnimatePresence custom={location.pathname}>
           <motion.div
             key={location.pathname}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3, ease: 'easeOut' }}
+            custom={location.pathname}
+            initial={{ opacity: 0, x: location.pathname === '/login' ? -50 : 50, filter: 'blur(10px)' }}
+            animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, x: location.pathname === '/login' ? 50 : -50, filter: 'blur(10px)' }}
+            transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
             className="w-full flex flex-col items-center justify-center [grid-area:1/1]"
           >
             <Outlet />

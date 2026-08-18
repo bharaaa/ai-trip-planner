@@ -42,20 +42,54 @@ export const AuthLayout: React.FC = () => {
         />
       </div>
 
-      <div className="relative z-10 w-full flex-1 grid">
-        <AnimatePresence custom={location.pathname}>
-          <motion.div
-            key={location.pathname}
-            custom={location.pathname}
-            initial={{ opacity: 0.01, x: location.pathname === '/login' ? -40 : 40 }}
-            animate={{ opacity: 0.99, x: 0 }}
-            exit={{ opacity: 0.01, x: location.pathname === '/login' ? 40 : -40 }}
-            transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
-            className="w-full flex flex-col items-center justify-center [grid-area:1/1]"
-          >
-            <Outlet />
-          </motion.div>
-        </AnimatePresence>
+      <div className="relative z-10 w-full flex-1 flex flex-col items-center justify-center">
+        {/* Dynamic Header */}
+        <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10 mb-8 mt-4">
+          <div className="flex justify-center text-4xl mb-8">
+            <span className="text-accent-400 drop-shadow-lg scale-150">◆</span>
+          </div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={location.pathname}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.2 }}
+              className="text-center"
+            >
+              <h2 className="mt-2 text-4xl sm:text-5xl font-black tracking-tighter text-white drop-shadow-md">
+                {location.pathname === '/login' ? 'Welcome back' : 'Create an account'}
+              </h2>
+              <p className="mt-4 text-warm-300 font-medium tracking-wide">
+                {location.pathname === '/login' 
+                  ? 'Ready to plan your next adventure?' 
+                  : 'Start planning your next adventure today'}
+              </p>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* Static Glass Card */}
+        <motion.div 
+          layout
+          className="mx-4 sm:mx-0 w-full sm:max-w-md bg-warm-950/60 backdrop-blur-lg border border-white/10 rounded-[2.5rem] shadow-2xl relative overflow-hidden"
+        >
+          <div className="grid [grid-area:1/1] w-full">
+            <AnimatePresence custom={location.pathname}>
+              <motion.div
+                key={location.pathname}
+                custom={location.pathname}
+                initial={{ opacity: 0, x: location.pathname === '/login' ? -40 : 40 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: location.pathname === '/login' ? 40 : -40 }}
+                transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
+                className="w-full [grid-area:1/1] py-8 px-4 sm:px-10"
+              >
+                <Outlet />
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </motion.div>
       </div>
     </div>
   );

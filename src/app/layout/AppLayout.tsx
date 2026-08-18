@@ -107,14 +107,14 @@ export function AppLayout() {
                 <NavLink to={`/trips/${tripId}`} active={location.pathname === `/trips/${tripId}` || location.pathname === `/trips/${tripId}/`}>
                   Overview
                 </NavLink>
-                <NavLink to={`/trips/${tripId}/itinerary`} active={location.pathname.includes('/itinerary')}>
-                  Itinerary
-                </NavLink>
                 <NavLink to={`/trips/${tripId}/discover`} active={location.pathname.includes('/discover')}>
                   Discover
                 </NavLink>
-                <NavLink to={`/trips/${tripId}/expenses`} active={location.pathname.includes('/expenses')}>
-                  Expenses
+                <NavLink to={`/trips/${tripId}/decisions`} active={location.pathname.includes('/decisions')}>
+                  Decide
+                </NavLink>
+                <NavLink to={`/trips/${tripId}/plan`} active={location.pathname.includes('/plan')}>
+                  Plan
                 </NavLink>
               </nav>
             )}

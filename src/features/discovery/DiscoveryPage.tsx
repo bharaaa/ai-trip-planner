@@ -195,7 +195,7 @@ export const DiscoveryPage = () => {
     <PageTransition className="min-h-screen bg-warm-950 pb-32">
       <div className="max-w-7xl mx-auto px-6 pt-32 md:pt-40">
         
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
           
           {/* LEFT SIDEBAR: Typography & Vibe */}
           <div className="lg:col-span-4 mb-12 lg:mb-0">

@@ -64,16 +64,15 @@ export function AppLayout() {
   }, [tripId, setActiveTrip])
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }}
-      animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-      exit={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }}
-      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-      className="min-h-dvh w-full bg-warm-950 flex flex-col font-sans"
-    >
+    <div className="min-h-dvh w-full bg-warm-950 flex flex-col font-sans">
       {/* Floating Pill Navigation */}
-      <header className="fixed top-4 left-0 right-0 z-50 flex justify-center pointer-events-none px-4">
-        <div className="pointer-events-auto bg-warm-950/90 backdrop-blur-2xl border border-white/10 shadow-2xl rounded-full flex items-center h-14 px-4 sm:px-6 w-full max-w-5xl justify-between text-white transition-all duration-300">
+      <header className="fixed top-4 left-0 right-0 z-[100] flex justify-center pointer-events-none px-4">
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          className="pointer-events-auto bg-warm-950/90 backdrop-blur-2xl border border-white/10 shadow-2xl rounded-full flex items-center h-14 px-4 sm:px-6 w-full max-w-5xl justify-between text-white transition-all duration-300"
+        >
             {/* Left: Branding or Trip Identity */}
             <div className="flex items-center gap-4">
               {(!isHome && !isCreateTrip) && (
@@ -108,74 +107,91 @@ export function AppLayout() {
                 <NavLink to={`/trips/${tripId}`} active={location.pathname === `/trips/${tripId}` || location.pathname === `/trips/${tripId}/`}>
                   Overview
                 </NavLink>
+                <NavLink to={`/trips/${tripId}/itinerary`} active={location.pathname.includes('/itinerary')}>
+                  Itinerary
+                </NavLink>
                 <NavLink to={`/trips/${tripId}/discover`} active={location.pathname.includes('/discover')}>
                   Discover
                 </NavLink>
-                <NavLink to={`/trips/${tripId}/decisions`} active={location.pathname.includes('/decisions')}>
-                  Decide
-                </NavLink>
-                <NavLink to={`/trips/${tripId}/plan`} active={location.pathname.includes('/plan')}>
-                  Plan
+                <NavLink to={`/trips/${tripId}/expenses`} active={location.pathname.includes('/expenses')}>
+                  Expenses
                 </NavLink>
               </nav>
             )}
 
-            {/* Right: Actions & Profile */}
+            {/* Right: User / Profile */}
             <div className="flex items-center gap-3">
-              <NotificationBell />
+              {user ? (
+                <div className="relative" ref={profileRef}>
+                  <button 
+                    onClick={() => setIsProfileOpen(!isProfileOpen)}
+                    className="flex items-center gap-2 pl-2 pr-1 py-1 rounded-full hover:bg-white/10 transition-colors focus:outline-none"
+                  >
+                    <span className="text-sm font-semibold hidden sm:block max-w-[100px] truncate">{user.name || 'User'}</span>
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-accent-500 to-accent-300 flex items-center justify-center text-white font-bold text-sm shadow-inner overflow-hidden border border-white/20">
+                      {(user.name?.[0] || user.email?.[0] || 'U').toUpperCase()}
+                    </div>
+                  </button>
 
-              <div className="relative" ref={profileRef}>
-                <button 
-                  onClick={() => setIsProfileOpen(!isProfileOpen)}
-                  className="flex items-center gap-2 hover:opacity-80 transition-opacity focus:outline-none"
-                >
-                  <div className="w-9 h-9 rounded-full bg-accent-100 text-accent-700 flex items-center justify-center text-sm font-semibold uppercase shadow-sm border border-accent-200">
-                    {user?.name?.[0] || user?.email?.[0] || 'U'}
-                  </div>
-                </button>
-
-                <AnimatePresence>
-                  {isProfileOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 8, scale: 0.96 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 8, scale: 0.96 }}
-                      transition={{ duration: 0.15, ease: "easeOut" }}
-                      className="absolute right-0 mt-3 w-56 rounded-2xl bg-white shadow-xl shadow-warm-900/5 border border-warm-200/60 overflow-hidden z-50"
-                    >
-                      <div className="px-4 py-3 border-b border-warm-100 bg-warm-50/50">
-                        <p className="text-sm font-semibold text-warm-900 truncate">{user?.name || 'User'}</p>
-                        <p className="text-xs text-warm-500 truncate">{user?.email}</p>
-                      </div>
-                      <div className="p-1.5">
-                        <button 
-                          onClick={() => {
-                            setIsProfileOpen(false)
-                            signOut()
-                          }}
-                          className="w-full text-left px-3 py-2 text-sm font-medium text-error-600 hover:bg-error-50 rounded-xl transition-colors"
-                        >
-                          Sign out
-                        </button>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+                  <AnimatePresence>
+                    {isProfileOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute right-0 mt-3 w-56 rounded-2xl bg-warm-950 shadow-2xl border border-white/10 overflow-hidden z-[100]"
+                      >
+                        <div className="p-3 border-b border-white/10">
+                          <p className="text-sm font-semibold text-white truncate">{user.name}</p>
+                          <p className="text-xs text-white/50 truncate">{user.email}</p>
+                        </div>
+                        <div className="p-1">
+                          <button 
+                            onClick={() => {
+                              setIsProfileOpen(false);
+                              signOut();
+                            }}
+                            className="w-full text-left px-3 py-2 text-sm text-error-400 hover:bg-error-500/10 rounded-xl transition-colors font-medium flex items-center gap-2"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+                            Sign Out
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <Link to="/login" className="px-4 py-1.5 text-sm font-semibold text-white/70 hover:text-white transition-colors">
+                    Log In
+                  </Link>
+                  <Link to="/register" className="px-4 py-1.5 text-sm font-bold bg-white text-black rounded-full hover:bg-warm-100 transition-colors">
+                    Sign Up
+                  </Link>
+                </div>
+              )}
             </div>
-          </div>
+        </motion.div>
       </header>
 
-      {/* Main content */}
-      <main className="flex-1 relative flex flex-col">
+      {/* Main Content Area */}
+      <motion.main 
+        initial={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }}
+        animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+        exit={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        className="flex-1 relative flex flex-col"
+      >
         <div className="flex-1 flex flex-col">
           <Outlet />
         </div>
-      </main>
+      </motion.main>
 
       {/* Mobile bottom navigation - only on trip pages */}
       {isTripPage && tripId && (
-        <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/90 backdrop-blur-lg border-t border-warm-200/50 pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_24px_rgba(40,35,30,0.04)]">
+        <nav className="md:hidden fixed bottom-0 inset-x-0 z-[100] bg-warm-950/90 backdrop-blur-2xl border-t border-white/5 pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_24px_rgba(0,0,0,0.5)]">
           <div className="flex items-center justify-around h-16 px-2">
             {mobileNavItems.map((item) => {
               const isActive = item.path
@@ -190,8 +206,8 @@ export function AppLayout() {
                   className={cn(
                     'flex flex-col items-center justify-center gap-1 w-16 h-12 rounded-xl transition-colors relative',
                     isActive
-                      ? 'text-accent-600'
-                      : 'text-warm-400 hover:text-warm-600'
+                      ? 'text-white'
+                      : 'text-white/40 hover:text-white/70'
                   )}
                 >
                   <span className={cn("text-xl relative z-10 transition-transform", isActive && "scale-110")}>{item.icon}</span>
@@ -199,7 +215,7 @@ export function AppLayout() {
                   {isActive && (
                     <motion.div 
                       layoutId="mobile-nav-active"
-                      className="absolute inset-0 bg-accent-50 rounded-xl -z-0"
+                      className="absolute inset-0 bg-white/10 rounded-xl -z-0"
                       transition={{ type: "spring", bounce: 0.25, duration: 0.5 }}
                     />
                   )}
@@ -209,7 +225,7 @@ export function AppLayout() {
           </div>
         </nav>
       )}
-    </motion.div>
+    </div>
   )
 }
 

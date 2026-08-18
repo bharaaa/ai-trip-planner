@@ -1,5 +1,6 @@
 import React from 'react';
 import { Check } from 'lucide-react';
+import { motion } from 'motion/react';
 
 import { cn } from '@/lib/utils/cn';
 import type { PreferenceCategory } from '@/types';
@@ -25,34 +26,45 @@ export const PreferencePicker: React.FC<PreferencePickerProps> = ({
   onToggle,
 }) => {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 w-full">
-      {CATEGORIES.map((category) => {
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
+      {CATEGORIES.map((category, i) => {
         const isSelected = selectedCategories.has(category.id);
         
         return (
-          <button
+          <motion.button
             key={category.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.05, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
             onClick={() => onToggle(category.id)}
             aria-pressed={isSelected}
             role="button"
             className={cn(
-              "relative flex flex-col items-center justify-center p-5 rounded-2xl border text-center transition-all duration-200 ease-out outline-none focus-visible:ring-2 focus-visible:ring-accent-400 focus-visible:ring-offset-2",
-              "hover:scale-[1.02] hover:shadow-sm active:scale-[0.98]",
+              "relative flex flex-col items-center justify-center p-6 rounded-2xl border text-center transition-all duration-300 ease-out outline-none",
+              "hover:scale-[1.04] active:scale-[0.97]",
               isSelected
-                ? "border-accent-400 bg-accent-50/50"
-                : "border-warm-200/60 bg-white"
+                ? "border-accent-400 bg-accent-500/15 shadow-[0_0_20px_rgba(14,165,233,0.15)]"
+                : "border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20"
             )}
           >
             {isSelected && (
-              <div className="absolute top-2.5 right-2.5 bg-accent-500 text-white rounded-full w-5 h-5 flex items-center justify-center shadow-xs animate-scale-in">
+              <motion.div 
+                initial={{ scale: 0 }} 
+                animate={{ scale: 1 }} 
+                transition={{ type: "spring", stiffness: 500, damping: 20 }}
+                className="absolute top-2.5 right-2.5 bg-accent-500 text-white rounded-full w-5 h-5 flex items-center justify-center shadow-[0_0_10px_rgba(14,165,233,0.5)]"
+              >
                 <Check className="w-3.5 h-3.5 stroke-[3]" />
-              </div>
+              </motion.div>
             )}
-            <span className="text-3xl mb-2 block" aria-hidden="true">
+            <span className="text-4xl mb-3 block" aria-hidden="true">
               {category.emoji}
             </span>
-            <span className="text-sm font-medium text-warm-800">{category.label}</span>
-          </button>
+            <span className={cn(
+              "text-sm font-semibold transition-colors",
+              isSelected ? "text-white" : "text-white/60"
+            )}>{category.label}</span>
+          </motion.button>
         );
       })}
     </div>

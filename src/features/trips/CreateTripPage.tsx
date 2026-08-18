@@ -7,7 +7,7 @@ import { useTripStore } from '@/stores/tripStore';
 import { useAuthStore } from '@/stores/authStore';
 import { DateRangePicker } from '@/components/ui/DateRangePicker';
 import { formatCurrency } from '@/lib/utils/formatting';
-import { ArrowRight, ArrowLeft, Check, CalendarRange, Calendar, Shuffle, CarFront, Plane, TrainFront, Car } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Check, Wallet, Armchair, Sparkles, CalendarRange, Calendar, Shuffle, CarFront, Plane, TrainFront, Car } from 'lucide-react';
 import type { User } from '@/types';
 import type { DateRange } from 'react-day-picker';
 import { differenceInDays } from 'date-fns';
@@ -177,7 +177,7 @@ export function CreateTripPage() {
               <input
                 type="text"
                 placeholder="e.g. Summer Getaway, Bali 2026..."
-                className="w-full bg-transparent border-none outline-none text-3xl sm:text-5xl font-medium text-white placeholder-white/20 caret-accent-400 py-4 focus:ring-0"
+                className="w-full bg-transparent border-none outline-none text-3xl sm:text-5xl font-medium text-white placeholder-white/20 caret-accent-400 py-4 focus:ring-0 focus:outline-none focus:ring-offset-0"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 autoFocus
@@ -231,7 +231,7 @@ export function CreateTripPage() {
             <div className="relative">
               <input
                 type="text"
-                className="w-full bg-white/5 border border-white/20 rounded-full px-8 py-5 text-xl font-medium text-white placeholder-white/40 focus:outline-none focus:border-accent-400 focus:bg-white/10 transition-all shadow-2xl backdrop-blur-md"
+                className="w-full bg-white/5 border border-white/20 rounded-full px-8 py-5 text-xl font-medium text-white placeholder-white/40 focus:outline-none focus:ring-0 focus:border-white/20 focus:bg-white/10 transition-all shadow-2xl backdrop-blur-md"
                 placeholder="Search friends by name..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -353,7 +353,7 @@ export function CreateTripPage() {
                     <select
                       value={formData.dateMonth}
                       onChange={(e) => setFormData({ ...formData, dateMonth: e.target.value })}
-                      className="w-full bg-white/5 border border-white/20 rounded-2xl px-6 py-4 text-xl font-medium text-white focus:outline-none focus:border-accent-400 backdrop-blur-md appearance-none"
+                      className="w-full bg-white/5 border border-white/20 rounded-2xl px-6 py-4 text-xl font-medium text-white focus:outline-none focus:ring-0 focus:border-white/20 backdrop-blur-md appearance-none"
                     >
                       <option value="" disabled className="text-black">Select a month</option>
                       {next12Months.map(m => (
@@ -364,7 +364,7 @@ export function CreateTripPage() {
                       <input
                         type="number"
                         placeholder="How many days?"
-                        className="w-full bg-white/5 border border-white/20 rounded-2xl px-6 py-4 text-xl font-medium text-white placeholder-white/40 focus:outline-none focus:border-accent-400 backdrop-blur-md"
+                        className="w-full bg-white/5 border border-white/20 rounded-2xl px-6 py-4 text-xl font-medium text-white placeholder-white/40 focus:outline-none focus:ring-0 focus:border-white/20 backdrop-blur-md"
                         value={formData.duration || ''}
                         onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) || 1 })}
                         min={1}
@@ -379,7 +379,7 @@ export function CreateTripPage() {
                       <input
                         type="number"
                         placeholder="Roughly how many days?"
-                        className="w-full bg-white/5 border border-white/20 rounded-2xl px-6 py-4 text-xl font-medium text-white placeholder-white/40 focus:outline-none focus:border-accent-400 backdrop-blur-md"
+                        className="w-full bg-white/5 border border-white/20 rounded-2xl px-6 py-4 text-xl font-medium text-white placeholder-white/40 focus:outline-none focus:ring-0 focus:border-white/20 backdrop-blur-md"
                         value={formData.duration || ''}
                         onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) || 1 })}
                         min={1}
@@ -461,7 +461,7 @@ export function CreateTripPage() {
 
               <input
                 type="number"
-                className="w-full bg-transparent border-b-2 border-white/20 text-4xl font-black text-white py-4 focus:outline-none focus:border-accent-400 text-center"
+                className="w-full bg-transparent border-b-2 border-white/20 text-4xl font-black text-white py-4 focus:outline-none focus:ring-0 focus:border-white/20 text-center"
                 value={formData.budgetPerPerson || ''}
                 onChange={(e) => setFormData({ ...formData, budgetPerPerson: parseInt(e.target.value) || 0 })}
               />
@@ -494,7 +494,7 @@ export function CreateTripPage() {
                 <p className="text-sm font-semibold text-white/60 uppercase tracking-widest mb-4">Starting From</p>
                 <input
                   type="text"
-                  className="w-full bg-transparent border-b border-white/20 text-3xl font-bold text-white py-2 focus:outline-none focus:border-accent-400 placeholder-white/20"
+                  className="w-full bg-transparent border-b border-white/20 text-3xl font-bold text-white py-2 focus:outline-none focus:ring-0 focus:border-white/20 placeholder-white/20"
                   placeholder="City, Country..."
                   value={formData.startingLocation}
                   onChange={(e) => setFormData({ ...formData, startingLocation: e.target.value })}

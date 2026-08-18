@@ -8,9 +8,10 @@ interface DateRangePickerProps {
   selected?: DateRange;
   onSelect?: (range: DateRange | undefined) => void;
   className?: string;
+  theme?: 'light' | 'dark';
 }
 
-export function DateRangePicker({ selected, onSelect, className }: DateRangePickerProps) {
+export function DateRangePicker({ selected, onSelect, className, theme = 'light' }: DateRangePickerProps) {
   const [holidays, setHolidays] = useState<Date[]>([]);
 
   useEffect(() => {
@@ -41,8 +42,14 @@ export function DateRangePicker({ selected, onSelect, className }: DateRangePick
     fetchHolidays();
   }, []);
 
+  const isDark = theme === 'dark';
+
   return (
-    <div className={cn("p-3 bg-white rounded-xl border border-warm-200 shadow-sm", className)}>
+    <div className={cn(
+      "p-3 rounded-xl shadow-sm",
+      isDark ? "bg-white/5 border border-white/10 text-white [&_.rdp-day_button:hover]:bg-white/10 [&_.rdp-day_selected]:bg-accent-500 [&_.rdp-day_selected]:text-white [&_.rdp-nav_button:hover]:bg-white/10 [&_.rdp-caption_label]:text-white [&_.rdp-head_cell]:text-white/50 [&_.rdp-day]:text-white/80 [&_.rdp-day_outside]:text-white/30" : "bg-white border border-warm-200 text-warm-900",
+      className
+    )}>
       <DayPicker
         mode="range"
         selected={selected}

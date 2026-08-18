@@ -21,17 +21,17 @@ export function StepIndicator({ currentStep, totalSteps, labels, className }: St
             <React.Fragment key={step}>
               <div 
                 className={cn(
-                  "h-3 w-3 rounded-full transition-all duration-300",
-                  isActive ? "bg-accent-400 scale-125" :
-                  isCompleted ? "bg-accent-400" :
-                  "bg-warm-200"
+                  "h-2 w-2 rounded-full transition-all duration-500",
+                  isActive ? "bg-accent-400 scale-[2] shadow-[0_0_12px_rgba(56,189,248,0.8)]" :
+                  isCompleted ? "bg-accent-400 opacity-60" :
+                  "bg-white/20"
                 )}
               />
               {step < totalSteps && (
                 <div 
                   className={cn(
-                    "h-0.5 w-8 sm:w-12 mx-1 transition-colors duration-300",
-                    isCompleted ? "bg-accent-400" : "bg-warm-200"
+                    "h-[2px] w-8 sm:w-12 mx-3 transition-colors duration-500 rounded-full",
+                    isCompleted ? "bg-accent-400/60" : "bg-white/10"
                   )}
                 />
               )}
@@ -40,7 +40,7 @@ export function StepIndicator({ currentStep, totalSteps, labels, className }: St
         })}
       </div>
       {labels && labels[currentStep - 1] && (
-        <span className="text-sm font-medium text-warm-600 mt-2">
+        <span className="text-sm font-medium text-warm-400 mt-4 tracking-wide uppercase text-[11px]">
           Step {currentStep} of {totalSteps}: {labels[currentStep - 1]}
         </span>
       )}

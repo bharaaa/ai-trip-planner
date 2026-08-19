@@ -25,7 +25,7 @@ export const NotificationBell: React.FC = () => {
     <div className="relative" ref={bellRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 rounded-full hover:bg-warm-100 text-warm-600 transition-colors focus:outline-none focus:ring-2 focus:ring-accent-500/50"
+        className="relative p-2 rounded-full hover:bg-white/10 text-white/70 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white/20"
         aria-label="Notifications"
       >
         <Bell className="w-5 h-5" />
@@ -41,7 +41,7 @@ export const NotificationBell: React.FC = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="absolute right-0 mt-2 w-80 sm:w-96 rounded-[1.25rem] bg-white shadow-xl border border-warm-200/60 overflow-hidden z-50 flex flex-col"
+            className="absolute right-0 mt-2 w-80 sm:w-96 rounded-[1.25rem] bg-warm-950 shadow-2xl border border-white/10 overflow-hidden z-50 flex flex-col"
             style={{ maxHeight: 'calc(100vh - 80px)' }}
           >
             <NotificationPopover onClose={() => setIsOpen(false)} />

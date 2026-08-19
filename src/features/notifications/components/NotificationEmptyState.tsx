@@ -7,12 +7,12 @@ export interface NotificationEmptyStateProps {
 
 export const NotificationEmptyState: React.FC<NotificationEmptyStateProps> = ({ onClose }) => {
   return (
-    <div className="p-8 flex flex-col items-center justify-center text-center space-y-3 bg-white">
-      <div className="w-12 h-12 bg-accent-50 text-accent-500 rounded-full flex items-center justify-center mb-2">
-        <Sparkles className="w-6 h-6" />
+    <div className="py-16 px-8 flex flex-col items-center justify-center text-center">
+      <div className="w-14 h-14 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-4">
+        <Sparkles className="w-6 h-6 text-accent-400" />
       </div>
-      <p className="text-warm-900 font-semibold text-base">You're all caught up ✨</p>
-      <p className="text-warm-500 text-sm max-w-[200px]">
+      <p className="text-white font-bold text-lg mb-1 tracking-tight">You're all caught up ✨</p>
+      <p className="text-white/40 text-[13px] max-w-[200px] leading-relaxed">
         Nothing new here. Go enjoy the trip planning.
       </p>
     </div>

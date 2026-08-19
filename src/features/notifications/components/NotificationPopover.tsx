@@ -12,14 +12,14 @@ export const NotificationPopover: React.FC<NotificationPopoverProps> = ({ onClos
 
   return (
     <div className="flex flex-col h-full max-h-[inherit]">
-      <div className="px-5 py-4 border-b border-warm-100 bg-warm-50 flex items-center justify-between shrink-0">
-        <h3 className="font-bold text-warm-900 text-lg tracking-tight">Notifications</h3>
+      <div className="px-5 py-4 border-b border-white/10 bg-white/5 flex items-center justify-between shrink-0">
+        <h3 className="font-bold text-white text-lg tracking-tight">Notifications</h3>
         {unreadCount > 0 && (
           <button 
             onClick={() => markAllAsRead()}
-            className="text-xs text-accent-600 hover:text-accent-700 font-semibold tracking-wide uppercase"
+            className="text-xs text-accent-400 hover:text-accent-300 font-bold tracking-[0.15em] uppercase transition-colors"
           >
-            Mark all as read
+            Mark all read
           </button>
         )}
       </div>

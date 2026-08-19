@@ -66,7 +66,7 @@ export function AppLayout() {
   return (
     <div className="min-h-dvh w-full bg-warm-950 flex flex-col font-sans">
       {/* Floating Pill Navigation */}
-      <header className="fixed top-4 left-0 right-0 z-[100] flex justify-center pointer-events-none px-4">
+      <header className="fixed top-4 left-0 right-0 z-50 flex justify-center pointer-events-none px-4">
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -191,7 +191,7 @@ export function AppLayout() {
 
       {/* Mobile bottom navigation - only on trip pages */}
       {isTripPage && tripId && (
-        <nav className="md:hidden fixed bottom-0 inset-x-0 z-[100] bg-warm-950/90 backdrop-blur-2xl border-t border-white/5 pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_24px_rgba(0,0,0,0.5)]">
+        <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-warm-950/90 backdrop-blur-2xl border-t border-white/5 pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_24px_rgba(0,0,0,0.5)]">
           <div className="flex items-center justify-around h-16 px-2">
             {mobileNavItems.map((item) => {
               const isActive = item.path

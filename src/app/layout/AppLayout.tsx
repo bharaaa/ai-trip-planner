@@ -122,16 +122,18 @@ export function AppLayout() {
             {/* Right: User / Profile */}
             <div className="flex items-center gap-3">
               {user ? (
-                <div className="relative" ref={profileRef}>
-                  <button 
-                    onClick={() => setIsProfileOpen(!isProfileOpen)}
-                    className="flex items-center gap-2 pl-2 pr-1 py-1 rounded-full hover:bg-white/10 transition-colors focus:outline-none"
-                  >
-                    <span className="text-sm font-semibold hidden sm:block max-w-[100px] truncate">{user.name || 'User'}</span>
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-accent-500 to-accent-300 flex items-center justify-center text-white font-bold text-sm shadow-inner overflow-hidden border border-white/20">
-                      {(user.name?.[0] || user.email?.[0] || 'U').toUpperCase()}
-                    </div>
-                  </button>
+                <>
+                  <NotificationBell />
+                  <div className="relative" ref={profileRef}>
+                    <button 
+                      onClick={() => setIsProfileOpen(!isProfileOpen)}
+                      className="flex items-center gap-2 pl-2 pr-1 py-1 rounded-full hover:bg-white/10 transition-colors focus:outline-none"
+                    >
+                      <span className="text-sm font-semibold hidden sm:block max-w-[100px] truncate">{user.name || 'User'}</span>
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-accent-500 to-accent-300 flex items-center justify-center text-white font-bold text-sm shadow-inner overflow-hidden border border-white/20">
+                        {(user.name?.[0] || user.email?.[0] || 'U').toUpperCase()}
+                      </div>
+                    </button>
 
                   <AnimatePresence>
                     {isProfileOpen && (
@@ -161,7 +163,8 @@ export function AppLayout() {
                       </motion.div>
                     )}
                   </AnimatePresence>
-                </div>
+                  </div>
+                </>
               ) : (
                 <div className="flex gap-2">
                   <Link to="/login" className="px-4 py-1.5 text-sm font-semibold text-white/70 hover:text-white transition-colors">
